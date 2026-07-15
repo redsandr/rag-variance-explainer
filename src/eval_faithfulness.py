@@ -49,6 +49,15 @@ Examples:
   Answer: "Labor costs decreased 0.2%." Source: "Labor costs decreased 0.2%."
   → Claim: "Labor costs decreased 0.2%." Verdict: FAITHFUL (rephrasing OK, number matches)
 
+  Answer: "Comparable sales decreased 0.4% for Mar 31, 2025." Source: "Comparable restaurant sales decreased 0.4% for the three months ended March 31, 2025."
+  → Claim: "Comparable sales decreased 0.4% for Mar 31, 2025." Verdict: FAITHFUL (number 0.4% matches exactly, period matches, minor abbreviation OK)
+
+  Answer: "As of Jan 30, 2026, we operated 656 stores." Source: "As of January 30, 2026, we operated 656 Cracker Barrel stores in 43 states."
+  → Claim: "As of Jan 30, 2026, we operated 656 stores." Verdict: FAITHFUL (number 656 matches, date matches, minor wording difference OK)
+
+  Answer: "Revenue increased 6.4% to $3.1 billion." Source: "Revenue was $3.0 billion, up 7.5%."
+  → Claim: "Revenue increased 6.4% to $3.1 billion." Verdict: UNFAITHFUL (source says 7.5% and $3.0B, not 6.4% and $3.1B)
+
 Return ONLY valid JSON with these exact keys:
 claims (list of {claim, verdict}), faithful_count, partial_count, unfaithful_count, total_claims, faithfulness_score (0.0 to 1.0)"""
 
