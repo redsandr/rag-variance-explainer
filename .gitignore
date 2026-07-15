@@ -1,0 +1,6 @@
+venv/
+data/raw/
+chroma_db/
+.env
+__pycache__/
+.squad/

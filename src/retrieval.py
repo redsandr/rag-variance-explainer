@@ -1,0 +1,259 @@
+"""
+ChromaDB interface for storing and retrieving MD&A chunks.
+
+Uses the nomic-embed embeddings from embedding.py directly (not
+ChromaDB's built-in embedding functions), so we keep full control over
+the prefixing behavior (search_document/search_query) that nomic-embed
+requires.
+"""
+
+import logging
+import re
+from typing import Any
+
+import chromadb
+
+from config import config
+from embedding import embed_documents, embed_query
+from hybrid_search import build_bm25, bm25_scores, rrf_merge
+from query_expansion import expand_query
+
+_DB_PATH = "./chroma_db"
+_COLLECTION_NAME = "mda_filings"
+
+
+def get_client() -> chromadb.PersistentClient:
+    """Persistent local ChromaDB client — data survives between runs."""
+    return chromadb.PersistentClient(path=_DB_PATH)
+
+
+def get_collection(client: chromadb.PersistentClient) -> Any:
+    """
+    Get or create the MD&A collection. Explicitly configured for cosine
+    distance since our embeddings are normalized (embedding.py uses
+    normalize_embeddings=True) — cosine similarity is the correct match
+    for that, not the L2 default ChromaDB otherwise uses.
+    """
+    return client.get_or_create_collection(
+        name=_COLLECTION_NAME,
+        metadata={"hnsw:space": "cosine"},
+    )
+
+
+def add_chunks(
+    collection: Any,
+    chunks: list[str],
+    ticker: str,
+    accession_number: str,
+    form: str,
+    filing_date: str,
+) -> None:
+    """
+    Embed and store a list of chunks from one filing, with metadata
+    that lets us trace each chunk back to its source filing later
+    (needed for citing "why did X happen" answers back to a real 10-Q/10-K).
+    """
+    if not chunks:
+        return
+
+    embeddings = embed_documents(chunks)
+    ids = [f"{ticker}_{accession_number}_{i}" for i in range(len(chunks))]
+    metadatas = [
+        {
+            "ticker": ticker,
+            "accession_number": accession_number,
+            "form": form,
+            "filing_date": filing_date,
+            "chunk_index": i,
+        }
+        for i in range(len(chunks))
+    ]
+
+    collection.upsert(
+        ids=ids,
+        embeddings=embeddings,
+        documents=chunks,
+        metadatas=metadatas,
+    )
+
+
+def query(
+    collection: Any,
+    query_text: str,
+    top_k: int = None,
+    min_relevance: float = None,
+    ticker_filter: str | None = None,
+    expand: bool = False,
+) -> list[dict]:
+    if top_k is None:
+        top_k = config.retrieval_top_k
+    if min_relevance is None:
+        min_relevance = config.retrieval_min_relevance
+
+    where = {"ticker": ticker_filter} if ticker_filter else None
+
+    lookup = expand_query(query_text) if expand else query_text
+
+    results = collection.query(
+        query_embeddings=[embed_query(lookup)],
+        n_results=top_k,
+        where=where,
+    )
+
+    output = []
+    for doc, meta, distance in zip(
+        results["documents"][0],
+        results["metadatas"][0],
+        results["distances"][0],
+    ):
+        relevance = 1 - distance
+        if relevance >= min_relevance:
+            output.append({
+                "text": doc,
+                "metadata": meta,
+                "relevance": relevance,
+            })
+
+    return output
+
+
+def _keyword_boost(query_text: str, chunk_text: str) -> float:
+    query_lower = query_text.lower()
+    words = re.findall(r'\w+', query_lower)
+    stopwords = {"the", "a", "an", "is", "are", "was", "were", "how", "why",
+                 "what", "did", "do", "does", "in", "of", "to", "at", "for",
+                 "and", "or", "s", "change", "changes", "drove", "affect",
+                 "performed", "evolve", "evolved"}
+    keywords = [w for w in words if w not in stopwords and len(w) > 2]
+    if not keywords:
+        return 0.0
+    chunk_lower = chunk_text.lower()
+    matches = sum(1 for w in keywords if w in chunk_lower)
+    return matches / len(keywords)
+
+
+def query_multi(
+    collection: Any,
+    query_text: str,
+    top_k: int = None,
+    min_relevance: float = None,
+    ticker_filter: str | None = None,
+) -> list[dict]:
+    """
+    Multi-strategy retrieval:
+    1. Bi-encoder (nomic-embed) + glossary expansion → N candidates
+    2. Optional: keyword boost + forward-looking penalty (legacy)
+    3. Optional: cross-encoder re-ranking
+    """
+    if top_k is None:
+        top_k = config.retrieval_top_k
+    if min_relevance is None:
+        min_relevance = config.retrieval_min_relevance
+
+    where = {"ticker": ticker_filter} if ticker_filter else None
+
+    lookup = expand_query(query_text) if config.expansion_enabled else query_text
+
+    results = collection.query(
+        query_embeddings=[embed_query(lookup)],
+        n_results=config.retrieval_n_candidates,
+        where=where,
+    )
+
+    dense_candidates = []
+    for doc, meta, distance in zip(
+        results["documents"][0],
+        results["metadatas"][0],
+        results["distances"][0],
+    ):
+        relevance = 1 - distance
+        if relevance >= min_relevance:
+            c = {"text": doc, "metadata": meta, "relevance": relevance}
+            if config.keyword_boost_enabled:
+                c["keyword_boost"] = _keyword_boost(query_text, doc)
+            if config.forward_looking_penalty_enabled:
+                c["forward_looking_penalty"] = _forward_looking_penalty(doc)
+            dense_candidates.append(c)
+
+    if not dense_candidates:
+        return []
+
+    # Hybrid search: BM25 runs on ALL matching docs (not just dense top-N)
+    # so it can surface chunks that dense embeddings miss entirely.
+    # Uses the same expanded query that dense retrieval uses.
+    if config.hybrid_search_enabled:
+        get_kw = {}
+        if ticker_filter:
+            get_kw["where"] = {"ticker": ticker_filter}
+        all_docs = collection.get(**get_kw)
+        all_texts = all_docs["documents"]
+        bm25 = build_bm25(all_texts)
+        bm25_raw = bm25_scores(bm25, lookup, all_texts)
+        paired = sorted(zip(bm25_raw, all_texts, all_docs["metadatas"]), key=lambda x: -x[0])
+        bm25_candidates = []
+        for score, text, meta in paired:
+            bm25_candidates.append({"text": text, "metadata": meta, "relevance": score})
+        bm25_candidates = [c for c in bm25_candidates if c["relevance"] > 0]
+        bm25_candidates = bm25_candidates[:config.retrieval_n_candidates]
+        candidates = rrf_merge(
+            dense_candidates,
+            bm25_candidates,
+            top_k=len(dense_candidates),
+        )
+    else:
+        candidates = dense_candidates
+
+    # Ensure all candidates have keyword_boost / forward_looking_penalty
+    # (BM25-only results from hybrid search won't have them)
+    if config.hybrid_search_enabled:
+        for c in candidates:
+            if "keyword_boost" not in c:
+                c["keyword_boost"] = _keyword_boost(query_text, c["text"])
+            if "forward_looking_penalty" not in c:
+                c["forward_looking_penalty"] = _forward_looking_penalty(c["text"])
+
+    if config.cross_encoder_enabled:
+        from cross_encoder import rerank
+        return rerank(query_text, candidates, top_k=top_k)
+
+    for c in candidates:
+        base = c.get("hybrid_score", c.get("relevance", 0))
+        boost = c.get("keyword_boost", 0) * config.keyword_boost_weight if config.keyword_boost_enabled else 0
+        penalty = c.get("forward_looking_penalty", 0) if config.forward_looking_penalty_enabled else 0
+        c["_sort_score"] = base + boost + penalty
+    candidates.sort(key=lambda x: x["_sort_score"], reverse=True)
+
+    return candidates[:top_k]
+
+
+def _forward_looking_penalty(chunk_text: str) -> float:
+    chunk_lower = chunk_text.lower()
+    matches = sum(1 for p in config.forward_looking_patterns if p in chunk_lower)
+    if matches >= 2:
+        return config.forward_looking_penalty_weight * 2
+    if matches == 1:
+        return config.forward_looking_penalty_weight
+    return 0.0
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    logger = logging.getLogger(__name__)
+    client = get_client()
+    collection = get_collection(client)
+
+    add_chunks(
+        collection,
+        chunks=[
+            "Revenue increased due to higher same-store sales and menu price increases.",
+            "Labor costs decreased as a percentage of total revenue due to lower turnover.",
+        ],
+        ticker="TEST",
+        accession_number="0000000000-00-000000",
+        form="10-Q",
+        filing_date="2026-01-01",
+    )
+
+    results = query(collection, "Why did revenue go up?", top_k=2, min_relevance=0.3)
+    for r in results:
+        logger.info("[%.4f] %s \u2014 %s", r["relevance"], r["metadata"]["ticker"], r["text"][:80])

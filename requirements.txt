@@ -1,0 +1,13 @@
+requests
+beautifulsoup4
+chromadb
+tiktoken
+llama-cpp-python
+python-dotenv
+pytest
+sentence-transformers
+numpy
+einops
+anthropic
+openai
+streamlit
