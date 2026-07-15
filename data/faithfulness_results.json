@@ -1,9 +1,4 @@
 {
-  "overall_faithfulness": 0.7347,
-  "total_claims": 98,
-  "faithful": 72,
-  "partial": 21,
-  "unfaithful": 5,
   "results": [
     {
       "id": "eval-001",
@@ -22,11 +17,11 @@
           "verdict": "PARTIALLY FAITHFUL"
         }
       ],
+      "faithfulness_score": 0.3333,
       "faithful_count": 1,
       "partial_count": 2,
       "unfaithful_count": 0,
-      "total_claims": 3,
-      "faithfulness_score": 0.6667
+      "total_claims": 3
     },
     {
       "id": "eval-002",
@@ -41,7 +36,7 @@
           "verdict": "PARTIALLY FAITHFUL"
         }
       ],
-      "faithfulness_score": 0.75,
+      "faithfulness_score": 0.5,
       "faithful_count": 1,
       "partial_count": 1,
       "unfaithful_count": 0,
@@ -68,11 +63,11 @@
           "verdict": "FAITHFUL"
         }
       ],
+      "faithfulness_score": 1.0,
+      "total_claims": 4,
       "faithful_count": 4,
       "partial_count": 0,
-      "unfaithful_count": 0,
-      "total_claims": 4,
-      "faithfulness_score": 1.0
+      "unfaithful_count": 0
     },
     {
       "id": "eval-004",
@@ -80,545 +75,30 @@
       "claims": [
         {
           "claim": "Total revenue increased 7.5% to $3.1 billion.",
-          "verdict": "PARTIALLY FAITHFUL"
+          "verdict": "UNFAITHFUL"
         },
         {
           "claim": "Total revenue increased 7.5% to $3.0 billion.",
-          "verdict": "PARTIALLY FAITHFUL"
+          "verdict": "UNFAITHFUL"
         },
         {
           "claim": "Total revenue increased 6.4% to $2.875.3 million.",
-          "verdict": "PARTIALLY FAITHFUL"
+          "verdict": "UNFAITHFUL"
         },
         {
           "claim": "Total revenue increased 6.5% to $2.859.8 million.",
-          "verdict": "PARTIALLY FAITHFUL"
+          "verdict": "UNFAITHFUL"
         },
         {
           "claim": "Total revenue increased 0.6% to $11.3 billion.",
-          "verdict": "PARTIALLY FAITHFUL"
+          "verdict": "UNFAITHFUL"
         }
       ],
       "faithful_count": 0,
-      "partial_count": 5,
-      "unfaithful_count": 0,
+      "partial_count": 0,
+      "unfaithful_count": 5,
       "total_claims": 5,
       "faithfulness_score": 0.0
-    },
-    {
-      "id": "eval-005",
-      "question": "Why did Cracker Barrel's operating costs change?",
-      "claims": [
-        {
-          "claim": "During the second quarter and first six months of 2025, Cracker Barrel's operating costs increased primarily due to higher professional fees related to legal fees and proxy contest expenses.",
-          "verdict": "PARTIALLY FAITHFUL"
-        },
-        {
-          "claim": "Additionally, the Company incurred higher costs of approximately $2,300 associated with the Company\u2019s strategic transformation plan for the first six months of 2025 as compared to the same period in the prior year.",
-          "verdict": "PARTIALLY FAITHFUL"
-        },
-        {
-          "claim": "Higher legal fees for the first six months of 2025 included an approximate $3,300 charge in connection with our settlement of a series of wage and hour arbitrations.",
-          "verdict": "PARTIALLY FAITHFUL"
-        },
-        {
-          "claim": "The decrease in professional fees as a percentage of total revenue in the third quarter of 2025 as compared to the same period in the prior year resulted primarily from lower costs related to the Company\u2019s strategic transformation plan.",
-          "verdict": "PARTIALLY FAITHFUL"
-        },
-        {
-          "claim": "The decrease in incentive compensation expense as a percentage of total revenue in the third quarter of 2025 as compared to the same period in the prior year resulted primarily from Chief Executive Officer transition costs incurred in 2024.",
-          "verdict": "PARTIALLY FAITHFUL"
-        },
-        {
-          "claim": "The increase in other store operating expenses as a percentage of total revenue in 2025 as compared to 2024 resulted primarily from costs associated with the Company\u2019s off-premise business.",
-          "verdict": "PARTIALLY FAITHFUL"
-        },
-        {
-          "claim": "The decrease in general and administrative expenses as a percentage of total revenue in the first quarter of 2025 as compared to the same period in the prior year resulted primarily from higher professional fees related to legal fees and proxy contest expenses.",
-          "verdict": "PARTIALLY FAITHFUL"
-        },
-        {
-          "claim": "Additionally, the Company incurred higher costs of approximately $2,300 associated with the Company\u2019s strategic transformation plan for the first six months of 2025 as compared to the same period in the prior year.",
-          "verdict": "PARTIALLY FAITHFUL"
-        },
-        {
-          "claim": "Higher legal fees for the first six months of 2025 included an approximate $3,300 charge in connection with our settlement of a series of wage and hour arbitrations.",
-          "verdict": "PARTIALLY FAITHFUL"
-        },
-        {
-          "claim": "The Company incurred proxy contest expenses of $5,263 and $8,220, respectively, in the second quarter and first six months of 2025 related to a proxy contest in connection with the Company\u2019s 2024 annual shareholders meeting held on November 21, 2024.",
-          "verdict": "PARTIALLY FAITHFUL"
-        }
-      ],
-      "faithfulness_score": 0.8,
-      "faithful_count": 0,
-      "partial_count": 10,
-      "unfaithful_count": 0,
-      "total_claims": 10
-    },
-    {
-      "id": "eval-006",
-      "question": "What drove Chipotle's food and beverage costs as a percentage of revenue?",
-      "claims": [],
-      "faithful_count": 0,
-      "partial_count": 0,
-      "unfaithful_count": 0,
-      "total_claims": 0,
-      "faithfulness_score": 0.0
-    },
-    {
-      "id": "eval-007",
-      "question": "How did Chipotle's comparable restaurant sales change in recent quarters?",
-      "claims": [
-        {
-          "claim": "Comparable restaurant sales decreased 0.4% for the three months ended March 31, 2025.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "Comparable restaurant sales increased 0.3% for the three months ended September 30, 2025.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "Comparable restaurant sales increased 7.4% for the year ended December 31, 2024.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "Comparable restaurant sales decreased 4.0% for the three months ended June 30, 2025.",
-          "verdict": "FAITHFUL"
-        }
-      ],
-      "faithful_count": 4,
-      "partial_count": 0,
-      "unfaithful_count": 0,
-      "total_claims": 4,
-      "faithfulness_score": 1.0
-    },
-    {
-      "id": "eval-008",
-      "question": "How did Chipotle's restaurant development and new openings evolve?",
-      "claims": [
-        {
-          "claim": "During the three months ended June 30, 2024, Chipotle opened 52 company-operated restaurants, including 46 with a Chipotlane.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "The company is on track to open approximately 285-315 new restaurants in 2024.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "At least 80% of the new restaurants are expected to include a Chipotlane.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "During the third quarter of 2024, Chipotle opened 86 company-operated restaurants, including 73 with a Chipotlane.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "The company plans to open approximately 285 to 315 new company-operated restaurants in 2024.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "At least 80% of the new company-operated restaurants will include a Chipotlane.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "During the three months ended March 31, 2025, Chipotle opened 57 restaurants, including 48 with a Chipotlane.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "The company expects to open approximately 315 to 345 company-operated restaurants in 2025.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "At least 80% of the new company-operated restaurants will include a Chipotlane.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "During the third quarter of 2025, Chipotle opened 84 restaurants, including 64 with a Chipotlane.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "The company remains on track to open approximately 315 to 345 company-operated restaurants in 2025.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "The company expects to open approximately 350 to 370 restaurants in 2026, including 10 to 15 international partner-operated restaurants.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "At least 80% of the new company-operated restaurants will include a Chipotlane.",
-          "verdict": "FAITHFUL"
-        }
-      ],
-      "faithful_count": 13,
-      "partial_count": 0,
-      "unfaithful_count": 0,
-      "total_claims": 13,
-      "faithfulness_score": 1.0
-    },
-    {
-      "id": "eval-009",
-      "question": "What drove Chipotle's general and administrative expenses?",
-      "claims": [
-        {
-          "claim": "General and administrative expenses decreased by 20.6% from $159.5 million in 2023 to $126.6 million in 2024.",
-          "verdict": "UNFAITHFUL"
-        },
-        {
-          "claim": "General and administrative expenses increased by 15.9% from $146.7 million in 2024 to $172.8 million in 2025.",
-          "verdict": "UNFAITHFUL"
-        },
-        {
-          "claim": "General and administrative expenses increased by 17.9% from $172.8 million in 2025 to $203.7 million in 2026.",
-          "verdict": "UNFAITHFUL"
-        }
-      ],
-      "faithful_count": 0,
-      "partial_count": 0,
-      "unfaithful_count": 3,
-      "total_claims": 3,
-      "faithfulness_score": 0.0
-    },
-    {
-      "id": "eval-010",
-      "question": "How did Darden's total revenue change year-over-year and what drove the change?",
-      "claims": [
-        {
-          "claim": "Darden's total revenue increased by 6.0% year-over-year from $11,390.0 million to $12,076.7 million.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "Darden's total revenue increased by 2.7% year-over-year from $10,487.8 million to $11,390.0 million.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "Darden's total revenue increased by 4.5% year-over-year from $964.4 million to $970.2 million.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "Darden's total revenue increased by 11.3% year-over-year from $1,136.9 million to $1,328.0 million.",
-          "verdict": "FAITHFUL"
-        }
-      ],
-      "faithful_count": 4,
-      "partial_count": 0,
-      "unfaithful_count": 0,
-      "total_claims": 4,
-      "faithfulness_score": 1.0
-    },
-    {
-      "id": "eval-011",
-      "question": "What drove Darden's food and beverage costs as a percentage of sales?",
-      "claims": [
-        {
-          "claim": "Restaurant labor costs remained flat as a percent of sales primarily due to a 0.4% impact from sales leverage, a 0.6% impact from salary and benefits, and a 0.2% impact from productivity improvement, partially offset by a 1.2% impact from inflation.",
-          "verdict": "FAITHFUL"
-        }
-      ],
-      "faithful_count": 1,
-      "partial_count": 0,
-      "unfaithful_count": 0,
-      "total_claims": 1,
-      "faithfulness_score": 1.0
-    },
-    {
-      "id": "eval-012",
-      "question": "How did Olive Garden's segment results perform?",
-      "claims": [
-        {
-          "claim": "Olive Garden's segment profit margin for the third quarter of fiscal 2026 decreased by 10 basis points (BPS) compared to the same period in fiscal 2025.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "The decrease was driven primarily by higher restaurant expenses and marketing costs, partially offset by lower restaurant labor costs.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "For the first nine months of fiscal 2026, Olive Garden's segment profit margin remained flat compared to fiscal 2025.",
-          "verdict": "FAITHFUL"
-        }
-      ],
-      "faithful_count": 3,
-      "partial_count": 0,
-      "unfaithful_count": 0,
-      "total_claims": 3,
-      "faithfulness_score": 1.0
-    },
-    {
-      "id": "eval-013",
-      "question": "What drove Darden's same-restaurant sales growth or decline?",
-      "claims": [
-        {
-          "claim": "Olive Garden's sales increase for the second quarter of fiscal 2026 was primarily driven by same-restaurant sales increases, as well as revenue from new restaurants.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "The increase in U.S. same-restaurant sales for the second quarter of fiscal 2026 resulted from a 1.7 percent increase in same-restaurant guest counts, combined with a 3.0 percent increase in average check, which includes a 1.1 percent increase in off-premise catering sales.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "Olive Garden's sales increase for the six months of fiscal 2026 was primarily driven by same-restaurant sales increases, as well as revenue from new restaurants, partially offset by the sale of all eight of our Olive Garden Canada locations.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "The increase in U.S. same-restaurant sales for the six months of fiscal 2026 resulted from a 2.2 percent increase in same-restaurant guest counts, combined with a 3.0 percent increase in average check, which includes a 0.9 percent increase in off-premise catering sales.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "LongHorn Steakhouse's sales increase for the second quarter of fiscal 2026 was primarily driven by same-restaurant sales increases, as well as revenue from new restaurants.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "The increase in same-restaurant sales for the second quarter of fiscal 2026 resulted from a 2.1 percent increase in average check combined with a 3.8 percent increase in same-restaurant guest counts.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "LongHorn Steakhouse's sales increase for the six months of fiscal 2026 was primarily driven by same-restaurant sales increases combined with revenue from new restaurants.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "The increase in same-restaurant sales for the six months of fiscal 2026 resulted from a 2.1 percent increase in average check combined with a 3.5 percent increase in same-restaurant guest counts.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "Olive Garden's sales increase for the second quarter of fiscal 2025 was primarily driven by same-restaurant sales increases, as well as revenue from new restaurants.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "The increase in U.S. same-restaurant sales for the second quarter of fiscal 2025 resulted from a 3.7 percent increase in average check, which includes a 0.6 percent increase in off-premise catering sales, partially offset by a 1.6 percent decrease in same-restaurant guest counts.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "LongHorn Steakhouse's sales increase for the second quarter and six months of fiscal 2025 was primarily driven by same-restaurant sales increases combined with revenue from new restaurants.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "The increase in same-restaurant sales for the second quarter of fiscal 2025 resulted from a 4.3 percent increase in same-restaurant guest counts, combined with a 3.1 percent increase in average check.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "LongHorn Steakhouse's sales increase for the six months of fiscal 2025 was primarily driven by same-restaurant sales increases combined with revenue from new restaurants.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "The increase in same-restaurant sales for the six months of fiscal 2025 resulted from a 3.0 percent increase in average check combined with a 2.5 percent increase in same-restaurant guest counts.",
-          "verdict": "FAITHFUL"
-        }
-      ],
-      "faithful_count": 14,
-      "partial_count": 0,
-      "unfaithful_count": 0,
-      "total_claims": 14,
-      "faithfulness_score": 1.0
-    },
-    {
-      "id": "eval-014",
-      "question": "How did Darden's acquisition of Chuy's impact financial results?",
-      "claims": [
-        {
-          "claim": "Depreciation and amortization expenses increased as a percent of sales primarily due to the acquisition of Chuy\u2019s as well as incremental depreciation on new restaurants and other capital investments.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "Impairment and disposal of assets, net remained flat as a percent of sales.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "The acquisition of Chuy\u2019s was financed with a portion of the proceeds from the issuance of senior notes.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "During the second quarter of fiscal 2025, Darden entered into an exclusive multi-year delivery arrangement with Uber Technologies, Inc., which is expected to impact sales and expenses.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "The acquisition of Chuy\u2019s is expected to contribute to fiscal 2025 sales growth, with an expectation of approximately 9.5 percent overall sales growth, driven by same-restaurant sales growth of approximately 4.5 percent and new restaurant openings of approximately 70.",
-          "verdict": "PARTIALLY FAITHFUL"
-        },
-        {
-          "claim": "The acquisition of Chuy\u2019s is expected to impact Darden\u2019s financial results in fiscal 2026, with an expectation of sales growth of approximately 9.5 percent, driven by same-restaurant sales growth of approximately 4.5 percent and new restaurant openings of approximately 70. The acquisition is expected to be completed in the second quarter of fiscal 2025 and will be funded through one or more new debt issuances.",
-          "verdict": "PARTIALLY FAITHFUL"
-        }
-      ],
-      "faithful_count": 4,
-      "partial_count": 2,
-      "unfaithful_count": 0,
-      "total_claims": 6,
-      "faithfulness_score": 0.8333
-    },
-    {
-      "id": "eval-015",
-      "question": "What drove Cracker Barrel's total revenue changes?",
-      "claims": [
-        {
-          "claim": "Total revenue for the third quarter and first nine months of 2026 decreased 2.9% and 5.6%, respectively, as compared to the same periods in the prior year.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "The decrease in revenue is attributed to a 2.6% decrease in comparable store sales and a 6.7% decrease in comparable restaurant guest traffic.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "Total revenue for the second quarter and first six months of 2026 decreased 7.9% and 6.8%, respectively, as compared to the same periods in the prior year.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "The decrease in revenue is attributed to a 7.1% decrease in comparable store sales and a 10.1% decrease in comparable restaurant guest traffic.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "Total revenue for the second quarter and first six months of 2025 increased 1.5% and 2.0%, respectively, as compared to the same periods in the prior year.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "The increase in revenue is attributed to a 4.7% increase in comparable store sales and a 7.4% increase in average check.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "Total revenue for the first quarter of 2025 increased 2.6% as compared to the same period in the prior year.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "The increase in revenue is attributed to a 2.9% increase in comparable store sales and a 5.8% increase in average check.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "The provided filings do not discuss the specific factors driving revenue changes in the most recent quarters. However, the revenue for 2024 increased by 0.8% compared to 2023, attributed to a 6.3% increase in comparable store sales and a 4.9% increase in average check.",
-          "verdict": "PARTIALLY FAITHFUL"
-        }
-      ],
-      "faithful_count": 7,
-      "partial_count": 1,
-      "unfaithful_count": 0,
-      "total_claims": 9,
-      "faithfulness_score": 0.89
-    },
-    {
-      "id": "eval-016",
-      "question": "How did Cracker Barrel's cost of goods sold change?",
-      "claims": [
-        {
-          "claim": "Cost of goods sold decreased from 33.7% in the first six months of 2024 to 32.6% in the first six months of 2025.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "Cost of goods sold decreased from 32.4% in the first six months of 2025 to 31.7% in the first six months of 2026.",
-          "verdict": "FAITHFUL"
-        }
-      ],
-      "faithful_count": 2,
-      "partial_count": 0,
-      "unfaithful_count": 0,
-      "total_claims": 2,
-      "faithfulness_score": 1.0
-    },
-    {
-      "id": "eval-017",
-      "question": "What drove Cracker Barrel's labor and related expenses?",
-      "claims": [
-        {
-          "claim": "The increase in store hourly labor and store management compensation as a percentage of total revenue in 2024 as compared to 2023 resulted primarily from higher staffing levels and the investment of additional labor hours to improve the guest experience as well as wage inflation partially offset by higher average check.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "Labor and other related expenses as a percentage of total revenue in 2024 were 34.4%, compared to 34.5% in 2023. The increase in 2024 was attributed to higher staffing levels, investment in labor hours, and wage inflation, partially offset by higher average check.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "The increase in payroll and related expense as a percentage of total revenue in the second quarter and the first six months of 2026 as compared to the same periods in the prior year resulted primarily from severance costs related to a corporate restructuring.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "The decrease in labor and related expenses as a percentage of total revenue in the second quarter and the first six months of 2026 as compared to the same periods in the prior year resulted primarily from lower performance against financial objectives in 2026 as compared to the same periods in the prior year.",
-          "verdict": "UNFAITHFUL"
-        }
-      ],
-      "faithful_count": 3,
-      "partial_count": 0,
-      "unfaithful_count": 1,
-      "total_claims": 4,
-      "faithfulness_score": 0.75
-    },
-    {
-      "id": "eval-018",
-      "question": "How did Cracker Barrel's store operating expenses change?",
-      "claims": [
-        {
-          "claim": "Cracker Barrel's other store operating expenses increased as a percentage of total revenue by 0.5% in the third quarter of 2025 compared to the same period in the prior year. This increase was primarily due to higher depreciation expense due to higher capital expenditures.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "For the first nine months of 2025, Cracker Barrel's other store operating expenses increased as a percentage of total revenue by 0.2%. This increase was attributed to higher conference expenses due to a biennial district manager conference held in the first quarter of 2025, costs associated with the off-premise business, and hurricane-related expenses incurred in the first quarter of 2025.",
-          "verdict": "FAITHFUL"
-        }
-      ],
-      "faithful_count": 2,
-      "partial_count": 0,
-      "unfaithful_count": 0,
-      "total_claims": 2,
-      "faithfulness_score": 1.0
-    },
-    {
-      "id": "eval-019",
-      "question": "What is Cracker Barrel's business model and store concept?",
-      "claims": [
-        {
-          "claim": "Cracker Barrel Old Country Store, Inc. is a publicly traded company engaged in the operation and development of the Cracker Barrel Old Country Store concept.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "Each store consists of a restaurant with a gift shop, offering breakfast, lunch, and dinner, and a variety of decorative and functional items.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "The company continues to operate 657 Cracker Barrel stores in 43 states and 68 MSBC locations in ten states.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "As of January 30, 2026, the company operated 656 Cracker Barrel stores in 43 states and 54 MSBC locations in ten states.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "As of October 31, 2025, the company operated 656 Cracker Barrel stores in 43 states and 54 MSBC locations in ten states.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "As of May 01, 2026, the company operated 657 Cracker Barrel stores in 43 states and 52 MSBC locations in ten states.",
-          "verdict": "FAITHFUL"
-        }
-      ],
-      "faithful_count": 6,
-      "partial_count": 0,
-      "unfaithful_count": 0,
-      "total_claims": 6,
-      "faithfulness_score": 1.0
-    },
-    {
-      "id": "eval-020",
-      "question": "How did Cracker Barrel's general and administrative expenses change?",
-      "claims": [
-        {
-          "claim": "General and administrative expenses increased from 5.0% of total revenue in 2023 to 6.0% in 2024.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "General and administrative expenses increased from 6.0% in 2024 to 6.5% in the first quarter of 2025.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "General and administrative expenses increased from 6.0% in 2024 to 6.2% in 2025.",
-          "verdict": "FAITHFUL"
-        },
-        {
-          "claim": "General and administrative expenses decreased from 7.1% in 2024 to 6.0% in 2025.",
-          "verdict": "UNFAITHFUL"
-        }
-      ],
-      "faithful_count": 3,
-      "partial_count": 0,
-      "unfaithful_count": 1,
-      "total_claims": 4,
-      "faithfulness_score": 0.75
     }
   ]
 }
