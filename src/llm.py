@@ -52,7 +52,7 @@ class LLMClient:
                 "downloaded .gguf file, e.g. models/llama-3-8b-instruct.Q4_K_M.gguf"
             )
         model_path = os.path.expandvars(model_path)
-        self._llm = Llama(model_path=model_path, n_ctx=8192, n_gpu_layers=-1, verbose=False)
+        self._llm = Llama(model_path=model_path, n_ctx=8192, n_gpu_layers=-1, seed=42, verbose=False)
 
     def _init_anthropic(self):
         import anthropic

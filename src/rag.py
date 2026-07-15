@@ -25,6 +25,7 @@ Below are excerpts from SEC 10-K/10-Q filings. Each is tagged with a relevance s
 4. CITE EVERY CLAIM: Start each claim with its source citation: [TICKER 10-Q filed DATE | relevance: X.XX]. Every factual claim must have a citation.
 5. GAPS ARE OK: If context lacks information for a period or metric, say "the provided filings do not discuss [metric] for [period]". Do NOT fill gaps with assumed or remembered knowledge.
 6. NO JUDGMENT CALLS: Present facts only. Do not assess whether a variance is acceptable, concerning, or requires escalation — that is the analyst's role.
+7. PERIOD INTEGRITY: Each number in a claim MUST belong to the same fiscal period as the claim's heading. If a number comes from a different filing period, do NOT use it. A claim like "G&A increased 15.9% driven by conferences +$23.3M" is wrong if $23.3M belongs to a different period.
 
 # Task
 For each fiscal period mentioned in the context, extract the relevant changes and explain what drove them. Organize chronologically.
@@ -35,12 +36,11 @@ For each fiscal period mentioned in the context, extract the relevant changes an
 - Include specific numbers exactly as they appear in context
 - If a metric is not directly discussed but a related metric exists, explain the closest match and note the difference
 
-# Anti-Hallucination Checklist — verify EVERY bullet before writing
-- Every percentage matches a percentage in context
-- Every dollar amount matches a dollar amount in context
-- Every date/period matches a date/period in context
-- Metric names are not conflated
+# Quick Checklist — verify before writing
+- Every percentage, dollar amount, and period matches context verbatim
+- Metric names are not conflated (revenue != comparable sales)
 - Numbers from different companies are never mixed
+- Period of every number matches the period of the claim heading
 """
 
 

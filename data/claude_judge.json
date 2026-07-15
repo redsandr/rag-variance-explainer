@@ -1,0 +1,665 @@
+{
+  "eval-005": {
+    "claims": [
+      {
+        "claim": "During the second quarter and first six months of 2025, impairment charges of $2,163 and $2,863 were recorded due to deterioration in operating performance of three MSBC locations and two Cracker Barrel locations",
+        "verdict": "PARTIALLY FAITHFUL",
+        "reason": "Numbers and wording match the source exactly (found in the 10-Q filed 2026-03-04 chunk and the 10-K chunk), but the answer cites this as coming from the '10-Q filed 2025-03-06' chunk, which actually discusses a different topic (G&A expense percentages); the filing label does not match where this content actually appears."
+      },
+      {
+        "claim": "One Cracker Barrel store was closed in the second quarter and first six months of 2025, resulting in closing costs of $288",
+        "verdict": "PARTIALLY FAITHFUL",
+        "reason": "Content and number match the source verbatim, but same filing-label mismatch as above: this text is not found in the cited '10-Q filed 2025-03-06' chunk."
+      },
+      {
+        "claim": "The decrease in professional fees as a percentage of total revenue in Q3 2025 vs. the prior year resulted primarily from lower strategic transformation plan costs",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim; correctly attributed to the 10-Q filed 2025-06-05 chunk elsewhere in the answer, which does contain this exact sentence."
+      },
+      {
+        "claim": "The decrease in incentive compensation expense as a percentage of total revenue in Q3 2025 vs. the prior year resulted primarily from CEO transition costs incurred in 2024",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim in the 10-Q filed 2025-06-05 chunk."
+      },
+      {
+        "claim": "The percentage change in G&A expenses as a percentage of total revenue for the first nine months of 2025 vs. the prior year was attributable to professional fees",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim in the 10-Q filed 2025-06-05 chunk."
+      },
+      {
+        "claim": "The Company incurred proxy contest expenses of $8,220 in the first nine months of 2025 related to the proxy contest tied to the 2024 annual shareholders meeting held November 21, 2024",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim and dollar amount exactly in the 10-Q filed 2025-06-05 chunk."
+      },
+      {
+        "claim": "Higher legal fees for the first nine months of 2025 included an approximate $3,300 charge related to settlement of wage and hour arbitrations",
+        "verdict": "PARTIALLY FAITHFUL",
+        "reason": "Content and dollar figure match the source verbatim, but this instance only appears under the mislabeled '10-Q filed 2025-03-06' citation; the correct source is the 10-Q filed 2025-06-05 chunk, and this sentence is not repeated with the correct label elsewhere in the answer."
+      },
+      {
+        "claim": "These fees were partially offset by lower costs associated with the strategic transformation plan for the first nine months of 2025 vs. the prior year",
+        "verdict": "PARTIALLY FAITHFUL",
+        "reason": "Content matches source verbatim, but again only appears under the incorrect '10-Q filed 2025-03-06' label rather than the correct 2025-06-05 filing."
+      }
+    ],
+    "faithful_count": 4,
+    "partial_count": 4,
+    "unfaithful_count": 0,
+    "total_claims": 8
+  },
+  "eval-009": {
+    "claims": [
+      {
+        "claim": "G&A decreased 20.6% from $159.5M (2023) to $126.6M (2024), driven by SBC -$32.0M and performance bonuses -$5.7M",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "G&A increased 15.9% from $146.7M (2024) to $172.8M (2025), driven by conferences +$23.3M, bonuses +$5.9M, wages +$5.1M, restructuring +$2.9M, SBC -$8.9M, other +$2.6M",
+        "verdict": "UNFAITHFUL"
+      }
+    ],
+    "faithful_count": 1,
+    "partial_count": 0,
+    "unfaithful_count": 1,
+    "total_claims": 2
+  },
+  "eval-004": {
+    "claims": [
+      {
+        "claim": "Revenue increased to $11.3 billion",
+        "verdict": "FAITHFUL",
+        "reason": "The $11.3 billion figure matches the 10-K filed 2025-02-05 chunk exactly."
+      },
+      {
+        "claim": "Revenue changed 0.6% from the previous year (FY2024 vs FY2023)",
+        "verdict": "UNFAITHFUL",
+        "reason": "The source chunk is truncated at the start, showing only a fragment '.6% to $11.3 billion'; the leading digit(s) of the percentage are missing, and a 0.6% total revenue increase is implausible alongside a 7.4% comparable sales increase and new restaurant openings \u00e2\u20ac\u201d the visible fragment more likely belongs to a larger percentage (e.g., 14.6%) that was cut off, so '0.6%' is not reliably supported."
+      },
+      {
+        "claim": "The increase is attributed to comparable restaurant sales growth of 7.4%",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim: 'Comparable restaurant sales increased 7.4%'."
+      },
+      {
+        "claim": "Diluted EPS increased 24.7% from $0.89 to $1.11",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim: 'Diluted earnings per share was $1.11, a 24.7% increase from $0.89'."
+      },
+      {
+        "claim": "The comparable sales increase was due to higher transactions of 5.3% and a 2.1% increase in average check",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim."
+      },
+      {
+        "claim": "Digital sales represented 35.1% of total food and beverage revenue (FY2024)",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim."
+      },
+      {
+        "claim": "Revenue decreased to $2.9 billion, a 6.5% change from the previous year (Q1 2025)",
+        "verdict": "UNFAITHFUL",
+        "reason": "The $2.9 billion figure appears in the source, but no percentage or directional word ('increased'/'decreased') for total revenue is visible anywhere in the 10-Q filed 2025-04-24 chunk \u00e2\u20ac\u201d the text is truncated before this detail, so '6.5% decrease' is not supported by the provided source."
+      },
+      {
+        "claim": "The decrease is attributed to a 0.4% decrease in comparable restaurant sales",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim: 'Comparable restaurant sales decreased 0.4%'."
+      },
+      {
+        "claim": "This was offset by a 1.9% increase in average check",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim."
+      },
+      {
+        "claim": "The decrease in comparable sales was due to lower transactions of 2.3%, impacted by a slowdown in consumer spending and inclement weather",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim."
+      },
+      {
+        "claim": "Digital sales represented 35.4% of total food and beverage revenue (Q1 2025)",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim."
+      },
+      {
+        "claim": "Revenue increased to $2,875.3 million, a 6.4% change from the previous year (Q2 2024)",
+        "verdict": "UNFAITHFUL",
+        "reason": "The 10-Q filed 2024-07-25 chunk contains no revenue dollar figure or percentage at all \u00e2\u20ac\u201d the visible content only covers EPS and comparable sales; this specific figure is not found anywhere in the provided sources."
+      },
+      {
+        "claim": "The increase is attributed to an 11.1% increase in comparable restaurant sales",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim: 'Comparable restaurant sales increased 11.1% for the three months ended June 30, 2024.'"
+      },
+      {
+        "claim": "Primarily due to higher transactions and a 3.4% increase in average restaurant sales",
+        "verdict": "UNFAITHFUL",
+        "reason": "Source says the increase was 'primarily attributable to higher transactions and, to a lesser extent, an increase in average check' with no percentage given; the '3.4%' figure does not appear anywhere in the provided source chunks."
+      },
+      {
+        "claim": "Digital sales represented 35.3% of total food and beverage revenue (Q2 2024)",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim."
+      },
+      {
+        "claim": "Revenue decreased to $3.1 billion, a 6.4% change from the previous year (Q2 2025)",
+        "verdict": "UNFAITHFUL",
+        "reason": "The $3.1 billion figure appears in the source, but no percentage or direction for total revenue is visible in the 10-Q filed 2025-07-24 chunk \u00e2\u20ac\u201d that detail is truncated/missing, so '6.4% decrease' is not supported."
+      },
+      {
+        "claim": "The decrease is attributed to a 4.0% decrease in comparable restaurant sales",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim: 'Comparable restaurant sales decreased 4.0%'."
+      },
+      {
+        "claim": "This was offset by a 0.9% increase in average check",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim."
+      },
+      {
+        "claim": "The decrease in comparable sales was due to lower transactions of 4.9%, impacted by a slowdown in consumer spending",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim."
+      },
+      {
+        "claim": "Digital sales represented 35.5% of total food and beverage revenue (Q2 2025)",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim."
+      },
+      {
+        "claim": "Revenue increased to $3.0 billion, a 7.5% change from the previous year (Q3 2025)",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim: 'Total revenue increased 7.5% to $3.0 billion'."
+      },
+      {
+        "claim": "The increase is attributed to a 0.3% increase in comparable restaurant sales",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim: 'Comparable restaurant sales increased 0.3%'."
+      },
+      {
+        "claim": "This was attributable to a 1.1% increase in average check, partially offset by lower transactions of approximately 0.8%",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim: 'attributable to a 1.1% increase in average check, partially offset by lower transactions of 0.8%'."
+      }
+    ],
+    "faithful_count": 18,
+    "partial_count": 0,
+    "unfaithful_count": 5,
+    "total_claims": 23
+  },
+  "eval-001": {
+    "claims": [
+      {
+        "claim": "Labor costs decreased 0.2% as a percentage of total revenue for the three months ended June 30, 2024 vs. three months ended June 30, 2023, including 1.5% from sales leverage, partially offset by 1.1% from restaurant wage inflation, of which 0.5% was due to California's minimum wage increasing to $20/hour in April 2024",
+        "verdict": "FAITHFUL",
+        "reason": "Matches the CMG 10-Q filed 2024-07-25 chunk verbatim, and the citation label is correct \u00e2\u20ac\u201d this exact sentence appears in that chunk."
+      },
+      {
+        "claim": "Labor costs decreased 0.3% as a percentage of total revenue for the six months ended June 30, 2024 vs. six months ended June 30, 2023, including 1.3% from sales leverage, partially offset by 0.8% from restaurant wage inflation, of which 0.3% was due to California's minimum wage increasing to $20/hour in April 2024",
+        "verdict": "PARTIALLY FAITHFUL",
+        "reason": "The content and all numbers match the source verbatim, but the answer cites this as coming from the '10-Q filed 2024-10-30' chunk. That chunk actually discusses store counts and risk factors, not labor costs \u00e2\u20ac\u201d the real source of this sentence is the 10-Q filed 2024-07-25 chunk (the same chunk as the prior bullet), so the filing citation is incorrect."
+      }
+    ],
+    "faithful_count": 1,
+    "partial_count": 1,
+    "unfaithful_count": 0,
+    "total_claims": 2
+  },
+  "eval-015": {
+    "claims": [
+      {
+        "claim": "Q1 2025 revenue +2.6%, restaurant +2.9%, retail -1.6%, avg check +5.8%, traffic -2.9%",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "FY2024 revenue +0.8%, restaurant +6.3%, retail -0.4%, avg check +4.9%, traffic -5.0%",
+        "verdict": "UNFAITHFUL"
+      },
+      {
+        "claim": "Q2/H1 2025 revenue +1.5%/+2.0%, restaurant +1.2%, retail +0.8%, avg check +5.2%, traffic -4.0%",
+        "verdict": "UNFAITHFUL"
+      },
+      {
+        "claim": "Q2/H1 2026 revenue -7.9%/-6.8%, restaurant -7.1%, retail -9.2%, avg check +3.4%, traffic -10.1%",
+        "verdict": "PARTIALLY FAITHFUL"
+      },
+      {
+        "claim": "Q3/9mo 2026 revenue -2.9%/-5.6%, restaurant -2.6%, retail -1.8%, avg check +4.3%",
+        "verdict": "PARTIALLY FAITHFUL"
+      }
+    ],
+    "faithful_count": 1,
+    "partial_count": 2,
+    "unfaithful_count": 2,
+    "total_claims": 5
+  },
+  "eval-002": {
+    "claims": [
+      {
+        "claim": "Marketing expenses increased from $144.5 million in fiscal 2023 to $169.9 million in fiscal 2024",
+        "verdict": "UNFAITHFUL",
+        "reason": "Per the cited 10-K filed 2024-07-19 chunk, $144.5 million is actually the fiscal 2024 marketing figure (not fiscal 2023, which was $118.3 million), and $169.9 million is actually the fiscal 2025 marketing figure from a different filing \u00e2\u20ac\u201d the years and values are mismatched."
+      },
+      {
+        "claim": "This represented a 17.6% increase (fiscal 2023 to fiscal 2024)",
+        "verdict": "UNFAITHFUL",
+        "reason": "The cited chunk shows a 22.1% change for fiscal 2024 vs fiscal 2023; 17.6% is actually the fiscal 2025 vs fiscal 2024 change from a different chunk."
+      },
+      {
+        "claim": "The fiscal 2024 marketing expense increase is attributed to the acquisition of Ruth's Chris",
+        "verdict": "UNFAITHFUL",
+        "reason": "The source only links Ruth's Chris to Fine Dining segment sales growth, not to marketing expense growth; no such attribution appears in the source."
+      },
+      {
+        "claim": "Marketing expenses increased from $169.9 million in fiscal 2024 to $175.1 million in fiscal 2025",
+        "verdict": "UNFAITHFUL",
+        "reason": "Per the cited 10-K filed 2025-07-18 chunk, $169.9 million is actually the fiscal 2025 marketing figure (not fiscal 2024, which was $144.5 million), and $175.1 million is actually the 'Interest, net' line item for fiscal 2025, not marketing expenses at all."
+      },
+      {
+        "claim": "This represented a 3.5% increase (fiscal 2024 to fiscal 2025)",
+        "verdict": "UNFAITHFUL",
+        "reason": "The source shows marketing expenses changed 17.6% (fiscal 2025 vs fiscal 2024); 3.5% does not match the marketing expense line at all."
+      },
+      {
+        "claim": "The fiscal 2025 marketing expense increase is attributed to the inclusion of Chuy's following its acquisition",
+        "verdict": "UNFAITHFUL",
+        "reason": "The source only links the Chuy's acquisition to the Other Business segment's sales growth, not to marketing expenses; no such attribution appears in the source."
+      }
+    ],
+    "faithful_count": 0,
+    "partial_count": 0,
+    "unfaithful_count": 6,
+    "total_claims": 6
+  },
+  "eval-003": {
+    "claims": [
+      {
+        "claim": "Labor costs decreased 0.2% as a percentage of total revenue for the three months ended June 30, 2024 vs. three months ended June 30, 2023, including 1.5% from sales leverage, partially offset by 1.1% from restaurant wage inflation, of which 0.5% was due to California's minimum wage increasing to $20/hour in April 2024",
+        "verdict": "FAITHFUL",
+        "reason": "Matches the CMG 10-Q filed 2024-07-25 chunk verbatim, correctly labeled."
+      },
+      {
+        "claim": "Labor costs increased 0.6% as a percentage of total revenue for the three months ended June 30, 2025 vs. June 30, 2024, primarily due to lower sales volumes, with a 0.5% menu price benefit and efficient labor management more than offsetting wage inflation",
+        "verdict": "FAITHFUL",
+        "reason": "Matches the CMG 10-Q filed 2025-07-24 chunk verbatim, correctly labeled."
+      },
+      {
+        "claim": "Labor costs increased 0.6% as a percentage of total revenue for the three months ended March 31, 2025 vs. March 31, 2024, due to lower sales volumes, with a 0.7% menu price benefit offset by restaurant wage inflation including California minimum wage increases",
+        "verdict": "FAITHFUL",
+        "reason": "Matches the CMG 10-Q filed 2025-04-24 chunk verbatim, correctly labeled."
+      },
+      {
+        "claim": "Labor costs increased 1.1% as a percentage of total revenue for the three months ended March 31, 2026 vs. March 31, 2025, driven by 0.4% from legal proceedings costs, 0.3% from wage inflation, 0.3% from lower average sales volumes, and 0.2% from higher benefits/performance bonuses, partially offset by a 0.2% menu price benefit",
+        "verdict": "FAITHFUL",
+        "reason": "Matches the CMG 10-Q filed 2026-04-30 chunk verbatim, correctly labeled."
+      }
+    ],
+    "faithful_count": 4,
+    "partial_count": 0,
+    "unfaithful_count": 0,
+    "total_claims": 4
+  },
+  "eval-007": {
+    "claims": [
+      {
+        "claim": "Comparable restaurant sales decreased 4.0% for the three months ended June 30, 2025",
+        "verdict": "FAITHFUL",
+        "reason": "Matches the CMG 10-Q filed 2025-07-24 chunk verbatim."
+      },
+      {
+        "claim": "The decrease was attributable to lower transactions of 4.9%, offset by a 0.9% increase in average check",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim."
+      },
+      {
+        "claim": "Comparable restaurant sales decreased 0.4% for the three months ended March 31, 2025",
+        "verdict": "FAITHFUL",
+        "reason": "Matches the CMG 10-Q filed 2025-04-24 chunk verbatim."
+      },
+      {
+        "claim": "The decrease was attributable to lower transactions of 2.3%, offset by a 1.9% increase in average check",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim."
+      },
+      {
+        "claim": "Comparable restaurant sales increased 0.3% for the three months ended September 30, 2025",
+        "verdict": "FAITHFUL",
+        "reason": "Matches the CMG 10-Q filed 2025-10-30 chunk verbatim."
+      },
+      {
+        "claim": "The increase was attributable to a 1.1% increase in average check, partially offset by lower transactions of 0.8%",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim."
+      },
+      {
+        "claim": "Comparable restaurant sales decreased 1.7% for the year ended December 31, 2025",
+        "verdict": "FAITHFUL",
+        "reason": "Matches the CMG 10-K filed 2026-02-04 chunk verbatim."
+      },
+      {
+        "claim": "The decrease was attributable to lower transactions of 2.9%, partially offset by a 1.2% increase in average check",
+        "verdict": "FAITHFUL",
+        "reason": "Matches source verbatim."
+      }
+    ],
+    "faithful_count": 8,
+    "partial_count": 0,
+    "unfaithful_count": 0,
+    "total_claims": 8
+  },
+  "eval-008": {
+    "claims": [
+      {
+        "claim": "Q2 2024: opened 52 restaurants, 46 with Chipotlane; on track 285-315 in 2024, 80%+ Chipotlane",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "Q3 2024: opened 86 restaurants, 73 with Chipotlane; on track 285-315 in 2024, expects 315-345 in 2025",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "Q1 2025: opened 57 restaurants, 48 with Chipotlane; expects 315-345 in 2025, 80%+ Chipotlane",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "Q3 2025: opened 84 restaurants, 64 with Chipotlane; on track 315-345 in 2025, expects 350-370 in 2026",
+        "verdict": "FAITHFUL"
+      }
+    ],
+    "faithful_count": 4,
+    "partial_count": 0,
+    "unfaithful_count": 0,
+    "total_claims": 4
+  },
+  "eval-010": {
+    "claims": [
+      {
+        "claim": "FY2024: OG driven by U.S. SRS increase + new restaurants",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "FY2024: LongHorn driven by SRS increase + new restaurants",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "FY2024: Fine Dining driven by Ruth's Chris acquisition, offset by SRS decreases",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "FY2024: Other Business driven by new restaurants offset by SRS decreases",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "FY2025: OG driven by U.S. SRS increase + new restaurants",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "FY2025: LongHorn driven by SRS increase + new restaurants",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "FY2025: Fine Dining driven by new restaurants offset by SRS decreases",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "FY2025: Other Business driven by SRS increase + Chuy's acquisition",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "Q3 FY2025: OG driven by SRS increases + new restaurants",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "Q3/9mo FY2025: LongHorn driven by SRS increases + new restaurants",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "Q2 FY2026: OG driven by SRS increases + new restaurants",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "Q2 FY2026: LongHorn driven by SRS increases + new restaurants",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "6mo FY2026: OG driven by SRS increases + new restaurants, offset by sale of 8 OG Canada locations",
+        "verdict": "FAITHFUL"
+      }
+    ],
+    "faithful_count": 13,
+    "partial_count": 0,
+    "unfaithful_count": 0,
+    "total_claims": 13
+  },
+  "eval-011": {
+    "claims": [
+      {
+        "claim": "FY2025 10-K: F&B costs decreased 30.9%\u219230.3%, driven by 0.9% pricing leverage, 0.2% cost savings, offset 0.5% mix",
+        "verdict": "PARTIALLY FAITHFUL"
+      },
+      {
+        "claim": "Q1 FY2025 10-Q: F&B costs decreased 30.3%\u219229.4%, driven by 0.9% pricing leverage, 0.2% cost savings, offset 0.5% mix",
+        "verdict": "FAITHFUL"
+      }
+    ],
+    "faithful_count": 1,
+    "partial_count": 1,
+    "unfaithful_count": 0,
+    "total_claims": 2
+  },
+  "eval-012": {
+    "claims": [
+      {
+        "claim": "FY2024: OG margin +90BP, driven by positive SRS, lower F&B/restaurant expenses, offset by marketing",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "Q2 FY2025: OG margin +40BP, driven by positive SRS, lower F&B and labor costs, offset by marketing",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "Q3 FY2025: OG margin -10BP, driven by higher restaurant expenses/marketing, offset by lower labor",
+        "verdict": "UNFAITHFUL"
+      },
+      {
+        "claim": "Q3 FY2026: OG margin -10BP, driven by higher restaurant expenses/marketing, offset by lower labor; 9mo FY2026 flat vs FY2025",
+        "verdict": "FAITHFUL"
+      }
+    ],
+    "faithful_count": 3,
+    "partial_count": 0,
+    "unfaithful_count": 1,
+    "total_claims": 4
+  },
+  "eval-013": {
+    "claims": [
+      {
+        "claim": "OG Q2 FY2026: driven by SRS (1.7% guest count, 3.0% avg check, 1.1% catering) + new restaurants",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "OG 6mo FY2026: driven by SRS (2.2% guest count, 3.0% avg check, 0.9% catering) + new restaurants, offset by OG Canada sale",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "LongHorn Q2 FY2026: driven by SRS (2.1% avg check, 3.8% guest count) + new restaurants",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "LongHorn 6mo FY2026: driven by SRS (2.1% avg check, 3.5% guest count) + new restaurants",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "Fine Dining Q2/6mo FY2025 decrease: 8.3%/8.7% guest count decline offset by 2.7%/3.1% avg check increase",
+        "verdict": "UNFAITHFUL"
+      }
+    ],
+    "faithful_count": 4,
+    "partial_count": 0,
+    "unfaithful_count": 1,
+    "total_claims": 5
+  },
+  "eval-014": {
+    "claims": [
+      {
+        "claim": "Q2 FY2025 outlook: sales growth ~9.5% (incl. ~2.0% from FY2026 53rd week), SRS ~4.5%, ~70 new restaurants, capex $750-775M",
+        "verdict": "UNFAITHFUL"
+      },
+      {
+        "claim": "Chuy's impact: D&A up from acquisition + new-restaurant depreciation; marketing up; G&A down from incentive/pricing/integration cost timing offset by Chuy's",
+        "verdict": "FAITHFUL"
+      }
+    ],
+    "faithful_count": 1,
+    "partial_count": 0,
+    "unfaithful_count": 1,
+    "total_claims": 2
+  },
+  "eval-016": {
+    "claims": [
+      {
+        "claim": "COGS decreased 33.7%\u219232.6% H1 2024\u2192H1 2025, due to MSBC/CB location deterioration",
+        "verdict": "PARTIALLY FAITHFUL"
+      },
+      {
+        "claim": "COGS decreased 32.4%\u219231.7% H1 2025\u2192H1 2026, due to location deterioration + lower revenue offset by lower COGS",
+        "verdict": "PARTIALLY FAITHFUL"
+      },
+      {
+        "claim": "COGS decreased 33.7%\u219232.6% H1 2024\u2192H1 2025 (duplicate), same drivers",
+        "verdict": "PARTIALLY FAITHFUL"
+      },
+      {
+        "claim": "COGS decreased 31.7%\u219232.4% H1 2025\u2192H1 2026, same drivers",
+        "verdict": "UNFAITHFUL"
+      }
+    ],
+    "faithful_count": 0,
+    "partial_count": 3,
+    "unfaithful_count": 1,
+    "total_claims": 4
+  },
+  "eval-017": {
+    "claims": [
+      {
+        "claim": "2024 vs 2023: store hourly labor/mgmt comp increase from higher staffing, added labor hours, wage inflation, offset by avg check; wage inflation ~3-4% expected 2025",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "Q2/H1 2026: payroll/related expense increase from severance costs tied to corporate restructuring",
+        "verdict": "UNFAITHFUL"
+      }
+    ],
+    "faithful_count": 1,
+    "partial_count": 0,
+    "unfaithful_count": 1,
+    "total_claims": 2
+  },
+  "eval-018": {
+    "claims": [
+      {
+        "claim": "Other store opex 'decreased' from 24.7% to 25.0%",
+        "verdict": "UNFAITHFUL"
+      },
+      {
+        "claim": "Q3 2025: other store opex increased 24.5%\u219225.3%, driven by depreciation (capex) and 9mo driven by conference/off-premise/hurricane costs",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "9mo 2025: other store opex increased 24.0%\u219224.4%, same drivers",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "FY2025 vs FY2024: other store opex increased 24.0%\u219225.3%, driven by off-premise business costs",
+        "verdict": "PARTIALLY FAITHFUL"
+      }
+    ],
+    "faithful_count": 2,
+    "partial_count": 1,
+    "unfaithful_count": 1,
+    "total_claims": 4
+  },
+  "eval-019": {
+    "claims": [
+      {
+        "claim": "Restaurant+gift shop concept description; as of 9/13/2024, 658 CB stores in 44 states, 68 MSBC in ten states",
+        "verdict": "PARTIALLY FAITHFUL"
+      },
+      {
+        "claim": "As of 9/12/2025, 657 CB stores in 43 states, 68 MSBC in ten states; brand evolving to 'goodness of country hospitality'",
+        "verdict": "UNFAITHFUL"
+      },
+      {
+        "claim": "As of 1/30/2026, 656 CB stores in 43 states, 54 MSBC in ten states",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "As of 10/31/2025, 656 CB stores in 43 states, 54 MSBC in ten states",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "As of 5/1/2026, 657 CB stores in 43 states, 52 MSBC in ten states",
+        "verdict": "FAITHFUL"
+      }
+    ],
+    "faithful_count": 3,
+    "partial_count": 1,
+    "unfaithful_count": 1,
+    "total_claims": 5
+  },
+  "eval-020": {
+    "claims": [
+      {
+        "claim": "G&A increased 5.6%\u21926.5% (2024\u21922025), driven by professional fees (legal/proxy) and strategic transformation costs",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "G&A increased 5.0%\u21926.0% (2023\u21922024), driven by professional fees, payroll (severance/CEO transition), incentive comp (CEO transition)",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "G&A increased 6.0%\u21926.2% (2024\u21922025), driven by professional fees (proxy/legal) and incentive comp (bonus payouts)",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "G&A decreased 7.1%\u21926.0% (2024\u2192Q1 2026), driven by lower incentive comp/professional fees, offset by higher payroll (severance)",
+        "verdict": "FAITHFUL"
+      }
+    ],
+    "faithful_count": 4,
+    "partial_count": 0,
+    "unfaithful_count": 0,
+    "total_claims": 4
+  },
+  "eval-006": {
+    "claims": [
+      {
+        "claim": "The provided filings do not discuss food and beverage costs as a percentage of revenue for Q3 2025 [CMG 10-Q filed 2025-10-30]",
+        "verdict": "UNFAITHFUL"
+      },
+      {
+        "claim": "The provided filings do not discuss food and beverage costs as a percentage of revenue for Q1 2026 [CMG 10-Q filed 2026-04-30]",
+        "verdict": "UNFAITHFUL"
+      },
+      {
+        "claim": "The provided filings do not discuss food and beverage costs as a percentage of revenue for FY2024 [CMG 10-K filed 2025-02-05]",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "The provided filings do not discuss food and beverage costs as a percentage of revenue for Q2 2024 [CMG 10-Q filed 2024-07-25]",
+        "verdict": "UNFAITHFUL"
+      },
+      {
+        "claim": "The provided filings do not discuss food and beverage costs as a percentage of revenue for Q1 2025 [CMG 10-Q filed 2025-04-24]",
+        "verdict": "FAITHFUL"
+      },
+      {
+        "claim": "Since the provided filings do not contain the specific percentages, we cannot determine what drove these costs",
+        "verdict": "UNFAITHFUL"
+      }
+    ],
+    "faithful_count": 2,
+    "partial_count": 0,
+    "unfaithful_count": 4,
+    "total_claims": 6
+  }
+}
