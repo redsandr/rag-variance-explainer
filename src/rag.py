@@ -3,11 +3,14 @@ End-to-end RAG pipeline: retrieve relevant MD&A chunks, then generate
 a grounded answer via the swappable LLMClient.
 """
 
+from __future__ import annotations
 from collections.abc import Callable
+from typing import TYPE_CHECKING
 
 from config import config
-from retrieval import get_client, get_collection, query_multi
-from llm import LLMClient
+
+if TYPE_CHECKING:
+    from llm import LLMClient
 
 SYSTEM_PROMPT = """You are a financial variance analysis assistant. You help \
 analysts understand WHY a company's financial metrics changed, using only \
@@ -82,6 +85,7 @@ def answer_question(
     if on_progress:
         on_progress("retrieval", "Retrieving relevant SEC filing chunks...")
 
+    from retrieval import get_client, get_collection, query_multi
     client = get_client()
     collection = get_collection(client)
 
@@ -103,7 +107,9 @@ def answer_question(
     if on_progress:
         on_progress("generate", "Generating answer with LLM (may take several minutes)...")
 
-    llm = llm or LLMClient()
+    if llm is None:
+        from llm import LLMClient
+        llm = LLMClient()
     answer = llm.generate(prompt, system=SYSTEM_PROMPT, max_tokens=config.llm_max_tokens)
 
     if on_progress:

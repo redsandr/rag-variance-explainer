@@ -29,14 +29,25 @@ EVAL_FILE = Path(__file__).parent.parent / "data" / "eval_questions.json"
 RESULT_FILE = Path(__file__).parent.parent / "data" / "faithfulness_results.json"
 
 JUDGE_SYSTEM_PROMPT = """You are a strict but fair faithfulness evaluator for financial RAG systems.
-Your job: check whether each factual claim in an answer is supported by the source chunks.
+Your job: extract each factual claim from the Answer text ONLY, then check if that claim is supported by the Source chunks.
+
+CRITICAL: Extract claims ONLY from the Answer. Do NOT extract claims from the Source chunks. If the Answer says "comparable sales increased 7.4%", your claim is "comparable sales increased 7.4%" — not "revenue increased 6.4%" just because that number appears in the sources.
 
 Rules:
-- FAITHFUL: The source chunks support the claim. The claim may use different wording or rephrase the source data.
-- PARTIALLY FAITHFUL: The source chunks support the general direction but not the specific detail (e.g. wrong number, wrong period).
+- FAITHFUL: The source chunks support the claim verbatim or with minor rephrasing. Numbers, percentages, and dollar amounts must match exactly.
+- PARTIALLY FAITHFUL: The source chunks support the general direction but the specific detail is wrong (e.g. wrong number, wrong period).
 - UNFAITHFUL: The source chunks contradict the claim or do not contain the information at all.
-- Numbers, percentages, and dollar amounts must match to be FAITHFUL. If the source uses a different number, it is PARTIALLY FAITHFUL or UNFAITHFUL.
 - If a claim cites a specific filing label, verify the information is actually in that filing's chunk.
+
+Examples:
+  Answer: "Revenue increased 7.4%." Source: "Comparable sales increased 7.4%."
+  → Claim: "Revenue increased 7.4%." Verdict: UNFAITHFUL (source says comparable sales, not revenue)
+
+  Answer: "Comparable sales increased 7.4%." Source: "Comparable sales increased 7.4%."
+  → Claim: "Comparable sales increased 7.4%." Verdict: FAITHFUL (verbatim match)
+
+  Answer: "Labor costs decreased 0.2%." Source: "Labor costs decreased 0.2%."
+  → Claim: "Labor costs decreased 0.2%." Verdict: FAITHFUL (rephrasing OK, number matches)
 
 Return ONLY valid JSON with these exact keys:
 claims (list of {claim, verdict}), faithful_count, partial_count, unfaithful_count, total_claims, faithfulness_score (0.0 to 1.0)"""
@@ -158,12 +169,20 @@ def main() -> None:
         sources = rag_result["sources"]
 
         prompt = build_judge_prompt(question, answer, sources)
-        response = llm.generate(prompt, system=JUDGE_SYSTEM_PROMPT, max_tokens=2048)
+        response = llm.generate(prompt, system=JUDGE_SYSTEM_PROMPT, max_tokens=4096)
         parsed = parse_judge_response(response)
         total_time = round(time.time() - t0, 1)
         times.append(total_time)
 
-        if parsed:
+        if parsed and isinstance(parsed, dict):
+            claims = parsed.get("claims", [])
+            tc = parsed.get("total_claims", len(claims))
+            if len(claims) != tc:
+                logger.warning("  -> claim count mismatch: %d claims in array vs %d total_claims", len(claims), tc)
+                parsed["total_claims"] = len(claims)
+                parsed["faithful_count"] = sum(1 for c in claims if c.get("verdict") == "FAITHFUL")
+                parsed["partial_count"] = sum(1 for c in claims if c.get("verdict") == "PARTIALLY FAITHFUL")
+                parsed["unfaithful_count"] = sum(1 for c in claims if c.get("verdict") == "UNFAITHFUL")
             logger.info("  -> %s [%s]", display_score(parsed), fmt_time(total_time))
             results.append({"id": qid, "question": question, **parsed})
         else:
