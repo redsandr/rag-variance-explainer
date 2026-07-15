@@ -72,20 +72,23 @@ class LLMClient:
         self._client = OpenAI(api_key=api_key)
         self._model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
-    def generate(self, prompt: str, system: str = None, max_tokens: int = 500) -> str:
+    def generate(self, prompt: str, system: str = None, max_tokens: int = 500, temperature: float | None = None) -> str:
         if self.backend == "llama_cpp":
-            return self._generate_llama_cpp(prompt, system, max_tokens)
+            return self._generate_llama_cpp(prompt, system, max_tokens, temperature)
         elif self.backend == "anthropic":
             return self._generate_anthropic(prompt, system, max_tokens)
         elif self.backend == "openai":
-            return self._generate_openai(prompt, system, max_tokens)
+            return self._generate_openai(prompt, system, max_tokens, temperature)
 
-    def _generate_llama_cpp(self, prompt: str, system: str, max_tokens: int) -> str:
+    def _generate_llama_cpp(self, prompt: str, system: str, max_tokens: int, temperature: float | None = None) -> str:
         messages = []
         if system:
             messages.append({"role": "system", "content": system})
         messages.append({"role": "user", "content": prompt})
-        output = self._llm.create_chat_completion(messages=messages, max_tokens=max_tokens)
+        kwargs = {"messages": messages, "max_tokens": max_tokens}
+        if temperature is not None:
+            kwargs["temperature"] = temperature
+        output = self._llm.create_chat_completion(**kwargs)
         return output["choices"][0]["message"]["content"].strip()
 
     def _generate_anthropic(self, prompt: str, system: str, max_tokens: int) -> str:
@@ -96,14 +99,15 @@ class LLMClient:
         response = self._client.messages.create(**kwargs)
         return response.content[0].text.strip()
 
-    def _generate_openai(self, prompt: str, system: str, max_tokens: int) -> str:
+    def _generate_openai(self, prompt: str, system: str, max_tokens: int, temperature: float | None = None) -> str:
         messages = []
         if system:
             messages.append({"role": "system", "content": system})
         messages.append({"role": "user", "content": prompt})
-        response = self._client.chat.completions.create(
-            model=self._model, max_tokens=max_tokens, messages=messages
-        )
+        kwargs = {"model": self._model, "max_tokens": max_tokens, "messages": messages}
+        if temperature is not None:
+            kwargs["temperature"] = temperature
+        response = self._client.chat.completions.create(**kwargs)
         return response.choices[0].message.content.strip()
 
 
