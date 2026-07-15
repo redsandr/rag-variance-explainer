@@ -38,6 +38,7 @@ Rules:
 - PARTIALLY FAITHFUL: The source chunks support the general direction but the specific detail is wrong (e.g. wrong number, wrong period).
 - UNFAITHFUL: The source chunks contradict the claim or do not contain the information at all.
 - If a claim cites a specific filing label, verify the information is actually in that filing's chunk.
+- Evaluate each claim independently against ALL source chunks. A claim about one period is FAITHFUL if its exact numbers match the source for that period — even if a different claim references a different period with different numbers. Do NOT penalize a claim just because other claims in the answer discuss different periods.
 
 Examples:
   Answer: "Revenue increased 7.4%." Source: "Comparable sales increased 7.4%."
@@ -111,14 +112,18 @@ def parse_judge_response(response: str) -> dict | None:
 
 
 def display_score(parsed: dict) -> str:
-    score = parsed.get("faithfulness_score", 0)
-    if score > 1:
-        score = score / 100
-    pct = round(score * 100)
     f = parsed.get("faithful_count", 0)
     p = parsed.get("partial_count", 0)
     u = parsed.get("unfaithful_count", 0)
-    return f"{pct}% ({f}F/{p}P/{u}U)"
+    total = f + p + u
+    strict = round(f / total * 100) if total > 0 else 0
+    weighted = round((f + 0.5 * p) / total * 100) if total > 0 else 0
+    return f"{strict}% strict / {weighted}% weighted ({f}F/{p}P/{u}U)"
+
+
+def _save_checkpoint(results: list) -> None:
+    with open(RESULT_FILE, "w") as f:
+        json.dump({"results": results}, f, indent=2)
 
 
 def fmt_time(seconds: float) -> str:
@@ -177,6 +182,25 @@ def main() -> None:
         answer = rag_result["answer"]
         sources = rag_result["sources"]
 
+        NO_INFO_PATTERNS = [
+            "do not discuss", "not mentioned", "no information",
+            "does not provide", "not addressed", "not covered",
+            "do not provide", "the provided filings do not",
+        ]
+        has_content = not any(p in answer.lower() for p in NO_INFO_PATTERNS)
+
+        if not has_content:
+            total_time = round(time.time() - t0, 1)
+            times.append(total_time)
+            logger.info("  -> RETRIEVAL GAP — answer has no info [%s]", fmt_time(total_time))
+            results.append({
+                "id": qid, "question": question,
+                "retrieval_gap": True,
+                "answer_preview": answer[:120],
+            })
+            _save_checkpoint(results)
+            continue
+
         prompt = build_judge_prompt(question, answer, sources)
         response = llm.generate(prompt, system=JUDGE_SYSTEM_PROMPT, max_tokens=4096)
         parsed = parse_judge_response(response)
@@ -185,32 +209,36 @@ def main() -> None:
 
         if parsed and isinstance(parsed, dict):
             claims = parsed.get("claims", [])
-            tc = parsed.get("total_claims", len(claims))
-            if len(claims) != tc:
-                logger.warning("  -> claim count mismatch: %d claims in array vs %d total_claims", len(claims), tc)
-                parsed["total_claims"] = len(claims)
-                parsed["faithful_count"] = sum(1 for c in claims if c.get("verdict") == "FAITHFUL")
-                parsed["partial_count"] = sum(1 for c in claims if c.get("verdict") == "PARTIALLY FAITHFUL")
-                parsed["unfaithful_count"] = sum(1 for c in claims if c.get("verdict") == "UNFAITHFUL")
+            faithful = sum(1 for c in claims if c.get("verdict") == "FAITHFUL")
+            partial = sum(1 for c in claims if c.get("verdict") == "PARTIALLY FAITHFUL")
+            unfaithful = sum(1 for c in claims if c.get("verdict") == "UNFAITHFUL")
+            parsed["total_claims"] = len(claims)
+            parsed["faithful_count"] = faithful
+            parsed["partial_count"] = partial
+            parsed["unfaithful_count"] = unfaithful
+            total = faithful + partial + unfaithful
+            parsed["faithfulness_score"] = round(faithful / total, 4) if total > 0 else 0.0
             logger.info("  -> %s [%s]", display_score(parsed), fmt_time(total_time))
             results.append({"id": qid, "question": question, **parsed})
         else:
             logger.warning("  -> PARSE FAILED [%s]", fmt_time(total_time))
             results.append({"id": qid, "question": question, "error": response})
+        _save_checkpoint(results)
 
-    total_f = sum(r.get("faithful_count", 0) for r in results if "error" not in r)
-    total_p = sum(r.get("partial_count", 0) for r in results if "error" not in r)
-    total_u = sum(r.get("unfaithful_count", 0) for r in results if "error" not in r)
+    total_f = sum(r.get("faithful_count", 0) for r in results if "error" not in r and not r.get("retrieval_gap"))
+    total_p = sum(r.get("partial_count", 0) for r in results if "error" not in r and not r.get("retrieval_gap"))
+    total_u = sum(r.get("unfaithful_count", 0) for r in results if "error" not in r and not r.get("retrieval_gap"))
     total = total_f + total_p + total_u
+    gaps = sum(1 for r in results if r.get("retrieval_gap"))
+    ok = sum(1 for r in results if "error" not in r and not r.get("retrieval_gap"))
     overall = total_f / total if total > 0 else 0
-    if total > 0 and overall != (total_f + 0.5 * total_p) / total:
-        logger.info("Weighted faithfulness: %.1f%% (partial weighted 0.5)", (total_f + 0.5 * total_p) / total * 100)
-    ok = sum(1 for r in results if "error" not in r)
+    weighted = (total_f + 0.5 * total_p) / total if total > 0 else 0
 
     summary = (
         f"\n{'='*60}\n"
-        f"OVERALL FAITHFULNESS: {overall:.1%} ({total_f}F / {total_p}P / {total_u}U)\n"
-        f"Evaluated: {ok}/{len(results)} questions, {total} total claims\n"
+        f"OVERALL FAITHFULNESS (strict): {overall:.1%} ({total_f}F / {total_p}P / {total_u}U)\n"
+        f"OVERALL FAITHFULNESS (weighted): {weighted:.1%}  (partial weighted 0.5)\n"
+        f"Evaluated: {ok} judged + {gaps} retrieval gaps / {len(results)} questions, {total} total claims\n"
         f"Total time: {fmt_time(sum(times))}\n"
         f"{'='*60}"
     )
@@ -218,11 +246,13 @@ def main() -> None:
 
     with open(RESULT_FILE, "w") as f:
         json.dump({
-            "overall_faithfulness": round(overall, 4),
+            "overall_faithfulness_strict": round(overall, 4),
+            "overall_faithfulness_weighted": round(weighted, 4),
             "total_claims": total,
             "faithful": total_f,
             "partial": total_p,
             "unfaithful": total_u,
+            "retrieval_gaps": gaps,
             "results": results,
         }, f, indent=2)
 
