@@ -26,7 +26,7 @@ class LLMClient:
             cls._instance._initialized = False
         return cls._instance
 
-    def __init__(self, backend: str = None):
+    def __init__(self, backend: str | None = None):
         if self._initialized:
             return
         self._initialized = True

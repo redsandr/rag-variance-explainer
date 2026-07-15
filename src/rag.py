@@ -3,6 +3,8 @@ End-to-end RAG pipeline: retrieve relevant MD&A chunks, then generate
 a grounded answer via the swappable LLMClient.
 """
 
+from collections.abc import Callable
+
 from config import config
 from retrieval import get_client, get_collection, query_multi
 from llm import LLMClient
@@ -70,7 +72,7 @@ def answer_question(
     top_k: int = None,
     min_relevance: float = None,
     llm: LLMClient = None,
-    on_progress: callable = None,
+    on_progress: Callable | None = None,
 ) -> dict:
     if top_k is None:
         top_k = config.retrieval_top_k

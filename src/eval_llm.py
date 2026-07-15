@@ -6,11 +6,14 @@ Runs the RAG pipeline on eval questions, saves Q&A for faithfulness review.
 import argparse
 import json
 import logging
-import sys
 import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
+
+from rag import answer_question
+from retrieval import get_client, get_collection, query
+from rag import build_context
 
 logger = logging.getLogger(__name__)
 
@@ -52,8 +55,6 @@ def main() -> None:
         t0 = time.time()
 
         if args.no_generate:
-            from retrieval import get_client, get_collection, query
-            from rag import build_context
             client = get_client()
             collection = get_collection(client)
             results = query(collection, question, top_k=5, ticker_filter=ticker)
@@ -73,7 +74,6 @@ def main() -> None:
                 "retrieval_time_s": round(time.time() - t0, 1),
             }
         else:
-            from rag import answer_question
             result = answer_question(question, ticker_filter=ticker, top_k=5)
             output = {
                 "question": question,

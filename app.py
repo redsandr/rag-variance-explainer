@@ -9,21 +9,59 @@ from llm import LLMClient
 from rag import answer_question
 
 
-@st.cache_resource
-def get_llm():
-    return LLMClient()
-
 st.set_page_config(
     page_title="RAG Variance Explainer",
     page_icon="\U0001f4ca",
     layout="wide",
 )
 
+st.markdown("""
+<style>
+    .main-header { margin-bottom: 0.5rem; }
+    .source-card {
+        background: var(--secondary-background-color);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.75rem;
+        border-left: 3px solid var(--primary-color);
+    }
+    .source-card .meta {
+        font-size: 0.85rem;
+        color: var(--text-color);
+        opacity: 0.75;
+        margin-bottom: 0.4rem;
+    }
+    .source-card .meta strong { color: var(--primary-color); }
+    .source-card .text {
+        font-family: 'Fira Code', 'Courier New', monospace;
+        font-size: 0.8rem;
+        line-height: 1.5;
+        white-space: pre-wrap;
+    }
+    .score-high { color: #22c55e; font-weight: 600; }
+    .score-mid { color: #eab308; font-weight: 600; }
+    .score-low { color: #ef4444; font-weight: 600; }
+    .answer-box {
+        background: var(--secondary-background-color);
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(255,255,255,0.08);
+    }
+    .answer-box h3 { margin-top: 0; }
+</style>
+""", unsafe_allow_html=True)
+
 st.title("RAG Variance Explainer")
 st.markdown(
     "Ask a question about financial variance drivers from SEC "
     "filing MD&A sections (CMG, DRI, CBRL)."
 )
+
+
+@st.cache_resource
+def get_llm():
+    return LLMClient()
 
 with st.sidebar:
     st.header("Settings")
@@ -112,6 +150,27 @@ if ask and question.strip():
 elif ask and not question.strip():
     st.warning("Please enter a question.")
 
+def _score_class(score: float) -> str:
+    if score >= 0.7:
+        return "score-high"
+    elif score >= 0.4:
+        return "score-mid"
+    return "score-low"
+
+def _render_sources(sources):
+    for i, src in enumerate(sources):
+        meta = src["metadata"]
+        score = src.get("hybrid_score", src.get("relevance", 0))
+        st.markdown(
+            f'<div class="source-card">'
+            f'<div class="meta"><strong>{meta["ticker"]}</strong> {meta["form"]} '
+            f'&middot; filed {meta["filing_date"]} '
+            f'&middot; <span class="{_score_class(score)}">score: {score:.2f}</span></div>'
+            f'<div class="text">{src["text"]}</div>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+
 if "last_result" in st.session_state:
     _r = st.session_state.last_result
     if _r.get("compare"):
@@ -119,46 +178,16 @@ if "last_result" in st.session_state:
         col_left, col_right = st.columns(2)
         with col_left:
             st.subheader("Before (bi-encoder only)")
-            st.markdown(before["answer"])
+            st.markdown(f'<div class="answer-box">{before["answer"]}</div>', unsafe_allow_html=True)
             with st.expander(f"Sources ({len(before['sources'])})"):
-                for i, src in enumerate(before["sources"]):
-                    meta = src["metadata"]
-                    score = src.get("hybrid_score", src.get("relevance", 0))
-                    st.markdown(
-                        f"**{i+1}. [{meta['ticker']} {meta['form']} "
-                        f"filed {meta['filing_date']}] "
-                        f"(score: {score:.2f})**"
-                    )
-                    st.text(src["text"])
-                    if i < len(before["sources"]) - 1:
-                        st.divider()
+                _render_sources(before["sources"])
         with col_right:
             st.subheader("After (with cross-encoder)")
-            st.markdown(after["answer"])
+            st.markdown(f'<div class="answer-box">{after["answer"]}</div>', unsafe_allow_html=True)
             with st.expander(f"Sources ({len(after['sources'])})"):
-                for i, src in enumerate(after["sources"]):
-                    meta = src["metadata"]
-                    score = src.get("hybrid_score", src.get("relevance", 0))
-                    st.markdown(
-                        f"**{i+1}. [{meta['ticker']} {meta['form']} "
-                        f"filed {meta['filing_date']}] "
-                        f"(score: {score:.2f})**"
-                    )
-                    st.text(src["text"])
-                    if i < len(after["sources"]) - 1:
-                        st.divider()
+                _render_sources(after["sources"])
     else:
         st.subheader("Answer")
-        st.markdown(_r["answer"])
+        st.markdown(f'<div class="answer-box">{_r["answer"]}</div>', unsafe_allow_html=True)
         with st.expander(f"Source chunks ({len(_r['sources'])})"):
-            for i, src in enumerate(_r["sources"]):
-                meta = src["metadata"]
-                score = src.get("hybrid_score", src.get("relevance", 0))
-                st.markdown(
-                    f"**{i+1}. [{meta['ticker']} {meta['form']} "
-                    f"filed {meta['filing_date']}] "
-                    f"(score: {score:.2f})**"
-                )
-                st.text(src["text"])
-                if i < len(_r["sources"]) - 1:
-                    st.divider()
+            _render_sources(_r["sources"])

@@ -71,22 +71,22 @@ Evaluate each factual claim in the answer against the source chunks.
 Return JSON only."""
 
 
-def parse_judge_response(response: str) -> dict:
+def parse_judge_response(response: str) -> dict | None:
     cleaned = response.strip()
     cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
     cleaned = re.sub(r"\s*```$", "", cleaned)
     if cleaned.endswith("},"):
         cleaned = cleaned[:-1]
-    try:
-        return json.loads(cleaned)
-    except json.JSONDecodeError:
-        pass
-    try:
-        last_brace = cleaned.rfind("}")
-        if last_brace != -1:
-            return json.loads(cleaned[:last_brace+1])
-    except json.JSONDecodeError:
-        pass
+    for _ in range(3):
+        try:
+            return json.loads(cleaned)
+        except json.JSONDecodeError:
+            last_brace = cleaned.rfind("}")
+            penultimate_brace = cleaned.rfind("}", 0, last_brace) if last_brace > 0 else -1
+            if penultimate_brace != -1:
+                cleaned = cleaned[:penultimate_brace + 1]
+                continue
+            break
     return None
 
 
@@ -175,6 +175,8 @@ def main() -> None:
     total_u = sum(r.get("unfaithful_count", 0) for r in results if "error" not in r)
     total = total_f + total_p + total_u
     overall = total_f / total if total > 0 else 0
+    if total > 0 and overall != (total_f + 0.5 * total_p) / total:
+        logger.info("Weighted faithfulness: %.1f%% (partial weighted 0.5)", (total_f + 0.5 * total_p) / total * 100)
     ok = sum(1 for r in results if "error" not in r)
 
     summary = (

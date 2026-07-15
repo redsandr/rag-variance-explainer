@@ -7,13 +7,13 @@ the prefixing behavior (search_document/search_query) that nomic-embed
 requires.
 """
 
-import logging
 import re
 from typing import Any
 
 import chromadb
 
 from config import config
+from cross_encoder import rerank
 from embedding import embed_documents, embed_query
 from hybrid_search import build_bm25, bm25_scores, rrf_merge
 from query_expansion import expand_query
@@ -122,8 +122,7 @@ def _keyword_boost(query_text: str, chunk_text: str) -> float:
     words = re.findall(r'\w+', query_lower)
     stopwords = {"the", "a", "an", "is", "are", "was", "were", "how", "why",
                  "what", "did", "do", "does", "in", "of", "to", "at", "for",
-                 "and", "or", "s", "change", "changes", "drove", "affect",
-                 "performed", "evolve", "evolved"}
+                 "and", "or", "change", "changes", "affect"}
     keywords = [w for w in words if w not in stopwords and len(w) > 2]
     if not keywords:
         return 0.0
@@ -213,7 +212,6 @@ def query_multi(
                 c["forward_looking_penalty"] = _forward_looking_penalty(c["text"])
 
     if config.cross_encoder_enabled:
-        from cross_encoder import rerank
         return rerank(query_text, candidates, top_k=top_k)
 
     for c in candidates:
@@ -237,6 +235,7 @@ def _forward_looking_penalty(chunk_text: str) -> float:
 
 
 if __name__ == "__main__":
+    import logging
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     logger = logging.getLogger(__name__)
     client = get_client()

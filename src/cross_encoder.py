@@ -13,7 +13,12 @@ def _get_model() -> CrossEncoder:
     global _model
     if _model is None:
         logger.info("Loading cross-encoder: %s (device=%s)", config.cross_encoder_model, config.cross_encoder_device)
-        _model = CrossEncoder(config.cross_encoder_model, device=config.cross_encoder_device)
+        try:
+            _model = CrossEncoder(config.cross_encoder_model, device=config.cross_encoder_device)
+        except Exception as e:
+            logger.error("Failed to load cross-encoder '%s' on device '%s': %s",
+                         config.cross_encoder_model, config.cross_encoder_device, e)
+            raise
     return _model
 
 

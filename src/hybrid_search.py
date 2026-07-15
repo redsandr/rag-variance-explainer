@@ -1,19 +1,24 @@
+import hashlib
 import re
-from typing import Any
+
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 try:
     from rank_bm25 import BM25Okapi
     HAS_BM25_LIB = True
 except ImportError:
     HAS_BM25_LIB = False
-    from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 def _tokenize(text: str) -> list[str]:
     return re.findall(r'\w+', text.lower())
 
 
-def build_bm25(corpus: list[str]) -> Any:
+def _content_key(text: str) -> str:
+    return text[:120] + hashlib.md5(text.encode()).hexdigest()
+
+
+def build_bm25(corpus: list[str]) -> BM25Okapi | TfidfVectorizer:
     tokenized = [_tokenize(d) for d in corpus]
     if HAS_BM25_LIB:
         return BM25Okapi(tokenized)
@@ -27,7 +32,7 @@ def build_bm25(corpus: list[str]) -> Any:
     return vec
 
 
-def bm25_scores(bm25: Any, query: str, corpus: list[str]) -> list[float]:
+def bm25_scores(bm25: BM25Okapi | TfidfVectorizer, query: str, corpus: list[str]) -> list[float]:
     tokens = _tokenize(query)
     if HAS_BM25_LIB:
         return bm25.get_scores(tokens)
@@ -48,12 +53,12 @@ def rrf_merge(
     items: dict[str, dict] = {}
 
     for rank, r in enumerate(dense_list):
-        key = r["text"][:120] + str(hash(r["text"]))
+        key = _content_key(r["text"])
         items[key] = r
         scores[key] = scores.get(key, 0) + 1 / (k + rank + 1)
 
     for rank, r in enumerate(bm25_list):
-        key = r["text"][:120] + str(hash(r["text"]))
+        key = _content_key(r["text"])
         if key not in items:
             items[key] = r
         scores[key] = scores.get(key, 0) + 1 / (k + rank + 1)

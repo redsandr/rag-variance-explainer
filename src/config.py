@@ -32,7 +32,7 @@ class RAGConfig:
 
     cross_encoder_enabled: bool = os.getenv("RAG_CROSS_ENCODER_ENABLED", "true").lower() == "true"
     cross_encoder_model: str = os.getenv("RAG_CROSS_ENCODER_MODEL", "cross-encoder/ms-marco-MiniLM-L-6-v2")
-    cross_encoder_device: str = os.getenv("RAG_CROSS_ENCODER_DEVICE", "cuda")
+    cross_encoder_device: str = os.getenv("RAG_CROSS_ENCODER_DEVICE", "cpu")
     cross_encoder_batch_size: int = int(os.getenv("RAG_CROSS_ENCODER_BATCH_SIZE", "32"))
     cross_encoder_weight: float = float(os.getenv("RAG_CROSS_ENCODER_WEIGHT", "0.7"))
 

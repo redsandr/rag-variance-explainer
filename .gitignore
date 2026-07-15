@@ -4,3 +4,6 @@ chroma_db/
 .env
 __pycache__/
 .squad/
+locks/
+models/
+*.gguf
