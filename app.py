@@ -46,6 +46,9 @@ EXAMPLE_QUESTIONS = [
     "How did wage inflation affect Chipotle's labor costs?",
 ]
 
+if "pending_question" in st.session_state:
+    st.session_state.question_input = st.session_state.pop("pending_question")
+
 st.subheader("Your Question")
 question = st.text_input(
     "Question",
@@ -63,7 +66,7 @@ cols = st.columns(len(EXAMPLE_QUESTIONS))
 for col, q in zip(cols, EXAMPLE_QUESTIONS):
     with col:
         if st.button(q, use_container_width=True, type="tertiary"):
-            st.session_state.question_input = q
+            st.session_state.pending_question = q
             st.rerun()
 
 if ask and question.strip():
