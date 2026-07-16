@@ -42,7 +42,11 @@ Dark-themed fintech dashboard with interactive question input, AI-sourced answer
 
 ### Option A — Local model (llama.cpp, ~4.7 GB)
 ```bash
+# Windows
 python -m venv venv && venv\Scripts\activate
+# Linux / macOS
+python -m venv venv && source venv/bin/activate
+
 pip install -r requirements.txt
 cp .env.example .env
 # Download Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf → models/
@@ -52,7 +56,11 @@ streamlit run app.py
 
 ### Option B — OpenAI API (no download)
 ```bash
+# Windows
 python -m venv venv && venv\Scripts\activate
+# Linux / macOS
+python -m venv venv && source venv/bin/activate
+
 pip install -r requirements.txt
 cp .env.example .env
 ```

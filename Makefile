@@ -19,5 +19,4 @@ eval-faithfulness:
 	python src/eval_faithfulness.py
 
 clean:
-	rm -rf .pytest_cache
-	python -c "import shutil, pathlib; [shutil.rmtree(p) for p in pathlib.Path('.').rglob('__pycache__')]"
+	python -c "import shutil, pathlib; shutil.rmtree('.pytest_cache', ignore_errors=True); [shutil.rmtree(p) for p in pathlib.Path('.').rglob('__pycache__')]"
