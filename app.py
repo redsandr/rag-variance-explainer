@@ -3,6 +3,7 @@ from pathlib import Path
 from config import config
 from llm import LLMClient
 from rag import answer_question
+from retrieval import get_client, get_collection
 
 
 st.set_page_config(
@@ -13,6 +14,17 @@ st.set_page_config(
 
 css_path = Path(__file__).parent / "src" / "styles.css"
 st.markdown(css_path.read_text(encoding="utf-8"), unsafe_allow_html=True)
+
+
+@st.cache_resource
+def _get_db_stats():
+    client = get_client()
+    collection = get_collection(client)
+    count = collection.count()
+    all_meta = collection.get(include=["metadatas"])
+    filings = set(m["accession_number"] for m in all_meta["metadatas"] if "accession_number" in m)
+    return count, len(filings)
+
 
 LOGO_SVG = (
     '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" '
@@ -351,31 +363,36 @@ st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown('<div class="right-col">', unsafe_allow_html=True)
 
+try:
+    chunk_count, filing_count = _get_db_stats()
+except Exception:
+    chunk_count, filing_count = 0, 0
+
 st.markdown(
-    '<div class="kpi-panel">'
-    '<div class="panel-title">System Overview</div>'
-    '<div class="kpi-stack">'
-    '<div class="kpi-stack-card">'
-    '<div class="kpi-row-label">Companies</div>'
-    '<div class="kpi-row-value">3</div>'
-    '<div class="kpi-row-sub">CMG &middot; DRI &middot; CBRL</div></div>'
-    '<div class="kpi-stack-card">'
-    '<div class="kpi-row-label">Filings Indexed</div>'
-    '<div class="kpi-row-value">24</div>'
-    '<div class="kpi-row-sub">10-K &amp; 10-Q combined</div></div>'
-    '<div class="kpi-stack-card">'
-    '<div class="kpi-row-label">Knowledge Base</div>'
-    '<div class="kpi-row-value">432</div>'
-    '<div class="kpi-row-sub">MD&A text chunks</div></div>'
-    '<div class="kpi-stack-card">'
-    '<div class="kpi-row-label">Retrieval MRR</div>'
-    '<div class="kpi-row-value"><span class="purple">0.66</span></div>'
-    '<div class="kpi-row-sub">+28% from baseline</div></div>'
-    '<div class="kpi-stack-card">'
-    '<div class="kpi-row-label">Faithfulness</div>'
-    '<div class="kpi-row-value"><span class="green">65.8%</span></div>'
-    '<div class="kpi-row-sub">strict weighted score</div></div>'
-    '</div></div>',
+    f'<div class="kpi-panel">'
+    f'<div class="panel-title">System Overview</div>'
+    f'<div class="kpi-stack">'
+    f'<div class="kpi-stack-card">'
+    f'<div class="kpi-row-label">Companies</div>'
+    f'<div class="kpi-row-value">3</div>'
+    f'<div class="kpi-row-sub">CMG &middot; DRI &middot; CBRL</div></div>'
+    f'<div class="kpi-stack-card">'
+    f'<div class="kpi-row-label">Filings Indexed</div>'
+    f'<div class="kpi-row-value">{filing_count}</div>'
+    f'<div class="kpi-row-sub">10-K &amp; 10-Q combined</div></div>'
+    f'<div class="kpi-stack-card">'
+    f'<div class="kpi-row-label">Knowledge Base</div>'
+    f'<div class="kpi-row-value">{chunk_count}</div>'
+    f'<div class="kpi-row-sub">MD&A text chunks</div></div>'
+    f'<div class="kpi-stack-card">'
+    f'<div class="kpi-row-label">Retrieval MRR</div>'
+    f'<div class="kpi-row-value"><span class="purple">0.66</span></div>'
+    f'<div class="kpi-row-sub">+28% from baseline</div></div>'
+    f'<div class="kpi-stack-card">'
+    f'<div class="kpi-row-label">Faithfulness</div>'
+    f'<div class="kpi-row-value"><span class="green">65.8%</span></div>'
+    f'<div class="kpi-row-sub">strict weighted score</div></div>'
+    f'</div></div>',
     unsafe_allow_html=True,
 )
 

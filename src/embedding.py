@@ -6,9 +6,6 @@ sentence-transformers
 import logging
 
 from sentence_transformers import SentenceTransformer
-from dotenv import load_dotenv
-load_dotenv()
-
 logger = logging.getLogger(__name__)
 
 _MODEL_NAME = "nomic-ai/nomic-embed-text-v1.5"
@@ -45,21 +42,3 @@ def embed_query(text: str) -> list[float]:
     return embedding[0].tolist()
 
 
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, format="%(message)s")
-    docs = [
-        "Revenue increased due to higher same-store sales and menu price increases.",
-        "Labor costs decreased as a percentage of total revenue due to lower turnover.",
-    ]
-    query_text = "Why did revenue go up?"
-
-    doc_embeddings = embed_documents(docs)
-    query_embedding = embed_query(query_text)
-
-    logger.info("Document embedding dimension: %s", len(doc_embeddings[0]))
-    logger.info("Query embedding dimension: %s", len(query_embedding))
-
-    import numpy as np
-    sims = [np.dot(query_embedding, d) for d in doc_embeddings]
-    logger.info("Similarity to doc 1 (revenue): %.4f", sims[0])
-    logger.info("Similarity to doc 2 (labor):   %.4f", sims[1])

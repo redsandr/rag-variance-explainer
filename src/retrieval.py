@@ -235,25 +235,3 @@ def _forward_looking_penalty(chunk_text: str) -> float:
     return 0.0
 
 
-if __name__ == "__main__":
-    import logging
-    logging.basicConfig(level=logging.INFO, format="%(message)s")
-    logger = logging.getLogger(__name__)
-    client = get_client()
-    collection = get_collection(client)
-
-    add_chunks(
-        collection,
-        chunks=[
-            "Revenue increased due to higher same-store sales and menu price increases.",
-            "Labor costs decreased as a percentage of total revenue due to lower turnover.",
-        ],
-        ticker="TEST",
-        accession_number="0000000000-00-000000",
-        form="10-Q",
-        filing_date="2026-01-01",
-    )
-
-    results = query(collection, "Why did revenue go up?", top_k=2, min_relevance=0.3)
-    for r in results:
-        logger.info("[%.4f] %s \u2014 %s", r["relevance"], r["metadata"]["ticker"], r["text"][:80])

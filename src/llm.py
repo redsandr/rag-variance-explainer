@@ -12,9 +12,7 @@ build_index.py) — only this file and the .env config change.
 
 import logging
 import os
-from dotenv import load_dotenv
 
-load_dotenv()
 
 
 class LLMClient:
@@ -122,15 +120,4 @@ class LLMClient:
         return response.choices[0].message.content.strip()
 
 
-if __name__ == "__main__":
-    import sys
-    logging.basicConfig(level=logging.INFO, format="%(message)s")
-    logger = logging.getLogger(__name__)
-    model_path = os.getenv("LLAMA_CPP_MODEL_PATH")
-    if not model_path or not os.path.exists(os.path.expandvars(model_path)):
-        logger.error("No model found at LLAMA_CPP_MODEL_PATH. Set LLM_BACKEND or LLAMA_CPP_MODEL_PATH in .env first.")
-        sys.exit(1)
-    client = LLMClient()
-    logger.info("Backend: %s", client.backend)
-    result = client.generate("Say hello in exactly five words.")
-    logger.info(result)
+
