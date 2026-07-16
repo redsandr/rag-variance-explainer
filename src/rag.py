@@ -68,7 +68,6 @@ def answer_question(
     if llm is None:
         llm = LLMClient()
     answer = llm.generate(prompt, system=SYSTEM_PROMPT_RAG, max_tokens=config.llm_max_tokens, temperature=config.llm_temperature)
-    print(f">>> RAW LLM OUTPUT (first 200 chars): {answer[:200]}")
     if on_progress:
         on_progress("done", "Done!")
 

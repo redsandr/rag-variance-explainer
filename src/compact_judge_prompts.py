@@ -3,10 +3,13 @@ Create compact Claude-friendly judge prompts from existing exports.
 No model needed — just reformats existing files.
 """
 
+import logging
 import re
 from pathlib import Path
 
-from prompts import JUDGE_SYSTEM_PROMPT_COMPACT_COMPACT
+from prompts import JUDGE_SYSTEM_PROMPT_COMPACT
+
+logger = logging.getLogger(__name__)
 
 DATA_DIR = Path(__file__).parent.parent / "data"
 OUT_DIR = DATA_DIR
@@ -53,7 +56,7 @@ def extract_sources(text: str) -> list[dict]:
 def main():
     files = sorted(OUT_DIR.glob("judge_prompt_eval-*.txt"))
     if not files:
-        print("No judge prompt files found. Run export_judge_prompts.py first.")
+        logger.error("No judge prompt files found. Run export_judge_prompts.py first.")
         return
 
     outputs = []
@@ -83,13 +86,12 @@ def main():
     total_per_question = sum(o["size"] for o in outputs)
     total = sys_size + total_per_question
 
-    print(f"=== Size Analysis ===")
-    print(f"System prompt: {sys_size} chars (~{sys_size//4} tokens)")
+    logger.info("=== Size Analysis ===")
+    logger.info("System prompt: %s chars (~%s tokens)", sys_size, sys_size // 4)
     per_q = [f"{o['id']}: {o['size']} chars (~{o['size']//4} tokens)" for o in outputs]
-    print(f"Per question: {per_q}")
-    print(f"All questions total: {total_per_question} chars (~{total_per_question//4} tokens)")
-    print(f"Grand total (with system): {total} chars (~{total//4} tokens)")
-    print()
+    logger.info("Per question: %s", per_q)
+    logger.info("All questions total: %s chars (~%s tokens)", total_per_question, total_per_question // 4)
+    logger.info("Grand total (with system): %s chars (~%s tokens)", total, total // 4)
 
     # Determine how many fit per batch for Claude free (~4000 tokens ≈ 16000 chars)
     BUDGET_CHARS = 35000  # ~8700 tokens per batch (Claude free: ~10-15K limit)
@@ -127,19 +129,20 @@ def main():
                 f.write(o["prompt"])
                 f.write("\n\n")
         size_kb = path.stat().st_size / 1024
-        print(f"  {path.name}: {len(batch)} questions, {size_kb:.0f} KB (~{path.stat().st_size//4} tokens)")
+        logger.info("  %s: %s questions, %s KB (~%s tokens)", path.name, len(batch), f"{size_kb:.0f}", path.stat().st_size // 4)
 
     # Summary per batch with question IDs
-    print(f"\n=== Workflow ===")
-    print(f"Total: {len(outputs)} questions, split into {len(batches)} Claude sessions")
+    logger.info("=== Workflow ===")
+    logger.info("Total: %s questions, split into %s Claude sessions", len(outputs), len(batches))
     for i, batch in enumerate(batches, 1):
         ids = [o["id"] for o in batch]
-        print(f"  Session {i}: {', '.join(ids)}")
-    print(f"\nFor each session:")
-    print(f"  1. Open Claude web, paste SYSTEM PROMPT as first message")
-    print(f"  2. Paste question prompts one at a time as follow-ups")
-    print(f"  3. Claude returns JSON — copy and send to me")
+        logger.info("  Session %s: %s", i, ", ".join(ids))
+    logger.info("For each session:")
+    logger.info("  1. Open Claude web, paste SYSTEM PROMPT as first message")
+    logger.info("  2. Paste question prompts one at a time as follow-ups")
+    logger.info("  3. Claude returns JSON — copy and send to me")
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
     main()

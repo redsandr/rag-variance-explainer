@@ -44,7 +44,7 @@ def main() -> None:
 
     LLMClient.reset()
     _test_client = LLMClient()
-    print(f">>> ACTIVE BACKEND: {_test_client.backend}")
+    logger.info("Active backend: %s", _test_client.backend)
     outputs = []
     for item in eval_set:
         qid = item["id"]

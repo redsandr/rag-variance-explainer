@@ -10,6 +10,7 @@ Usage:
 
 import argparse
 import json
+import logging
 import math
 import sys
 from pathlib import Path
@@ -18,25 +19,17 @@ from llm import LLMClient
 from rag import answer_question
 from prompts import JUDGE_SYSTEM_PROMPT_MEDIUM, build_judge_prompt_compact
 
+logger = logging.getLogger(__name__)
+
 EVAL_FILE = Path(__file__).parent.parent / "data" / "eval_questions.json"
 OUT_DIR = Path(__file__).parent.parent / "data"
-    context_blocks = []
-    for s in sources:
-        meta = s.get("metadata", {})
-        label = f"[{meta.get('ticker', '?')} {meta.get('form', '?')} filed {meta.get('filing_date', '?')}]"
-        text = s.get("text", "")
-        # Truncate to 800 chars per source chunk
-        if len(text) > 800:
-            text = text[:800] + "..."
-        context_blocks.append(f"{label}\n{text}")
-    return f"Question: {question}\n\nSource chunks:\n{chr(10)+chr(10).join(context_blocks) if context_blocks else '(no sources)'}\n\n---\n\nAnswer:\n{answer}"
 
 
 def _generate_from_cache(eval_set: list[dict], split: int | None) -> None:
     """Re-export judge prompts from cached faithfulness_results.json (no model needed)."""
     cache_path = Path(__file__).parent.parent / "data" / "faithfulness_results.json"
     if not cache_path.exists():
-        print(f"ERROR: {cache_path} not found. Run src/eval_faithfulness.py first.")
+        logger.error("%s not found. Run src/eval_faithfulness.py first.", cache_path)
         sys.exit(1)
 
     with open(cache_path) as f:
@@ -49,21 +42,21 @@ def _generate_from_cache(eval_set: list[dict], split: int | None) -> None:
         qid = item["id"]
         cached = cache_map.get(qid)
         if not cached or cached.get("retrieval_gap"):
-            print(f"  SKIP {qid}: no cached answer found")
+            logger.info("  SKIP %s: no cached answer found", qid)
             continue
 
         answer = cached["answer"]
         sources = cached.get("sources", [])
         prompt = build_judge_prompt_compact(item["question"], answer, sources)
         outputs.append({"id": qid, "prompt": prompt, "question": item["question"], "answer_preview": answer[:80]})
-        print(f"  [{qid}] {item['question'][:50]}... done")
+        logger.info("  [%s] %s... done", qid, item["question"][:50])
 
     if not outputs:
-        print("No cached results to export.")
+        logger.warning("No cached results to export.")
         return
 
     _write_batches(outputs, split)
-    print(f"  Exported {len(outputs)} questions from cache")
+    logger.info("  Exported %s questions from cache", len(outputs))
 
 
 def _write_batches(outputs: list[dict], split: int | None) -> None:
@@ -83,14 +76,14 @@ def _write_batches(outputs: list[dict], split: int | None) -> None:
             f.write("-" * 40 + "\n")
             f.write(o["prompt"])
             f.write("\n\n")
-    print(f"  Saved {path_all.name} ({path_all.stat().st_size} bytes)")
+    logger.info("  Saved %s (%s bytes)", path_all.name, path_all.stat().st_size)
 
     # Individual
     for o in outputs:
         path = OUT_DIR / f"claude_{o['id']}.txt"
         with open(path, "w", encoding="utf-8") as f:
             f.write(o["prompt"])
-        print(f"  Saved {path.name}")
+        logger.info("  Saved %s", path.name)
 
     # Batches
     if split and split > 0:
@@ -113,7 +106,7 @@ def _write_batches(outputs: list[dict], split: int | None) -> None:
                     f.write("-" * 40 + "\n")
                     f.write(o["prompt"])
                     f.write("\n\n")
-            print(f"  Saved {path.name} ({len(batch)} questions, {path.stat().st_size} bytes)")
+            logger.info("  Saved %s (%s questions, %s bytes)", path.name, len(batch), path.stat().st_size)
 
 
 def main():
@@ -131,7 +124,7 @@ def main():
         eval_set = [q for q in eval_set if q["id"] in args.ids]
 
     if not eval_set:
-        print("No matching questions found.")
+        logger.error("No matching questions found.")
         sys.exit(1)
 
     if args.from_cache:
@@ -141,11 +134,11 @@ def main():
     try:
         llm = LLMClient()
     except ValueError as e:
-        print(f"ERROR: Cannot load LLM model: {e}")
-        print()
-        print("Options:")
-        print("  1. Set LLAMA_CPP_MODEL_PATH in .env to your .gguf file")
-        print("  2. Use --from-cache to re-export from cached eval results")
+        logger.error("Cannot load LLM model: %s", e)
+        logger.error("")
+        logger.error("Options:")
+        logger.error("  1. Set LLAMA_CPP_MODEL_PATH in .env to your .gguf file")
+        logger.error("  2. Use --from-cache to re-export from cached eval results")
         sys.exit(1)
     outputs = []
     TOT_SYSTEM_PROMPT = "You are an AI assistant that helps export RAG evaluation data. Respond with 'OK' when you receive data."
@@ -154,17 +147,18 @@ def main():
         qid = item["id"]
         question = item["question"]
         ticker = item.get("ticker_filter")
-        print(f"  [{qid}] {question[:50]}... ", end="", flush=True)
+        logger.info("  [%s] %s...", qid, question[:50])
 
         rag_result = answer_question(question, ticker_filter=ticker, top_k=5, llm=llm)
         answer = rag_result["answer"]
         sources = rag_result["sources"]
         prompt = build_judge_prompt_compact(question, answer, sources)
         outputs.append({"id": qid, "prompt": prompt, "question": question, "answer_preview": answer[:80]})
-        print(f"done ({len(answer)} chars)")
+        logger.info("  done (%s chars)", len(answer))
 
     _write_batches(outputs, args.split)
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
     main()

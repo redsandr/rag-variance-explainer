@@ -3,10 +3,7 @@ Embedding wrapper around nomic-embed-text (768-dim), loaded locally via
 sentence-transformers
 """
 
-import logging
-
 from sentence_transformers import SentenceTransformer
-logger = logging.getLogger(__name__)
 
 _MODEL_NAME = "nomic-ai/nomic-embed-text-v1.5"
 _model = None  # lazy-loaded singleton — avoid reloading the model on every call

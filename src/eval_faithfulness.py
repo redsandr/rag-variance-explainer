@@ -70,21 +70,21 @@ def fmt_time(seconds: float) -> str:
 
 def _load_eval_set(args) -> list[dict]:
     if not EVAL_FILE.exists():
-        print(f"ERROR: {EVAL_FILE} not found.")
+        logger.error("%s not found.", EVAL_FILE)
         sys.exit(1)
 
     with open(EVAL_FILE) as f:
         eval_set = json.load(f)
 
     if args.ids and args.sample:
-        print("Warning: both --ids and --sample provided. Using --ids, ignoring --sample.")
+        logger.warning("Both --ids and --sample provided. Using --ids, ignoring --sample.")
     if args.ids:
         eval_set = [q for q in eval_set if q["id"] in args.ids]
     elif args.sample:
         eval_set = eval_set[:args.sample]
 
     if not eval_set:
-        print("No matching questions found.")
+        logger.error("No matching questions found.")
         sys.exit(1)
 
     return eval_set
