@@ -52,7 +52,7 @@ pip install -r requirements.txt
 # Configuration
 cp .env.example .env           # Set LLM backend, model path, RAG params
 
-# Download model (Qwen2.5-VL-7B-Instruct Q4_K_M ~4.7 GB)
+# Download model (Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf ~4.7 GB)
 # Place .gguf in models/
 
 # Build vector index (432 chunks from 24 filings)
@@ -106,7 +106,7 @@ User Question
 | Vector store | ChromaDB, cosine distance, metadata-rich |
 | Re-ranking | `cross-encoder/ms-marco-MiniLM-L-6-v2` |
 | Chunking | Structure-aware recursive split, 500-token chunks |
-| LLM (default) | `Qwen2.5-VL-7B-Instruct-Q4_K_M` (RTX 5060, ~2-3s/gen) |
+| LLM (default) | `Qwen2.5-VL-7B-Instruct-Q4_K_M` GGUF (RTX 5060, ~2-3s/gen) |
 | Data source | SEC EDGAR HTML 10-K/10-Q (MD&A section) |
 | Companies | CMG (Chipotle), DRI (Darden), CBRL (Cracker Barrel) |
 
@@ -137,7 +137,7 @@ Hardest-case turnaround:
 
 ### Faithfulness (LLM-as-Judge)
 
-Automated eval across 149 claims from 20 questions (local Qwen 2.5 Coder 14B, truncated source chunks):
+Automated eval across 149 claims from 20 questions (local Qwen2.5-VL-7B, truncated source chunks):
 
 ```
 Strict:   65.8%  (98 faithful / 39 partial / 12 unfaithful)

@@ -1,8 +1,6 @@
 # RAG Variance Explainer — Documentation
 
-Extended documentation for the project, covering problem validation, architecture decisions, evaluation iterations, and technical notes. These files live in the project's portfolio directory and are linked here for reference.
-
-See: `[project-docs]`
+Extended documentation for the project, covering problem validation, architecture decisions, evaluation iterations, and technical notes.
 
 | File | Description |
 |------|-------------|
