@@ -2,6 +2,8 @@
 
 Extended documentation for the project, covering problem validation, architecture decisions, evaluation iterations, and technical notes.
 
+> **Mulai dari sini → [`_Dashboard.md`](_Dashboard.md)**
+
 | File | Description |
 |------|-------------|
 | `00. RAG Project Plan.md` | Project scope, problem statement validated against real job listings |
@@ -9,6 +11,8 @@ Extended documentation for the project, covering problem validation, architectur
 | `02. Progress & Technical Documentation.md` | Comprehensive docs: architecture, eval results, refactoring history (Phase 1–6) |
 | `03. Faithfulness Eval — Iterasi 3.md` | Faithfulness evaluation methodology and results |
 | `04. Prompt Engineering & Evaluation Fixes.md` | Prompt engineering iterations and calibration |
+| `05. Turn Weaknesses Into Strengths.md` | Action plan: scaling, deployment, community outreach, user testing |
+| `_Dashboard.md` | **Start here** — MOC/index with links to all files + quick stats |
 
 ---
 
