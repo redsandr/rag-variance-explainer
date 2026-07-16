@@ -21,6 +21,11 @@ streamlit run app.py
 
 Dark-themed fintech dashboard with interactive question input, AI-sourced answers, color-coded source chunks, and side-by-side cross-encoder comparison mode.
 
+![Dashboard Screenshot](docs/screenshot.png)
+<!-- TODO: Add a screenshot showing the dashboard with a sample question, answer, and source cards -->
+
+> **Quick links:** [Full project documentation](docs/) — problem validation, architecture decisions, evaluation iterations, and technical notes.
+
 ---
 
 ## Features
@@ -150,26 +155,28 @@ Key improvements via prompt engineering:
 ## Project Structure
 
 ```
-├── pyproject.toml             # Package config (pip install -e .)
-├── app.py                     # Streamlit dashboard
+├── pyproject.toml             # Package config with dependencies (pip install -e .)
+├── app.py                     # Streamlit dashboard (DB-driven KPI)
 ├── .streamlit/config.toml     # Dark theme config
 ├── .env / .env.example        # Configuration
 ├── Makefile                   # install / test / run / eval-*
-├── tests.py                   # 7 pytest tests
+├── tests.py                   # 32 pytest tests (9 modules)
 ├── .github/workflows/test.yml # CI pipeline
+├── docs/                      # Extended documentation (problem validation, iteration history)
 ├── src/
 │   ├── rag.py                 # RAG orchestrator
-│   ├── retrieval.py           # ChromaDB + query_multi pipeline
+│   ├── retrieval.py           # ChromaDB + multi-strategy retrieval
 │   ├── cross_encoder.py       # Cross-encoder re-ranking
+│   ├── hybrid_search.py       # BM25 + RRF merge
 │   ├── query_expansion.py     # Financial synonym expansion
 │   ├── llm.py                 # 3-backend LLM client
-│   ├── config.py              # Centralized config
-│   ├── prompts.py             # Judge prompts (3 variants) + helpers
+│   ├── config.py              # Centralized config (22 params from env vars)
+│   ├── prompts.py             # RAG system prompt + judge prompts (3 variants) + helpers
 │   ├── styles.css             # Dashboard stylesheet (imported by app.py)
+│   ├── logging_config.py      # Shared logging setup
 │   ├── ingest.py              # SEC EDGAR fetcher
 │   ├── embedding.py           # nomic-embed wrapper
 │   ├── chunking.py            # Structure-aware chunking
-│   ├── glossary.py            # Per-company XBTR tag mappings
 │   ├── build_index.py         # End-to-end index pipeline
 │   └── eval_*.py              # Evaluation scripts
 └── data/

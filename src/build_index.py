@@ -13,10 +13,9 @@ from ingest import (
 )
 from chunking import chunk_document
 from retrieval import get_client, get_collection, add_chunks
+from config import config
 
 logger = logging.getLogger(__name__)
-
-FILINGS_PER_COMPANY = 8
 
 
 def build_index() -> None:
@@ -30,7 +29,7 @@ def build_index() -> None:
         logger.info("=== %s ===", ticker)
         cik = get_cik(ticker)
         submissions = fetch_submissions(cik)
-        filings = list_10k_10q_filings(submissions)[:FILINGS_PER_COMPANY]
+        filings = list_10k_10q_filings(submissions)[:config.build_filings_per_company]
 
         for filing in filings:
             accession = filing["accessionNumber"]

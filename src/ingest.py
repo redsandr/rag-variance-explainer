@@ -10,8 +10,20 @@ import requests
 import time
 from bs4 import BeautifulSoup
 import re
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 HEADERS = {"User-Agent": "Sebas (your@email.com)"}
+
+_SESSION = requests.Session()
+_SESSION.headers.update(HEADERS)
+retry_strategy = Retry(
+    total=3,
+    backoff_factor=0.5,
+    status_forcelist=[429, 500, 502, 503, 504],
+    allowed_methods=["GET"],
+)
+_SESSION.mount("https://", HTTPAdapter(max_retries=retry_strategy))
 
 TICKERS = {
     "CMG": "Chipotle Mexican Grill",
@@ -36,8 +48,8 @@ CANDIDATE_TAGS = [
 ### FETCHING ###
 
 def fetch_filing_html(url: str) -> str:
-    """Fetch raw HTML of a filing document."""
-    response = requests.get(url, headers=HEADERS)
+    """Fetch raw HTML of a filing document with retry on transient failures."""
+    response = _SESSION.get(url)
     response.raise_for_status()
     time.sleep(0.15)
     return response.text
@@ -119,8 +131,7 @@ def get_mda_for_filing(cik: str, accession_number: str, primary_document: str) -
 
 
 def get_cik(ticker: str) -> str:
-    url = "https://www.sec.gov/files/company_tickers.json"
-    response = requests.get(url, headers=HEADERS)
+    response = _SESSION.get("https://www.sec.gov/files/company_tickers.json")
     response.raise_for_status()
     data = response.json()
 
@@ -134,16 +145,16 @@ def get_cik(ticker: str) -> str:
 def fetch_companyfacts(cik: str) -> dict:
     """Fetch all XBRL-tagged facts for a company."""
     url = f"https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json"
-    response = requests.get(url, headers=HEADERS)
+    response = _SESSION.get(url)
     response.raise_for_status()
-    time.sleep(0.15)  # stay comfortably under SEC's 10 req/sec cap
+    time.sleep(0.15)
     return response.json()
 
 
 def fetch_submissions(cik: str) -> dict:
     """Fetch filing history/metadata (accession numbers, forms, dates)."""
     url = f"https://data.sec.gov/submissions/CIK{cik}.json"
-    response = requests.get(url, headers=HEADERS)
+    response = _SESSION.get(url)
     response.raise_for_status()
     time.sleep(0.15)
     return response.json()

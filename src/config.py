@@ -37,6 +37,7 @@ class RAGConfig:
     cross_encoder_weight: float = float(os.getenv("RAG_CROSS_ENCODER_WEIGHT", "0.7"))
 
     db_path: str = os.getenv("CHROMA_DB_PATH", "./chroma_db")
+    build_filings_per_company: int = int(os.getenv("RAG_FILINGS_PER_COMPANY", "8"))
 
     llm_max_tokens: int = int(os.getenv("RAG_LLM_MAX_TOKENS", "2048"))
     llm_temperature: float = float(os.getenv("RAG_LLM_TEMPERATURE", "0.1"))

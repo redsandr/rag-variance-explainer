@@ -7,6 +7,21 @@ name = "rag-variance-explainer"
 version = "0.1.0"
 description = "RAG pipeline for financial variance explanation using SEC filing MD&A sections"
 requires-python = ">=3.11"
+dependencies = [
+    "requests",
+    "beautifulsoup4",
+    "chromadb",
+    "tiktoken",
+    "llama-cpp-python",
+    "python-dotenv",
+    "pytest",
+    "sentence-transformers",
+    "numpy",
+    "einops",
+    "anthropic",
+    "openai",
+    "streamlit",
+]
 
 [tool.setuptools.package-dir]
 "" = "src"
