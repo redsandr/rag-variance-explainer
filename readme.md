@@ -137,12 +137,19 @@ Hardest-case turnaround:
 
 ### Faithfulness (LLM-as-Judge)
 
-Automated eval across 149 claims from 20 questions:
+Automated eval across 149 claims from 20 questions (local Qwen 2.5 Coder 14B, truncated source chunks):
 
 ```
 Strict:   65.8%  (98 faithful / 39 partial / 12 unfaithful)
 Weighted: 78.9%  (partial weighted 0.5)
 ```
+
+The automated judge penalizes truncation artifacts: Claude re-evaluation with **full source chunks** raises strict faithfulness to **74.8%** (95 faithful / 18 partial / 14 unfaithful), and Gemini's evaluation to **86.7%** (with a stricter 10-rule checklist). The gap between automated (65.8%) and human-eval (74.8–86.7%) is mostly truncation bias — the judge cannot see the full source to verify claims.
+
+Known remaining issues:
+- **Metric conflation** (4–5% of errors): model writes "comparable sales" where source says "total revenue" or vice versa
+- **Number transposition** (2–3%): decimal shifts (0.6% → 6%), column year mismatches (FY2024 → FY2023)
+- **Causal proximity** (~7%): model attributes driver from adjacent section to wrong metric
 
 Key improvements via prompt engineering:
 - **Period integrity rule** — eval-001 50%→100%, eval-015 20%→67%
