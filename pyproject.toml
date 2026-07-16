@@ -8,19 +8,21 @@ version = "0.1.0"
 description = "RAG pipeline for financial variance explanation using SEC filing MD&A sections"
 requires-python = ">=3.11"
 dependencies = [
-    "requests",
-    "beautifulsoup4",
-    "chromadb",
-    "tiktoken",
-    "llama-cpp-python",
-    "python-dotenv",
-    "pytest",
-    "sentence-transformers",
-    "numpy",
-    "einops",
-    "anthropic",
-    "openai",
-    "streamlit",
+    "anthropic==0.116.0",
+    "beautifulsoup4==4.15.0",
+    "chromadb==1.5.9",
+    "einops==0.8.2",
+    "llama-cpp-python==0.3.6",
+    "numpy==2.4.6",
+    "openai==2.45.0",
+    "pytest==9.1.1",
+    "python-dotenv==1.2.2",
+    "rank-bm25==0.2.2",
+    "requests==2.34.2",
+    "scikit-learn==1.9.0",
+    "sentence-transformers==5.6.0",
+    "streamlit==1.59.2",
+    "tiktoken==0.13.0",
 ]
 
 [tool.setuptools.package-dir]
