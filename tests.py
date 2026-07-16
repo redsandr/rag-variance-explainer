@@ -150,11 +150,68 @@ def test_parse_judge_response_garbage_returns_none() -> None:
     assert parse_judge_response("not json at all") is None
 
 
-def test_is_retrieval_gap_has_content_returns_true() -> None:
-    from src.eval_faithfulness import _is_retrieval_gap
-    assert _is_retrieval_gap("Revenue increased due to higher pricing")
+def test_has_answer_content_returns_true() -> None:
+    from src.eval_faithfulness import _has_answer_content
+    assert _has_answer_content("Revenue increased due to higher pricing")
 
 
-def test_is_retrieval_gap_no_info_returns_false() -> None:
-    from src.eval_faithfulness import _is_retrieval_gap
-    assert not _is_retrieval_gap("the provided filings do not discuss this topic")
+def test_has_answer_content_no_info_returns_false() -> None:
+    from src.eval_faithfulness import _has_answer_content
+    assert not _has_answer_content("the provided filings do not discuss this topic")
+
+
+def test_rrf_merge_interleaves_dense_and_bm25() -> None:
+    from src.hybrid_search import rrf_merge
+    dense = [{"text": f"dense_{i}"} for i in range(3)]
+    bm25 = [{"text": f"bm25_{i}"} for i in range(3)]
+    merged = rrf_merge(dense, bm25, top_k=4)
+    assert len(merged) == 4
+    assert all("hybrid_score" in m for m in merged)
+
+
+def test_rrf_merge_empty_lists() -> None:
+    from src.hybrid_search import rrf_merge
+    assert rrf_merge([], []) == []
+
+
+def test_config_defaults() -> None:
+    from src.config import RAGConfig
+    cfg = RAGConfig()
+    assert cfg.retrieval_top_k == 5
+    assert cfg.cross_encoder_enabled is True
+    assert cfg.hybrid_search_enabled is True
+    assert cfg.llm_temperature == 0.1
+
+
+def test_filing_document_url_format() -> None:
+    from src.ingest import filing_document_url
+    url = filing_document_url("0000010290", "0000010290-26-000001", "test.htm")
+    assert "000001029026000001" in url  # dashes removed
+    assert url.startswith("https://www.sec.gov/")
+
+
+def test_parse_judge_response_trailing_comma_returns_none() -> None:
+    from src.eval_faithfulness import parse_judge_response
+    raw = '{"claims": [{"claim": "test", "verdict": "FAITHFUL"}], "faithful_count": 1,}'
+    assert parse_judge_response(raw) is None
+
+
+def test_parse_judge_response_empty_claims() -> None:
+    from src.eval_faithfulness import parse_judge_response
+    assert parse_judge_response("{}") is not None
+
+
+def test_forward_looking_penalty_edge_zero_match() -> None:
+    from src.retrieval import _forward_looking_penalty
+    assert _forward_looking_penalty("") == 0.0
+
+
+def test_expand_query_unknown_terms_adds_no_synonyms() -> None:
+    from src.query_expansion import expand_query
+    result = expand_query("quantum", n_extra_terms=20)
+    assert result.rstrip() == "quantum"
+
+
+def test_keyword_boost_stopwords_ignored() -> None:
+    from src.retrieval import _keyword_boost
+    assert _keyword_boost("the a an in of to", "any text here") == 0.0

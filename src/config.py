@@ -28,7 +28,7 @@ class RAGConfig:
                                              "forward-looking statements", "could be adversely",
                                              "may not be achieved", "risk factors", "no assurance"]))
 
-    hybrid_search_enabled: bool = os.getenv("RAG_HYBRID_SEARCH_ENABLED", "false").lower() == "true"
+    hybrid_search_enabled: bool = os.getenv("RAG_HYBRID_SEARCH_ENABLED", "true").lower() == "true"
 
     cross_encoder_enabled: bool = os.getenv("RAG_CROSS_ENCODER_ENABLED", "true").lower() == "true"
     cross_encoder_model: str = os.getenv("RAG_CROSS_ENCODER_MODEL", "cross-encoder/ms-marco-MiniLM-L-6-v2")

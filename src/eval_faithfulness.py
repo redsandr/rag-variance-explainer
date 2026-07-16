@@ -97,7 +97,7 @@ NO_INFO_PATTERNS = [
 ]
 
 
-def _is_retrieval_gap(answer: str) -> bool:
+def _has_answer_content(answer: str) -> bool:
     return not any(p in answer.lower() for p in NO_INFO_PATTERNS)
 
 
@@ -134,7 +134,7 @@ def _process_question(item: dict, llm: LLMClient, times: list[float], i: int, n:
     sources = rag_result["sources"]
     total_time = round(time.time() - t0, 1)
 
-    if not _is_retrieval_gap(answer):
+    if not _has_answer_content(answer):
         times.append(total_time)
         logger.info("  -> RETRIEVAL GAP — answer has no info [%s]", fmt_time(total_time))
         return {
