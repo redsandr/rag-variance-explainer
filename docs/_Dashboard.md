@@ -18,7 +18,8 @@ status: active
 | 02 | [Technical Docs](02.%20Progress%20%26%20Technical%20Documentation.md) | **Single source of truth** — arsitektur, evaluasi, refactoring history phases 1–7d | ✅ |
 | 03 | [Faithfulness Eval Iterasi](03.%20Faithfulness%20Eval%20%E2%80%94%20Iterasi%203.md) | Iterasi 3–6 faithfulness evaluation: fixes, results, failure analysis | ✅ |
 | 04 | [Prompt Engineering](04.%20Prompt%20Engineering%20%26%20Evaluation%20Fixes.md) | Iterasi 8 prompt fixes, LLM reset, 4 broken evals analysis | ✅ |
-| 05 | [Turn Weaknesses → Strengths](05.%20Turn%20Weaknesses%20Into%20Strengths.md) | Rencana aksi: scaling, deployment, exposure, user testing | 🟡 |
+| 05 | [Turn Weaknesses → Strengths](05.%20Turn%20Weaknesses%20Into%20Strengths.md) | Rencana aksi: scaling, deployment, exposure, user testing (superseded by 07) | 🟡 |
+| 07 | [Roadmap & Execution Plan](07.%20Roadmap%20%26%20Execution%20Plan.md) | **Primary execution doc** — merged roadmap + multi-role breakdown, sequential langkah demi langkah, Phases 1-4 terisi semua | ✅ |
 
 ---
 
