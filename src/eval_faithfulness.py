@@ -90,15 +90,20 @@ def _load_eval_set(args) -> list[dict]:
     return eval_set
 
 
-NO_INFO_PATTERNS = [
-    "do not discuss", "not mentioned", "no information",
-    "does not provide", "not addressed", "not covered",
-    "do not provide", "the provided filings do not",
-]
+_SECTION_PATTERN = re.compile(
+    r"^-\s*\[.*?\]\s*(?:-\s*)?.*?(?:Not directly discussed|not discussed|no information|"
+    r"not mentioned|does not provide|not addressed|not covered)", re.MULTILINE
+)
 
 
 def _has_answer_content(answer: str) -> bool:
-    return not any(p in answer.lower() for p in NO_INFO_PATTERNS)
+    answer_lower = answer.lower()
+    stripped = _SECTION_PATTERN.sub("", answer_lower).strip()
+    if not stripped:
+        return False
+    no_info = ["do not discuss", "no information", "does not provide",
+               "not addressed", "the provided filings do not"]
+    return not any(p in stripped for p in no_info)
 
 
 def _summarize_sources(sources: list[dict]) -> list[dict]:
@@ -119,7 +124,12 @@ def _process_question(item: dict, llm: LLMClient, times: list[float], i: int, n:
     question = item["question"]
     ticker = item.get("ticker_filter")
 
-    elapsed_prompt = f" [~{fmt_time(sum(times)/len(times) * (n-i+1))} remaining]" if times else ""
+    avg = sum(times) / len(times) if times else 0
+    warm = min(len(times), 3)
+    recent = sum(times[-warm:]) / warm if times else 0
+    rate = min(avg, recent * 1.2)
+    remaining = int(rate * (n - i))
+    elapsed_prompt = f" [~{fmt_time(remaining)} remaining]" if times else ""
     logger.info("[%s/%s] [%s] %s...%s", i, n, qid, question[:50], elapsed_prompt)
 
     t0 = time.time()

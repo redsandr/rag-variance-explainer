@@ -390,8 +390,8 @@ st.markdown(
     f'<div class="kpi-row-sub">+28% from baseline</div></div>'
     f'<div class="kpi-stack-card">'
     f'<div class="kpi-row-label">Faithfulness</div>'
-    f'<div class="kpi-row-value"><span class="green">65.8%</span></div>'
-    f'<div class="kpi-row-sub">strict weighted score</div></div>'
+f'<div class="kpi-row-value"><span class="green">65.8%</span></div>'
+     f'<div class="kpi-row-sub">strict score</div></div>'
     f'</div></div>',
     unsafe_allow_html=True,
 )

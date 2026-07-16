@@ -15,7 +15,7 @@ def _tokenize(text: str) -> list[str]:
 
 
 def _content_key(text: str) -> str:
-    return text[:120] + hashlib.md5(text.encode()).hexdigest()
+    return text[:120] + hashlib.md5(text.encode(), usedforsecurity=False).hexdigest()
 
 
 def build_bm25(corpus: list[str]) -> BM25Okapi | TfidfVectorizer:

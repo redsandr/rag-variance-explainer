@@ -13,7 +13,9 @@ import re
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-HEADERS = {"User-Agent": "Sebas (your@email.com)"}
+from config import config
+
+HEADERS = {"User-Agent": config.sec_user_agent}
 
 _SESSION = requests.Session()
 _SESSION.headers.update(HEADERS)

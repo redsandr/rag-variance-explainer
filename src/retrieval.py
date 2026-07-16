@@ -207,7 +207,7 @@ def query_multi(
 
     if config.hybrid_search_enabled:
         bm25 = _retrieve_bm25(collection, lookup, ticker_filter)
-        candidates = rrf_merge(dense, bm25, top_k=len(dense))
+        candidates = rrf_merge(dense, bm25, top_k=None)
         _fill_missing_fields(candidates, query_text)
     else:
         candidates = dense
