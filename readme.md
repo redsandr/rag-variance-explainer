@@ -21,10 +21,7 @@ streamlit run app.py
 
 Dark-themed fintech dashboard with interactive question input, AI-sourced answers, color-coded source chunks, and side-by-side cross-encoder comparison mode.
 
-![Dashboard Screenshot](docs/screenshot.png)
-<!-- TODO: Add a screenshot showing the dashboard with a sample question, answer, and source cards -->
-
-> **Quick links:** [Full project documentation](docs/) — problem validation, architecture decisions, evaluation iterations, and technical notes.
+> **📖 Full documentation:** [docs/](docs/) — problem validation, architecture decisions, evaluation iterations, technical notes, and roadmap.
 
 ---
 
@@ -43,22 +40,29 @@ Dark-themed fintech dashboard with interactive question input, AI-sourced answer
 
 ## Quick Start
 
+### Option A — Local model (llama.cpp, ~4.7 GB)
 ```bash
-# Setup
-python -m venv venv
-venv\Scripts\activate          # Windows
+python -m venv venv && venv\Scripts\activate
 pip install -r requirements.txt
-
-# Configuration
-cp .env.example .env           # Set LLM backend, model path, RAG params
-
-# Download model (Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf ~4.7 GB)
-# Place .gguf in models/
-
-# Build vector index (432 chunks from 24 filings)
+cp .env.example .env
+# Download Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf → models/
 python src/build_index.py
+streamlit run app.py
+```
 
-# Launch demo
+### Option B — OpenAI API (no download)
+```bash
+python -m venv venv && venv\Scripts\activate
+pip install -r requirements.txt
+cp .env.example .env
+```
+Then set in `.env`:
+```
+LLM_BACKEND=openai
+OPENAI_API_KEY=sk-...
+```
+```bash
+python src/build_index.py
 streamlit run app.py
 ```
 
@@ -194,13 +198,14 @@ Key improvements via prompt engineering:
 
 ---
 
-## Refactoring (Jul 2026)
+## Recent Updates
 
-- **`pyproject.toml`** — Proper package build (`pip install -e .`) removes fragile `sys.path.insert()` hacks from 5 files.
-- **`src/prompts.py`** — Extracted 3 judge prompt variants (`_FULL`, `_MEDIUM`, `_COMPACT`) + `build_judge_prompt()` helpers into a single module.
-- **`src/styles.css`** — 510 lines of inline CSS extracted from `app.py` into a standalone stylesheet.
-- **Dead code removed** — `build_multi_queries()` (query_expansion.py), `check_reported_tags()` / `list_all_taxonomies_and_matching_tags()` (ingest.py), all demo `__main__` blocks.
-- **Deferred imports** — `from retrieval import ...` and `from llm import LLMClient` lifted to top level in `rag.py`.
+- **Prompt engineering** — period integrity rule (+7pp), seed=42, anti-hallucination checklist, direction verification
+- **Cross-encoder re-ranking** — MiniLM-L-6 with hybrid scoring, MRR 0.52 → **0.66** (+28%)
+- **Multi-backend LLM** — Swappable via `.env`: llama.cpp (local), Anthropic, or OpenAI
+- **Code quality** — `pyproject.toml` packaging, 32 tests, CI pipeline, shared prompts & CSS modules
+
+> Full change history in [docs/](docs/).
 
 ## CI
 
