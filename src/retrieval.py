@@ -18,13 +18,12 @@ from embedding import embed_documents, embed_query
 from hybrid_search import build_bm25, bm25_scores, rrf_merge
 from query_expansion import expand_query
 
-_DB_PATH = "./chroma_db"
 _COLLECTION_NAME = "mda_filings"
 
 
 def get_client() -> chromadb.PersistentClient:
     """Persistent local ChromaDB client — data survives between runs."""
-    return chromadb.PersistentClient(path=_DB_PATH)
+    return chromadb.PersistentClient(path=config.db_path)
 
 
 def get_collection(client: chromadb.PersistentClient) -> Any:

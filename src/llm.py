@@ -29,18 +29,25 @@ class LLMClient:
     def __init__(self, backend: str | None = None):
         if self._initialized:
             return
-        self._initialized = True
 
         self.backend = backend or os.getenv("LLM_BACKEND", "llama_cpp")
 
-        if self.backend == "llama_cpp":
-            self._init_llama_cpp()
-        elif self.backend == "anthropic":
-            self._init_anthropic()
-        elif self.backend == "openai":
-            self._init_openai()
-        else:
-            raise ValueError(f"Unknown backend: {self.backend}")
+        try:
+            if self.backend == "llama_cpp":
+                self._init_llama_cpp()
+            elif self.backend == "anthropic":
+                self._init_anthropic()
+            elif self.backend == "openai":
+                self._init_openai()
+            else:
+                raise ValueError(f"Unknown backend: {self.backend}")
+        except Exception:
+            cls = type(self)
+            cls._instance = None
+            self._initialized = False
+            raise
+
+        self._initialized = True
 
     def _init_llama_cpp(self):
         from llama_cpp import Llama

@@ -114,36 +114,44 @@ if ask and question.strip():
         status = st.status(label, expanded=True)
         def on_progress(_phase, msg):
             status.update(label=msg, state="running")
-        result = fn(on_progress=on_progress)
-        status.update(label="Complete!", state="complete")
-        return result
+        try:
+            result = fn(on_progress=on_progress)
+            status.update(label="Complete!", state="complete")
+            return result
+        except Exception as e:
+            status.update(label=f"Error: {e}", state="error")
+            raise
 
-    if compare:
-        orig = config.cross_encoder_enabled
-        config.cross_encoder_enabled = False
-        before = run_with_progress(
-            lambda on_progress: answer_question(
-                question, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
-                on_progress=on_progress),
-            "Without cross-encoder",
-        )
-        config.cross_encoder_enabled = True
-        after = run_with_progress(
-            lambda on_progress: answer_question(
-                question, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
-                on_progress=on_progress),
-            "With cross-encoder",
-        )
-        config.cross_encoder_enabled = orig
-        st.session_state.last_result = {"compare": True, "before": before, "after": after}
-    else:
-        result = run_with_progress(
-            lambda on_progress: answer_question(
-                question, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
-                on_progress=on_progress),
-            "Processing",
-        )
-        st.session_state.last_result = {"compare": False, **result}
+    try:
+        if compare:
+            orig = config.cross_encoder_enabled
+            config.cross_encoder_enabled = False
+            before = run_with_progress(
+                lambda on_progress: answer_question(
+                    question, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
+                    on_progress=on_progress),
+                "Without cross-encoder",
+            )
+            config.cross_encoder_enabled = True
+            after = run_with_progress(
+                lambda on_progress: answer_question(
+                    question, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
+                    on_progress=on_progress),
+                "With cross-encoder",
+            )
+            config.cross_encoder_enabled = orig
+            st.session_state.last_result = {"compare": True, "before": before, "after": after}
+        else:
+            result = run_with_progress(
+                lambda on_progress: answer_question(
+                    question, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
+                    on_progress=on_progress),
+                "Processing",
+            )
+            st.session_state.last_result = {"compare": False, **result}
+    except Exception as e:
+        st.error(f"Something went wrong: {e}")
+        st.session_state.pop("last_result", None)
 
     st.rerun()
 

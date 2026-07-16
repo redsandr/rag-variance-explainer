@@ -36,6 +36,8 @@ class RAGConfig:
     cross_encoder_batch_size: int = int(os.getenv("RAG_CROSS_ENCODER_BATCH_SIZE", "32"))
     cross_encoder_weight: float = float(os.getenv("RAG_CROSS_ENCODER_WEIGHT", "0.7"))
 
+    db_path: str = os.getenv("CHROMA_DB_PATH", "./chroma_db")
+
     llm_max_tokens: int = int(os.getenv("RAG_LLM_MAX_TOKENS", "2048"))
     llm_temperature: float = float(os.getenv("RAG_LLM_TEMPERATURE", "0.1"))
 

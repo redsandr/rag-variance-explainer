@@ -196,7 +196,14 @@ def main() -> None:
             results.append({
                 "id": qid, "question": question,
                 "retrieval_gap": True,
-                "answer_preview": answer[:120],
+                "answer": answer,
+                "sources": [
+                    {"ticker": s["metadata"]["ticker"], "form": s["metadata"]["form"],
+                     "filing_date": s["metadata"]["filing_date"],
+                     "relevance": s.get("hybrid_score", s.get("relevance", 0)),
+                     "text": s["text"]}
+                    for s in sources
+                ],
             })
             _save_checkpoint(results)
             continue
@@ -219,7 +226,19 @@ def main() -> None:
             total = faithful + partial + unfaithful
             parsed["faithfulness_score"] = round(faithful / total, 4) if total > 0 else 0.0
             logger.info("  -> %s [%s]", display_score(parsed), fmt_time(total_time))
-            results.append({"id": qid, "question": question, **parsed})
+            results.append({
+                "id": qid,
+                "question": question,
+                "answer": answer,
+                "sources": [
+                    {"ticker": s["metadata"]["ticker"], "form": s["metadata"]["form"],
+                     "filing_date": s["metadata"]["filing_date"],
+                     "relevance": s.get("hybrid_score", s.get("relevance", 0)),
+                     "text": s["text"]}
+                    for s in sources
+                ],
+                **parsed,
+            })
         else:
             logger.warning("  -> PARSE FAILED [%s]", fmt_time(total_time))
             results.append({"id": qid, "question": question, "error": response})
