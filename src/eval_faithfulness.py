@@ -28,27 +28,6 @@ EVAL_FILE = Path(__file__).parent.parent / "data" / "eval_questions.json"
 RESULT_FILE = Path(__file__).parent.parent / "data" / "faithfulness_results.json"
 
 
-        text = s.get("text", "")
-        if len(text) > 2000:
-            text = text[:2000] + "..."
-        context_blocks.append(f"{label}\n{text}")
-
-    return f"""Question: {question}
-
-Source chunks:
-{chr(10)+chr(10).join(context_blocks) if context_blocks else "(no sources available)"}
-
----
-
-Answer to evaluate:
-{answer}
-
----
-
-Evaluate each factual claim in the answer against the source chunks.
-Return JSON only."""
-
-
 def parse_judge_response(response: str) -> dict | None:
     cleaned = response.strip()
     cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
@@ -89,12 +68,7 @@ def fmt_time(seconds: float) -> str:
     return f"{seconds/60:.0f}m {seconds%60:.0f}s"
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--sample", type=int, default=None, help="Run first N questions")
-    parser.add_argument("--ids", nargs="*", default=None, help="Specific eval IDs to run")
-    args = parser.parse_args()
-
+def _load_eval_set(args) -> list[dict]:
     if not EVAL_FILE.exists():
         print(f"ERROR: {EVAL_FILE} not found.")
         sys.exit(1)
@@ -113,95 +87,93 @@ def main() -> None:
         print("No matching questions found.")
         sys.exit(1)
 
-    logger.info("Running RAG + faithfulness eval for %s questions...", len(eval_set))
-    logger.info("(each question = 2 LLM calls: 1 generate + 1 judge)\n")
+    return eval_set
 
-    results = []
-    times = []
 
-    for i, item in enumerate(eval_set, 1):
-        qid = item["id"]
-        question = item["question"]
-        ticker = item.get("ticker_filter")
+NO_INFO_PATTERNS = [
+    "do not discuss", "not mentioned", "no information",
+    "does not provide", "not addressed", "not covered",
+    "do not provide", "the provided filings do not",
+]
 
-        elapsed_prompt = f" [~{fmt_time(sum(times)/len(times) * (len(eval_set)-i+1))} remaining]" if times else ""
-        logger.info("[%s/%s] [%s] %s...%s", i, len(eval_set), qid, question[:50], elapsed_prompt)
 
-        LLMClient.reset()
-        llm = LLMClient()
-        t0 = time.time()
+def _is_retrieval_gap(answer: str) -> bool:
+    return not any(p in answer.lower() for p in NO_INFO_PATTERNS)
 
-        try:
-            rag_result = answer_question(question, ticker_filter=ticker, top_k=5, llm=llm)
-        except Exception as e:
-            logger.error("  -> RAG FAILED: %s", e)
-            results.append({"id": qid, "question": question, "error": str(e)})
-            continue
-        answer = rag_result["answer"]
-        sources = rag_result["sources"]
 
-        NO_INFO_PATTERNS = [
-            "do not discuss", "not mentioned", "no information",
-            "does not provide", "not addressed", "not covered",
-            "do not provide", "the provided filings do not",
-        ]
-        has_content = not any(p in answer.lower() for p in NO_INFO_PATTERNS)
+def _summarize_sources(sources: list[dict]) -> list[dict]:
+    return [
+        {
+            "ticker": s["metadata"]["ticker"],
+            "form": s["metadata"]["form"],
+            "filing_date": s["metadata"]["filing_date"],
+            "relevance": s.get("hybrid_score", s.get("relevance", 0)),
+            "text": s["text"],
+        }
+        for s in sources
+    ]
 
-        if not has_content:
-            total_time = round(time.time() - t0, 1)
-            times.append(total_time)
-            logger.info("  -> RETRIEVAL GAP — answer has no info [%s]", fmt_time(total_time))
-            results.append({
-                "id": qid, "question": question,
-                "retrieval_gap": True,
-                "answer": answer,
-                "sources": [
-                    {"ticker": s["metadata"]["ticker"], "form": s["metadata"]["form"],
-                     "filing_date": s["metadata"]["filing_date"],
-                     "relevance": s.get("hybrid_score", s.get("relevance", 0)),
-                     "text": s["text"]}
-                    for s in sources
-                ],
-            })
-            _save_checkpoint(results)
-            continue
 
-        prompt = build_judge_prompt(question, answer, sources)
-        response = llm.generate(prompt, system=JUDGE_SYSTEM_PROMPT_FULL, max_tokens=4096)
-        parsed = parse_judge_response(response)
-        total_time = round(time.time() - t0, 1)
+def _process_question(item: dict, llm: LLMClient, times: list[float], i: int, n: int) -> dict | None:
+    qid = item["id"]
+    question = item["question"]
+    ticker = item.get("ticker_filter")
+
+    elapsed_prompt = f" [~{fmt_time(sum(times)/len(times) * (n-i+1))} remaining]" if times else ""
+    logger.info("[%s/%s] [%s] %s...%s", i, n, qid, question[:50], elapsed_prompt)
+
+    t0 = time.time()
+
+    try:
+        rag_result = answer_question(question, ticker_filter=ticker, top_k=5, llm=llm)
+    except Exception as e:
+        logger.error("  -> RAG FAILED: %s", e)
+        return {"id": qid, "question": question, "error": str(e)}
+
+    answer = rag_result["answer"]
+    sources = rag_result["sources"]
+    total_time = round(time.time() - t0, 1)
+
+    if not _is_retrieval_gap(answer):
         times.append(total_time)
+        logger.info("  -> RETRIEVAL GAP — answer has no info [%s]", fmt_time(total_time))
+        return {
+            "id": qid, "question": question,
+            "retrieval_gap": True,
+            "answer": answer,
+            "sources": _summarize_sources(sources),
+        }
 
-        if parsed and isinstance(parsed, dict):
-            claims = parsed.get("claims", [])
-            faithful = sum(1 for c in claims if c.get("verdict") == "FAITHFUL")
-            partial = sum(1 for c in claims if c.get("verdict") == "PARTIALLY FAITHFUL")
-            unfaithful = sum(1 for c in claims if c.get("verdict") == "UNFAITHFUL")
-            parsed["total_claims"] = len(claims)
-            parsed["faithful_count"] = faithful
-            parsed["partial_count"] = partial
-            parsed["unfaithful_count"] = unfaithful
-            total = faithful + partial + unfaithful
-            parsed["faithfulness_score"] = round(faithful / total, 4) if total > 0 else 0.0
-            logger.info("  -> %s [%s]", display_score(parsed), fmt_time(total_time))
-            results.append({
-                "id": qid,
-                "question": question,
-                "answer": answer,
-                "sources": [
-                    {"ticker": s["metadata"]["ticker"], "form": s["metadata"]["form"],
-                     "filing_date": s["metadata"]["filing_date"],
-                     "relevance": s.get("hybrid_score", s.get("relevance", 0)),
-                     "text": s["text"]}
-                    for s in sources
-                ],
-                **parsed,
-            })
-        else:
-            logger.warning("  -> PARSE FAILED [%s]", fmt_time(total_time))
-            results.append({"id": qid, "question": question, "error": response})
-        _save_checkpoint(results)
+    prompt = build_judge_prompt(question, answer, sources)
+    response = llm.generate(prompt, system=JUDGE_SYSTEM_PROMPT_FULL, max_tokens=4096)
+    parsed = parse_judge_response(response)
+    times.append(total_time)
 
+    if parsed and isinstance(parsed, dict):
+        claims = parsed.get("claims", [])
+        faithful = sum(1 for c in claims if c.get("verdict") == "FAITHFUL")
+        partial = sum(1 for c in claims if c.get("verdict") == "PARTIALLY FAITHFUL")
+        unfaithful = sum(1 for c in claims if c.get("verdict") == "UNFAITHFUL")
+        parsed["total_claims"] = len(claims)
+        parsed["faithful_count"] = faithful
+        parsed["partial_count"] = partial
+        parsed["unfaithful_count"] = unfaithful
+        total = faithful + partial + unfaithful
+        parsed["faithfulness_score"] = round(faithful / total, 4) if total > 0 else 0.0
+        logger.info("  -> %s [%s]", display_score(parsed), fmt_time(total_time))
+        return {
+            "id": qid,
+            "question": question,
+            "answer": answer,
+            "sources": _summarize_sources(sources),
+            **parsed,
+        }
+
+    logger.warning("  -> PARSE FAILED [%s]", fmt_time(total_time))
+    return {"id": qid, "question": question, "error": response}
+
+
+def _aggregate_results(results: list[dict], times: list[float]) -> dict:
     total_f = sum(r.get("faithful_count", 0) for r in results if "error" not in r and not r.get("retrieval_gap"))
     total_p = sum(r.get("partial_count", 0) for r in results if "error" not in r and not r.get("retrieval_gap"))
     total_u = sum(r.get("unfaithful_count", 0) for r in results if "error" not in r and not r.get("retrieval_gap"))
@@ -221,17 +193,43 @@ def main() -> None:
     )
     logger.info(summary)
 
+    return {
+        "overall_faithfulness_strict": round(overall, 4),
+        "overall_faithfulness_weighted": round(weighted, 4),
+        "total_claims": total,
+        "faithful": total_f,
+        "partial": total_p,
+        "unfaithful": total_u,
+        "retrieval_gaps": gaps,
+        "results": results,
+    }
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--sample", type=int, default=None, help="Run first N questions")
+    parser.add_argument("--ids", nargs="*", default=None, help="Specific eval IDs to run")
+    args = parser.parse_args()
+
+    eval_set = _load_eval_set(args)
+
+    logger.info("Running RAG + faithfulness eval for %s questions...", len(eval_set))
+    logger.info("(each question = 2 LLM calls: 1 generate + 1 judge)\n")
+
+    results = []
+    times = []
+
+    for i, item in enumerate(eval_set, 1):
+        LLMClient.reset()
+        llm = LLMClient()
+        result = _process_question(item, llm, times, i, len(eval_set))
+        results.append(result)
+        _save_checkpoint(results)
+
+    full = _aggregate_results(results, times)
+
     with open(RESULT_FILE, "w") as f:
-        json.dump({
-            "overall_faithfulness_strict": round(overall, 4),
-            "overall_faithfulness_weighted": round(weighted, 4),
-            "total_claims": total,
-            "faithful": total_f,
-            "partial": total_p,
-            "unfaithful": total_u,
-            "retrieval_gaps": gaps,
-            "results": results,
-        }, f, indent=2)
+        json.dump(full, f, indent=2)
 
     logger.info("Saved to %s", RESULT_FILE)
 

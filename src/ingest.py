@@ -43,7 +43,7 @@ def fetch_filing_html(url: str) -> str:
     return response.text
 
 
-def _find_mda_start(text: str):
+def _find_mda_start(text: str) -> re.Match | None:
     heading_pattern = re.compile(
         r"Item\s+\d+[A]?\.\s*Management.{0,3}s\s+Discussion\s+and\s+Analysis",
         re.IGNORECASE,
@@ -65,7 +65,7 @@ def _find_mda_start(text: str):
     return best_match
 
 
-def _convert_tables_to_text(soup):
+def _convert_tables_to_text(soup: BeautifulSoup) -> None:
     """Join table row cells so numbers stay with their labels.
 
     SEC filing HTML uses one <td> per token for visual alignment. When

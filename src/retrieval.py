@@ -130,35 +130,18 @@ def _keyword_boost(query_text: str, chunk_text: str) -> float:
     return matches / len(keywords)
 
 
-def query_multi(
+def _retrieve_dense(
     collection: Any,
     query_text: str,
-    top_k: int = None,
-    min_relevance: float = None,
-    ticker_filter: str | None = None,
+    lookup: str,
+    min_relevance: float,
 ) -> list[dict]:
-    """
-    Multi-strategy retrieval:
-    1. Bi-encoder (nomic-embed) + glossary expansion → N candidates
-    2. Optional: keyword boost + forward-looking penalty (legacy)
-    3. Optional: cross-encoder re-ranking
-    """
-    if top_k is None:
-        top_k = config.retrieval_top_k
-    if min_relevance is None:
-        min_relevance = config.retrieval_min_relevance
-
-    where = {"ticker": ticker_filter} if ticker_filter else None
-
-    lookup = expand_query(query_text) if config.expansion_enabled else query_text
-
     results = collection.query(
         query_embeddings=[embed_query(lookup)],
         n_results=config.retrieval_n_candidates,
-        where=where,
     )
 
-    dense_candidates = []
+    candidates = []
     for doc, meta, distance in zip(
         results["documents"][0],
         results["metadatas"][0],
@@ -171,44 +154,63 @@ def query_multi(
                 c["keyword_boost"] = _keyword_boost(query_text, doc)
             if config.forward_looking_penalty_enabled:
                 c["forward_looking_penalty"] = _forward_looking_penalty(doc)
-            dense_candidates.append(c)
+            candidates.append(c)
 
-    if not dense_candidates:
+    return candidates
+
+
+def _retrieve_bm25(
+    collection: Any,
+    lookup: str,
+    ticker_filter: str | None,
+) -> list[dict]:
+    get_kw = {}
+    if ticker_filter:
+        get_kw["where"] = {"ticker": ticker_filter}
+    all_docs = collection.get(**get_kw)
+    all_texts = all_docs["documents"]
+    bm25 = build_bm25(all_texts)
+    bm25_raw = bm25_scores(bm25, lookup, all_texts)
+    paired = sorted(zip(bm25_raw, all_texts, all_docs["metadatas"]), key=lambda x: -x[0])
+    candidates = []
+    for score, text, meta in paired:
+        candidates.append({"text": text, "metadata": meta, "relevance": score})
+    candidates = [c for c in candidates if c["relevance"] > 0]
+    return candidates[:config.retrieval_n_candidates]
+
+
+def _fill_missing_fields(candidates: list[dict], query_text: str) -> None:
+    for c in candidates:
+        if "keyword_boost" not in c:
+            c["keyword_boost"] = _keyword_boost(query_text, c["text"])
+        if "forward_looking_penalty" not in c:
+            c["forward_looking_penalty"] = _forward_looking_penalty(c["text"])
+
+
+def query_multi(
+    collection: Any,
+    query_text: str,
+    top_k: int = None,
+    min_relevance: float = None,
+    ticker_filter: str | None = None,
+) -> list[dict]:
+    if top_k is None:
+        top_k = config.retrieval_top_k
+    if min_relevance is None:
+        min_relevance = config.retrieval_min_relevance
+
+    lookup = expand_query(query_text) if config.expansion_enabled else query_text
+
+    dense = _retrieve_dense(collection, query_text, lookup, min_relevance)
+    if not dense:
         return []
 
-    # Hybrid search: BM25 runs on ALL matching docs (not just dense top-N)
-    # so it can surface chunks that dense embeddings miss entirely.
-    # Uses the same expanded query that dense retrieval uses.
     if config.hybrid_search_enabled:
-        get_kw = {}
-        if ticker_filter:
-            get_kw["where"] = {"ticker": ticker_filter}
-        all_docs = collection.get(**get_kw)
-        all_texts = all_docs["documents"]
-        bm25 = build_bm25(all_texts)
-        bm25_raw = bm25_scores(bm25, lookup, all_texts)
-        paired = sorted(zip(bm25_raw, all_texts, all_docs["metadatas"]), key=lambda x: -x[0])
-        bm25_candidates = []
-        for score, text, meta in paired:
-            bm25_candidates.append({"text": text, "metadata": meta, "relevance": score})
-        bm25_candidates = [c for c in bm25_candidates if c["relevance"] > 0]
-        bm25_candidates = bm25_candidates[:config.retrieval_n_candidates]
-        candidates = rrf_merge(
-            dense_candidates,
-            bm25_candidates,
-            top_k=len(dense_candidates),
-        )
+        bm25 = _retrieve_bm25(collection, lookup, ticker_filter)
+        candidates = rrf_merge(dense, bm25, top_k=len(dense))
+        _fill_missing_fields(candidates, query_text)
     else:
-        candidates = dense_candidates
-
-    # Ensure all candidates have keyword_boost / forward_looking_penalty
-    # (BM25-only results from hybrid search won't have them)
-    if config.hybrid_search_enabled:
-        for c in candidates:
-            if "keyword_boost" not in c:
-                c["keyword_boost"] = _keyword_boost(query_text, c["text"])
-            if "forward_looking_penalty" not in c:
-                c["forward_looking_penalty"] = _forward_looking_penalty(c["text"])
+        candidates = dense
 
     if config.cross_encoder_enabled:
         return rerank(query_text, candidates, top_k=top_k)
