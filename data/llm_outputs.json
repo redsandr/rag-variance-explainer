@@ -1,662 +1,134 @@
 [
   {
-    "question": "Why did Chipotle's labor costs change?",
-    "ticker": "CMG",
-    "answer": "- [CMG 10-Q filed 2024-07-25 | relevance: 1.15]\n  - Labor costs increased by 17.2% for the three months ended June 30, 2024, compared to the same period in 2023.\n  - Labor costs increased by 15.1% for the six months ended June 30, 2024, compared to the same period in 2023.\n  - Labor costs decreased as a percentage of total revenue by 0.2% for the three months ended June 30, 2024, compared to the same period in 2023, due to 1.5% sales leverage, partially offset by 1.1% restaurant wage inflation, including a 0.5% increase due to the minimum wage for restaurants like Chipotle in California increasing to $20 per hour in April 2024.\n  - Labor costs decreased as a percentage of total revenue by 0.3% for the six months ended June 30, 2024, compared to the same period in 2023, due to 1.3% sales leverage, partially offset by 0.8% restaurant wage inflation, including a 0.3% increase due to the minimum wage for restaurants like Chipotle in California increasing to $20 per hour in April 2024.",
-    "sources": [
-      {
-        "chunk_id": "CMG_0001058090-24-000032_6",
-        "relevance": 0.7946486473083496,
-        "text_preview": " for frying chips.\n\nLabor Costs\n\nThree months ended June 30, Percentage Six months ended June 30, Percentage\n\n2024 2023 change 2024 2023 change\n\n(dollars in millions) (dollars in millions)\n\nLabor cost"
-      },
-      {
-        "chunk_id": "CMG_0001058090-24-000032_3",
-        "relevance": 0.671477198600769,
-        "text_preview": " per share was $0.33, a 32.0% increase from $0.25, which includes a $0.01 after-tax impact from an unrealized loss on a long-term investment and an increase in legal reserves.\n\nSales Trends\n\n. Compara"
-      },
-      {
-        "chunk_id": "CMG_0001058090-24-000050_2",
-        "relevance": 0.6782703399658203,
-        "text_preview": " through licensed restaurants in the Middle East; increases in ingredient and other operating costs due to inflation, global conflicts, severe weather and climate change, our Food with Integrity philo"
-      },
-      {
-        "chunk_id": "CMG_0001058090-25-000056_2",
-        "relevance": 0.6884438395500183,
-        "text_preview": " including through licensed restaurants in the Middle East and Mexico; increases in ingredient and other operating costs due to inflation, global conflicts, severe weather and climate change, our Food"
-      },
-      {
-        "chunk_id": "CMG_0001058090-25-000031_2",
-        "relevance": 0.686355710029602,
-        "text_preview": " including through licensed restaurants in the Middle East and Mexico; increases in ingredient and other operating costs due to inflation, global conflicts, severe weather and climate change, our Food"
-      }
-    ],
-    "retrieval_time_s": 622.8
-  },
-  {
     "question": "Why did marketing costs change at Darden?",
     "ticker": "DRI",
-    "answer": "- [DRI 10-K filed 2024-07-19 | relevance: 0.88]\n  - Marketing expenses increased from $144.5 million to $169.9 million, representing a 17.6% increase from fiscal 2023 to fiscal 2024.\n  - The increase was driven by a 22.1% increase in marketing expenses as a percentage of sales from continuing operations, from 1.1% to 1.3%.\n\n- [DRI 10-K filed 2025-07-18 | relevance: 1.12]\n  - Marketing expenses increased from $169.9 million to $175.1 million, representing a 3.0% increase from fiscal 2024 to fiscal 2025.\n  - The increase was driven by a 1.3% increase in marketing expenses as a percentage of sales from continuing operations, from 1.3% to 1.4%.\n\n- [DRI 10-Q filed 2025-01-02 | relevance: 0.57]\n  - Marketing expenses for the three months ended November 24, 2024, were $169.9 million, representing a 3.3% increase from the same period in fiscal 2023.\n  - Marketing expenses for the six months ended November 24, 2024, were $339.8 million, representing a 0.9% increase from the same period in fiscal 2023.\n  - The increase in marketing expenses as a percentage of sales from continuing operations was consistent with the fiscal year trends, showing a 1.3% increase for the three-month period and 1.4% for the six-month period.",
+    "answer": "- [DRI 10-K filed 2024-07-19 | relevance: 0.75] Marketing expenses increased by 22.1% from $144.5 million in fiscal 2023 to $175.1 million in fiscal 2024. This increase was driven by the acquisition of Ruth\u2019s Chris, which contributed to the higher marketing expenses in fiscal 2024.\n\n- [DRI 10-K filed 2025-07-18 | relevance: 1.12] Marketing expenses increased by 17.6% from $169.9 million in fiscal 2024 to $195.9 million in fiscal 2025. This increase was driven by the inclusion of Chuy\u2019s in the marketing expenses, as Chuy\u2019s was acquired and its results were included in the fiscal 2025 financials.",
     "sources": [
       {
         "chunk_id": "DRI_0000940944-25-000038_2",
         "relevance": 0.6703348159790039,
-        "text_preview": "6, we expect our annual effective tax rate to be 13 percent, and we expect capital expenditures incurred to build new restaurants, remodel and maintain existing restaurants and technology initiatives "
+        "text_preview": "6, we expect our annual effective tax rate to be 13 percent, and we expect capital expenditures incurred to build new restaurants, remodel and maintain existing restaurants and technology initiatives to be between $700 million and $750 million.\n\n(1) \n\n \n\nAnnual same-restaurant sales is a 52-week metric and excludes the impact of Chuy\u2019s, which will not have been owned and operated by Darden for a 16-month period prior to the beginning of fiscal 2026, as well as any additional locations not expected to be operated by Darden for the entirety of the fiscal year.\n\n30\n\nRESULTS OF OPERATIONS FOR FISCAL 2025 AND 2024\n\nTo facilitate review of our results of operations, the following table sets forth our financial results for the periods indicated. All information is derived from the consolidated statements of earnings for the fiscal years ended May 25, 2025 and May 26, 2024: \n\nFiscal Year Ended Percent Change\n\n(in millions) May 25, 2025 May 26, 2024 2025 v. 2024\n\nSales $ 12,076.7 $ 11,390.0 6.0%\n\nCosts and expenses:\n\nFood and beverage 3,657.0 3,523.9 3.8%\n\nRestaurant labor 3,833.1 3,619.3 5.9%\n\nRestaurant expenses 1,944.0 1,812.3 7.3%\n\nPre-opening costs 24.8 24.3 2.1%\n\nMarketing expenses 169.9 144.5 17.6%\n\nGeneral and administrative expenses 520.3 479.2 8.6%\n\nDepreciation and amortization 516.1 459.9 12.2%\n\nImpairments and disposal of assets, net 49.2 12.4 NM\n\nTotal operating costs and expenses $ 10,714.4 $ 10,075.8 6.3%\n\nOperating income $ 1,362.3 $ 1,314.2 3.7%\n\nInterest, net 175.1 138.7 26.2%\n\nEarnings before income taxes $ 1,187.2 $ 1,175.5 1.0%\n\nIncome tax expense (1) 136.2 145.0 (6.1)%\n\nEarnings from continuing operations $ 1,051.0 $ 1,030.5 2.0%\n\nLosses from discontinued operations, net of tax (1.4) (2.9) (51.7)%"
       },
       {
         "chunk_id": "DRI_0000940944-24-000035_4",
         "relevance": 0.6310020685195923,
-        "text_preview": "225.3 $ 2,166.9 2.7 % (0.7) % $ 6.0 $ 6.0\n\n$ 11,390.0 $ 10,487.8\n\n(1)\n\nSame-restaurant sales is a year-over-year comparison of each period\u2019s sales volumes for a 52-week year and is limited to restaura"
+        "text_preview": "225.3 $ 2,166.9 2.7 % (0.7) % $ 6.0 $ 6.0\n\n$ 11,390.0 $ 10,487.8\n\n(1)\n\nSame-restaurant sales is a year-over-year comparison of each period\u2019s sales volumes for a 52-week year and is limited to restaurants that have been open, and operated by Darden, for at least 16 months.\n\n(2)\n\nAverage annual sales are calculated as sales divided by total restaurant operating weeks multiplied by 52 weeks; excludes franchise locations.\n\nOlive Garden\u2019s sales increase for fiscal 2024 was primarily driven by a U.S. same-restaurant sales increase combined with revenue from new restaurants. The increase in U.S. same-restaurant sales in fiscal 2024 resulted from a 3.3 percent increase in average check, partially offset by a 1.7 percent decrease in same-restaurant guest counts. \n\nLongHorn Steakhouse\u2019s sales increase for fiscal 2024 was primarily driven by a same-restaurant sales increase combined with revenue from new restaurants. The increase in same-restaurant sales in fiscal 2024 resulted from a 5.2 percent increase in average check, partially offset by a 0.4 percent decrease in same-restaurant guest counts. \n\nFine Dining\u2019s sales increase for fiscal 2024 was driven by the acquisition of Ruth\u2019s Chris, offset by same-restaurant sales decreases. The decrease in same-restaurant sales in fiscal 2024 resulted from a 6.9 percent decrease in same-restaurant guest counts offset by a 4.9 percent increase in average check. \n\nOther Business\u2019s sales increase for fiscal 2024 was driven by revenue from new restaurants offset by same-restaurant sales decreases. The decrease in same-restaurant sales in fiscal 2024 resulted from a 3.3 percent decrease in same-restaurant guest counts offset by a 2.6 percent increase in average check. \n\n32\n\nCOSTS AND EXPENSES \n\nThe following table sets forth selected operating data as a percent of sales from continuing operations for the periods indicated. This information is derived from the consolidated statements of earnings for the fiscal years ended May 26, 2024 and May 28, 2023.\n\nFiscal Year Ended\n\nMay 26, 2024 May 28, 2023\n\nSales 100.0 % 100.0 %\n\nCosts and expenses:\n\nFood and beverage 30.9 32.0\n\nRestaurant labor 31.8 31.9\n\nRestaurant expenses 16.1 16.2\n\nMarketing expenses 1.3 1.1"
       },
       {
         "chunk_id": "DRI_0000940944-24-000035_2",
         "relevance": 0.6329097151756287,
-        "text_preview": "\u2019s have not been included in our fiscal 2025 outlook below.\n\nWe expect fiscal 2025 sales from continuing operations to increase between 3.5 percent and 4.5 percent, driven by same-restaurant sales gro"
+        "text_preview": "\u2019s have not been included in our fiscal 2025 outlook below.\n\nWe expect fiscal 2025 sales from continuing operations to increase between 3.5 percent and 4.5 percent, driven by same-restaurant sales growth\n\n (1)\n\n of 1.0 percent to 2.0 percent, and sales from 45 to 50 new restaurant openings. In fiscal 2025, we expect our annual effective tax rate to be 13 percent and we expect capital expenditures incurred to build new restaurants, remodel and maintain existing restaurants and technology initiatives to be between $550 million and $600 million.\n\n(1) \n\n \n\nExcludes Ruth\u2019s Chris as they will not be owned and operated by Darden for a 16-month period at the \n\n beginning of fiscal 2025.\n\n30\n\nRESULTS OF OPERATIONS FOR FISCAL 2024 AND 2023\n\nTo facilitate review of our results of operations, the following table sets forth our financial results for the periods indicated. All information is derived from the consolidated statements of earnings for the fiscal years ended May 26, 2024 and May 28, 2023: \n\nFiscal Year Ended Percent Change\n\n(in millions) May 26, 2024 May 28, 2023 2024 v. 2023\n\nSales $ 11,390.0 $ 10,487.8 8.6%\n\nCosts and expenses:\n\nFood and beverage 3,523.9 3,355.9 5.0%\n\nRestaurant labor 3,619.3 3,346.3 8.2%\n\nRestaurant expenses 1,836.6 1,702.2 7.9%\n\nMarketing expenses 144.5 118.3 22.1%\n\nGeneral and administrative expenses 479.2 386.1 24.1%\n\nDepreciation and amortization 459.9 387.8 18.6%\n\nImpairments and disposal of assets, net 12.4 (10.6) NM\n\nTotal operating costs and expenses $ 10,075.8 $ 9,286.0 8.5%\n\nOperating income $ 1,314.2 $ 1,201.8 9.4%\n\nInterest, net 138.7 81.3 70.6%\n\nEarnings before income taxes $ 1,175.5 $ 1,120.5 4.9%\n\nIncome tax expense (1) 145.0 137.0 5.8%\n\nEarnings from continuing operations $ 1,030.5 $ 983.5 4.8%"
       },
       {
         "chunk_id": "DRI_0000940944-25-000038_4",
         "relevance": 0.6321054100990295,
-        "text_preview": ",533.5 $ 2,225.3 13.8 % 0.2 % $ 5.8 $ 6.0\n\n$ 12,076.7 $ 11,390.0\n\n(1)\n\nSame-restaurant sales is a year-over-year comparison of each period\u2019s sales volumes for a 52-week year and is limited to restaura"
+        "text_preview": ",533.5 $ 2,225.3 13.8 % 0.2 % $ 5.8 $ 6.0\n\n$ 12,076.7 $ 11,390.0\n\n(1)\n\nSame-restaurant sales is a year-over-year comparison of each period\u2019s sales volumes for a 52-week year and is limited to restaurants that have been open, and operated by Darden, for at least 16 months.\n\n(2)\n\nAverage annual sales are calculated as sales divided by total restaurant operating weeks multiplied by 52 weeks; excludes franchise locations.\n\nOlive Garden\u2019s sales increase for fiscal 2025 was primarily driven by a U.S. same-restaurant sales increase combined with revenue from new restaurants. The increase in U.S. same-restaurant sales in fiscal 2025 resulted from a 4.1 percent increase in average check, which includes a 0.7 increase in off-premise catering sales, partially offset by a 2.3 percent decrease in same-restaurant guest counts. \n\nLongHorn Steakhouse\u2019s sales increase for fiscal 2025 was primarily driven by a same-restaurant sales increase combined with revenue from new restaurants. The increase in same-restaurant sales in fiscal 2025 resulted from a 3.1 percent increase in average check and a 1.9 percent increase in same-restaurant guest counts. \n\nFine Dining\u2019s sales increase for fiscal 2025 was driven by revenue from new restaurants offset by same-restaurant sales decreases. The decrease in same-restaurant sales in fiscal 2025 resulted from a 5.2 percent decrease in same-restaurant guest counts offset by a 2.3 percent increase in average check. \n\nOther Business\u2019s sales increase for fiscal 2025 was driven by a U.S. same-restaurant sales increase combined with revenue from new restaurants including the acquisition of Chuy\u2019s. The increase in same-restaurant sales in fiscal 2025 resulted from a 2.6 percent increase in average check offset by a 2.4 percent decrease in same-restaurant guest counts.\n\n32\n\nCOSTS AND EXPENSES \n\nThe following table sets forth selected operating data as a percent of sales from continuing operations for the periods indicated. This information is derived from the consolidated statements of earnings for the fiscal years ended May 25, 2025 and May 26, 2024.\n\nFiscal Year Ended\n\nMay 25, 2025 May 26, 2024\n\nSales 100.0 % 100.0 %\n\nCosts and expenses:\n\nFood and beverage 30.3 30.9\n\nRestaurant labor 31.7 31.8"
       },
       {
         "chunk_id": "DRI_0000940944-25-000003_4",
         "relevance": 0.6672831773757935,
-        "text_preview": " expenditures incurred to build new restaurants, remodel and maintain existing restaurants and for technology initiatives to be approximately $650 million. These amounts now all include the addition o"
+        "text_preview": " expenditures incurred to build new restaurants, remodel and maintain existing restaurants and for technology initiatives to be approximately $650 million. These amounts now all include the addition of Chuy\u2019s and our expectations for Chuy\u2019s results from the date of acquisition forward.\n\n1\n\n Same-restaurant sales exclude Ruth\u2019s Chris and Chuy\u2019s as they were not owned and operated by Darden for a 16-month period at the beginning of the fiscal year.\n\n SALES\n\nThe following table presents our sales by segment for the periods indicated.\n\nThree Months Ended Six Months Ended\n\n(in millions) November 24, 2024 November 26, 2023 % Chg SRS (1) November 24, 2024 November 26, 2023 % Chg SRS (1)\n\nOlive Garden $ 1,292.5 $ 1,251.4 3.3 % 2.0 % $ 2,501.6 $ 2,479.3 0.9 % (0.4) %\n\nLongHorn Steakhouse $ 710.1 $ 643.0 10.4 % 7.5 % $ 1,423.6 $ 1,312.8 8.4 % 5.6 %\n\nFine Dining $ 306.0 $ 318.0 (3.8) % (5.8) % $ 584.9 $ 591.5 (1.1) % (5.8) %\n\nOther Business $ 581.4 $ 514.9 12.9 % 0.7 % $ 1,136.9 $ 1,074.3 5.8 % (0.6) %\n\n(1)\n\nSame-restaurant sales is a year-over-year comparison of each period\u2019s sales volumes for a 52-week year and is limited to restaurants that have been open, and operated by Darden, for at least 16 months. Accordingly, Chuy\u2019s results will not be included in this calculation until the fourth quarter of fiscal 2026 and Ruth\u2019s Chris results are included for fiscal 2025 November only."
       }
     ],
-    "retrieval_time_s": 623.8
-  },
-  {
-    "question": "How did wage inflation affect Chipotle's labor costs?",
-    "ticker": "CMG",
-    "answer": "- [CMG 10-Q filed 2024-07-25 | relevance: 1.15]: Wage inflation contributed to a 1.1% increase in labor costs for the three months ended June 30, 2024, primarily due to the minimum wage for restaurants like Chipotle in California increasing to $20 per hour in April 2024.\n- [CMG 10-Q filed 2025-07-24 | relevance: 0.81]: Wage inflation, including minimum wage increases for restaurants in California, contributed to a 0.5% increase in labor costs for the three months ended June 30, 2025.\n- [CMG 10-Q filed 2026-04-30 | relevance: 0.72]: Wage inflation, along with other factors, contributed to a 0.3% increase in labor costs for the three months ended March 31, 2026.\n- [CMG 10-Q filed 2025-04-24 | relevance: 0.65]: Wage inflation, including minimum wage increases for restaurants in California, contributed to a 0.7% increase in labor costs for the three months ended March 31, 2025.",
-    "sources": [
-      {
-        "chunk_id": "CMG_0001058090-24-000032_6",
-        "relevance": 0.7782372236251831,
-        "text_preview": " for frying chips.\n\nLabor Costs\n\nThree months ended June 30, Percentage Six months ended June 30, Percentage\n\n2024 2023 change 2024 2023 change\n\n(dollars in millions) (dollars in millions)\n\nLabor cost"
-      },
-      {
-        "chunk_id": "CMG_0001058090-25-000056_6",
-        "relevance": 0.6818456053733826,
-        "text_preview": ".5 $ 1,376.1 7.2 %\n\nAs a percentage of total revenue 24.7 % 24.1 % 0.6 % 24.8 % 24.2 % 0.6 %\n\nLabor costs increased 0.6% as a percentage of total revenue for the three months ended June 30, 2025 compa"
-      },
-      {
-        "chunk_id": "CMG_0001058090-24-000032_3",
-        "relevance": 0.6306924819946289,
-        "text_preview": " per share was $0.33, a 32.0% increase from $0.25, which includes a $0.01 after-tax impact from an unrealized loss on a long-term investment and an increase in legal reserves.\n\nSales Trends\n\n. Compara"
-      },
-      {
-        "chunk_id": "CMG_0001058090-26-000028_5",
-        "relevance": 0.6691288948059082,
-        "text_preview": "6 2025 change\n\n(dollars in millions)\n\nLabor costs $ 805.4 $ 718.2 12.1 %\n\nAs a percentage of total revenue 26.1 % 25.0 % 1.1 %\n\nLabor costs increased 1.1% as a percentage of total revenue for the thre"
-      },
-      {
-        "chunk_id": "CMG_0001058090-25-000031_5",
-        "relevance": 0.65688157081604,
-        "text_preview": " a 20 basis point increase in food, beverage and packaging costs during the second quarter of 2025 relating to tariffs.\n\nLabor Costs\n\nThree months ended March 31, Percentage\n\n2025 2024 change\n\n(dollar"
-      }
-    ],
-    "retrieval_time_s": 467.0
+    "retrieval_time_s": 25.0
   },
   {
     "question": "What drove Chipotle's revenue changes?",
     "ticker": "CMG",
-    "answer": "- [CMG 10-K filed 2025-02-05 | relevance: 1.11]\n  - Comparable restaurant sales increased 7.4%, driven by higher transactions of 5.3% and a 2.1% increase in average check.\n  - Digital sales represented 35.1% of total food and beverage revenue.\n\n- [CMG 10-Q filed 2024-07-25 | relevance: 1.05]\n  - Comparable restaurant sales increased 11.1%, primarily attributable to higher transactions and a lesser extent an increase in average check.\n  - Digital sales represented 35.3% of total food and beverage revenue.\n\n- [CMG 10-Q filed 2025-04-24 | relevance: 1.09]\n  - Comparable restaurant sales decreased 0.4%, attributable to lower transactions of 2.3% offset by a 1.9% increase in average check.\n  - Transactions were impacted by a slowdown in consumer spending and periods of inclement weather.\n\n- [CMG 10-Q filed 2025-07-24 | relevance: 1.04]\n  - Comparable restaurant sales decreased 4.0%, attributable to lower transactions of 4.9% offset by a 0.9% increase in average check.\n  - Management anticipates about flat comparable restaurant sales for 2025.\n\n- [CMG 10-Q filed 2025-10-30 | relevance: 0.98]\n  - Comparable restaurant sales increased 0.3%, attributable to a 1.1% increase in average check partially offset by lower transactions of 0.8%.\n  - Digital sales represented 36.7% of total food and beverage revenue.\n  - Management anticipates comparable",
+    "answer": "- [CMG 10-K filed 2025-02-05 | relevance: 1.06]\n  - Total revenue increased to $11.3 billion, a 0.6% increase from the previous year.\n\n- [CMG 10-Q filed 2025-04-24 | relevance: 1.04]\n  - Total revenue decreased to $2.9 billion, a 6.4% decrease from the previous year.\n\n- [CMG 10-Q filed 2024-07-25 | relevance: 1.00]\n  - Total revenue increased to $2,875.3 million, a 6.4% increase from the previous year.\n\n- [CMG 10-Q filed 2025-07-24 | relevance: 0.99]\n  - Total revenue decreased to $3.1 billion, a 7.5% decrease from the previous year.\n\n- [CMG 10-Q filed 2025-10-30 | relevance: 0.93]\n  - Total revenue increased to $3.0 billion, a 7.5% increase from the previous year.\n\n### Explanation of Revenue Changes:\n\n1. **2024-07-25 (Q2 2024):**\n   - Total revenue increased by 6.4% to $2,875.3 million. This increase is attributed to higher transactions (11.1%) and a 3.4% increase in average restaurant sales. The decrease in average check is offset by the increase in transactions.\n\n2. **2025-04-24 (Q1 2025):**\n   - Total revenue decreased by 6.4% to $2.9 billion. The decrease is attributed to lower transactions (2.3%) which is offset by a 1.9% increase in average check. The decrease in consumer spending and periods of inclement weather are cited as factors impacting transactions.\n\n3. **2025-07-24 (Q2 2025):**\n   - Total revenue decreased by 7.5% to $3.1 billion. The decrease is attributed to lower transactions (4.9%) which is offset by a 0.9% increase in average check. The slowdown in consumer spending is cited as a factor impacting transactions.\n\n4. **2025-10-30 (Q3 2025):**\n   - Total revenue increased by 7.5% to $3.0 billion. The increase is attributed to a 1.1% increase in average check, partially offset by lower transactions (0.8%). The increase in digital sales (",
     "sources": [
       {
         "chunk_id": "CMG_0001058090-25-000014_1",
         "relevance": 0.7239304780960083,
-        "text_preview": ".6% to $11.3 billion\n\n\u2022\n\nComparable restaurant sales increased 7.4%\n\n\u2022\n\nDiluted earnings per share was $1.11, a 24.7% increase from $0.89\n\nSales Trends. \n\nComparable restaurant sales increased 7.4% fo"
+        "text_preview": ".6% to $11.3 billion\n\n\u2022\n\nComparable restaurant sales increased 7.4%\n\n\u2022\n\nDiluted earnings per share was $1.11, a 24.7% increase from $0.89\n\nSales Trends. \n\nComparable restaurant sales increased 7.4% for the year ended December 31, 2024. The increase is attributable to higher transactions of 5.3% and a 2.1% increase in average check. Comparable restaurant sales represent the change in period-over-period total revenue for restaurants in operation for at least 13 full calendar months. Digital sales represented 35.1% of total food and beverage revenue. For 2025, management is anticipating comparable restaurant sales growth in the low to mid-single digit range.\n\nRestaurant Development. \n\nDuring the year ended December 31, 2024, we opened 304 restaurants, which included 257 restaurants with a Chipotlane. We expect to open approximately 315 to 345 company-owned restaurants in 2025. We expect that at least 80% of our new company-owned restaurants will include a Chipotlane. \n\nLicensing\n\n. During the year ended December 31, 2024, three licensed restaurants were opened in the Middle East.\n\nCultivate Next Fund\n\n. Our Cultivate Next Fund is a venture formed to make early-stage investments into strategically aligned companies that further our purpose to Cultivate a Better World. The Fund is authorized to invest up to $100.0 million, which is financed almost entirely by Chipotle. As of December 31, 2024, we have made $63.0 million in investments through this Fund. \n\n26\n\nTable of Contents\n\nRestaurant Activity\n\nThe following table details company-owned restaurant unit data for the years indicated. \n\nYear ended December 31,\n\n2024 2023\n\nBeginning of period 3,437 3,187\n\nChipotle openings 304 270\n\nNon-Chipotle openings - 1\n\nChipotle permanent closures (7) (3)\n\nChipotle relocations (8) (12)\n\nNon-Chipotle permanent closures - (6)\n\nTotal at end of period 3,726 3,437\n\nThe following table details licensed restaurant unit data for the years indicated.\n\nYear ended December 31,\n\n2024 2023\n\nBeginning of period - -\n\nLicensed restaurant openings 3 -\n\nTotal at end of period 3 -\n\nResults of Operations\n\nOur results of operations as a percentage of total revenue and period-over-period change are discussed in the following section. \n\nRevenue\n\nYear ended December 31, Percentage\n\n2024 2023 change\n\n(dollars in millions)"
       },
       {
         "chunk_id": "CMG_0001058090-25-000031_3",
         "relevance": 0.7497910261154175,
-        "text_preview": " $2.9 billion\n\n\u2022\n\nComparable restaurant sales decreased 0.4%\n\n\u2022\n\nDiluted earnings per share was $0.28, a 7.7% increase from $0.26\n\n14\n\nTable of Contents\n\nSales Trends\n\n. Comparable restaurant sales de"
+        "text_preview": " $2.9 billion\n\n\u2022\n\nComparable restaurant sales decreased 0.4%\n\n\u2022\n\nDiluted earnings per share was $0.28, a 7.7% increase from $0.26\n\n14\n\nTable of Contents\n\nSales Trends\n\n. Comparable restaurant sales decreased 0.4% for the three months ended March 31, 2025. The decrease is attributable to lower transactions of 2.3% which is offset by a 1.9% increase in average check. Transactions have been impacted by both a slowdown in consumer spending, which has continued into April, as well as periods of inclement weather across the country. Comparable restaurant sales represent the change in period-over-period total revenue for restaurants in operation for at least 13 full calendar months. Digital sales represented 35.4% of total food and beverage revenue.\n\nRestaurant Development. \n\nDuring the three months ended March 31, 2025, we opened 57 restaurants, which included 48 restaurants with a Chipotlane. We expect to open approximately 315 to 345 company-owned restaurants in 2025. We expect that at least 80% of our new company-owned restaurants will include a Chipotlane.\n\nLicensing.\n\n During the three months ended March 31, 2025, two licensed restaurants were opened in the Middle East.\n\nRestaurant Activity\n\nThe following table details company-owned restaurant unit data for the periods indicated.\n\nThree months ended March 31,\n\n2025 2024\n\nBeginning of period 3,726 3,437\n\nChipotle openings 57 47\n\nChipotle permanent closures (2) (3)\n\nChipotle relocations - (2)\n\nTotal at end of period 3,781 3,479\n\nThe following table details licensed restaurant unit data for the periods indicated.\n\nThree months ended March 31,\n\n2025 2024\n\nBeginning of period 3 -\n\nLicensed restaurant openings 2 -\n\nTotal at end of period 5 -\n\n15\n\nTable of Contents\n\nResults of Operations\n\nOur results of operations as a percentage of total revenue and period-over-period change are discussed in the following section.\n\nRevenue\n\n \n\nThree months ended March 31, Percentage\n\n2025 2024 change\n\n(dollars in millions)\n\nFood and beverage revenue $ 2,859.8 $ 2,684.4 6.5 %\n\nDelivery service revenue 15.4 17.4 (11.4 %)\n\nTotal revenue $ 2,875.3 $ 2,701.8 6.4 %\n\nAverage restaurant sales(1) $ 3.186 $ 3.082 3.4 %"
       },
       {
         "chunk_id": "CMG_0001058090-24-000032_3",
         "relevance": 0.7209555506706238,
-        "text_preview": " per share was $0.33, a 32.0% increase from $0.25, which includes a $0.01 after-tax impact from an unrealized loss on a long-term investment and an increase in legal reserves.\n\nSales Trends\n\n. Compara"
+        "text_preview": " per share was $0.33, a 32.0% increase from $0.25, which includes a $0.01 after-tax impact from an unrealized loss on a long-term investment and an increase in legal reserves.\n\nSales Trends\n\n. Comparable restaurant sales increased 11.1% for the three months ended June 30, 2024. The increase is primarily attributable to higher transactions and, to a lesser extent, an increase in average check. Comparable restaurant sales represent the change in period-over-period total revenue for restaurants in operation for at least 13 full calendar months. Digital sales represented 35.3% of total food and beverage revenue.\n\n14\n\nTable of Contents\n\nRestaurant Operating Costs.\n\n During the three months ended June 30, 2024, our restaurant operating costs (food, beverage and packaging; labor; occupancy; and other operating costs) were 71.1% of total revenue, a decrease from 72.5% during the three months ended June 30, 2023. The decrease was driven by the benefit of sales leverage, partially offset by wage inflation and, to a lesser extent, inflation across several food costs.\n\nRestaurant Development. \n\nDuring the three months ended June 30, 2024, we opened 52 company-operated restaurants, which included 46 restaurants with a Chipotlane. We are on track to open approximately 285-315 new restaurants in 2024. We expect that at least 80% of our new restaurants will include a Chipotlane.\n\nLicensing.\n\n In April 2024, our first licensed location opened in Kuwait City in partnership with international licensed retail operator Alshaya Group. Our location in Kuwait marks the first time the we have entered a new country in over 10 years, and is our only licensed restaurant.\n\nCultivate Next Fund.\n\n Our Cultivate Next Fund is a venture formed to make early-stage investments into strategically aligned companies that further our mission to Cultivate a Better World. The Fund has a size of $100.0 million, which is financed almost entirely by Chipotle. As of June 30, 2024, we have made $34.0 million in investments through this Fund.\n\nRestaurant Activity\n\nThe following table details company-operated restaurant unit data for the periods indicated.\n\nThree months ended June 30, Six months ended June 30,\n\n2024 2023 2024 2023\n\nBeginning of period 3,479 3,224 3,437 3,187\n\nChipotle openings 52 47 99 87\n\nNon-Chipotle openings - - - 1\n\nChipotle permanent closures (1) - (4) -"
       },
       {
         "chunk_id": "CMG_0001058090-25-000056_3",
         "relevance": 0.7518158555030823,
-        "text_preview": " $3.1 billion\n\n\u2022\n\nComparable restaurant sales decreased 4.0%\n\n\u2022\n\nDiluted earnings per share was $0.32, a 3.0% decrease from $0.33\n\n14\n\nTable of Contents\n\nSales Trends\n\n. Comparable restaurant sales de"
+        "text_preview": " $3.1 billion\n\n\u2022\n\nComparable restaurant sales decreased 4.0%\n\n\u2022\n\nDiluted earnings per share was $0.32, a 3.0% decrease from $0.33\n\n14\n\nTable of Contents\n\nSales Trends\n\n. Comparable restaurant sales decreased 4.0% for the three months ended June 30, 2025. The decrease is attributable to lower transactions of 4.9% which is offset by a 0.9% increase in average check. While transactions have been impacted by a slowdown in consumer spending, we exited the quarter with positive comps and positive transactions. Comparable restaurant sales represent the change in period-over-period total revenue for company-owned restaurants in operation for at least 13 full calendar months. Digital sales represented 35.5% of total food and beverage revenue. For 2025, management is anticipating about flat comparable restaurant sales.\n\nRestaurant Development. \n\nDuring the three months ended June 30, 2025, we opened 61 restaurants, which included 47 restaurants with a Chipotlane. We expect to open approximately 315 to 345 company-owned restaurants in 2025. We expect that at least 80% of our new company-owned restaurants will include a Chipotlane.\n\nRestaurant Activity\n\nThe following table details company-owned restaurant unit data for the periods indicated.\n\nThree months endedJune 30, Six months endedJune 30,\n\n2025 2024 2025 2024\n\nBeginning of period 3,781 3,479 3,726 3,437\n\nChipotle openings 61 52 118 99\n\nChipotle permanent closures (2) (1) (4) (4)\n\nChipotle relocations (1) - (1) (2)\n\nTotal at end of period 3,839 3,530 3,839 3,530\n\nThe following table details licensed restaurant unit data for the periods indicated.\n\nThree months endedJune 30, Six months endedJune 30,\n\n2025 2024 2025 2024\n\nBeginning of period 5 - 3 -\n\nLicensed restaurant openings - 1 2 1\n\nTotal at end of period 5 1 5 1\n\n15\n\nTable of Contents\n\nResults of Operations\n\nOur results of operations as a percentage of total revenue and period-over-period change are discussed in the following section.\n\nRevenue\n\n \n\nThree months endedJune 30, Percentage Six months endedJune 30, Percentage\n\n2025 2024 change 2025 2024 change\n\n(dollars in millions) (dollars in millions)"
       },
       {
         "chunk_id": "CMG_0001058090-25-000088_3",
         "relevance": 0.7003174424171448,
-        "text_preview": " of total revenue\n\n\u2022\n\nOccupancy as a percentage of total revenue\n\n\u2022\n\nOther operating costs as a percentage of total revenue\n\n\u2022\n\nNew restaurant openings\n\n14\n\nTable of Contents\n\nThird Quarter 2025 Finan"
+        "text_preview": " of total revenue\n\n\u2022\n\nOccupancy as a percentage of total revenue\n\n\u2022\n\nOther operating costs as a percentage of total revenue\n\n\u2022\n\nNew restaurant openings\n\n14\n\nTable of Contents\n\nThird Quarter 2025 Financial Highlights, year-over-year: \n\n\u2022\n\nTotal revenue increased 7.5% to $3.0 billion\n\n\u2022\n\nComparable restaurant sales increased 0.3%\n\n\u2022\n\nDiluted earnings per share was $0.29, a 3.6% increase from $0.28\n\nSales Trends\n\n. Comparable restaurant sales increased 0.3% for the three months ended September 30, 2025. The increase is attributable to a 1.1% increase in average check, partially offset by lower transactions of 0.8%. Comparable restaurant sales represent the change in period-over-period total revenue for company-owned restaurants in operation for at least 13 full calendar months. Digital sales represented 36.7% of total food and beverage revenue. For full-year 2025, management is anticipating comparable restaurant sales declines in the low-single digit range.\n\nRestaurant Development. \n\nDuring the three months ended September 30, 2025, we opened 84 restaurants, which included 64 restaurants with a Chipotlane. We remain on track to open approximately 315 to 345 company-owned restaurants in 2025 and expect to open approximately 350 to 370 restaurants in 2026, which includes 10 to 15 international partner-operated restaurants. We expect that at least 80% of our new company-owned restaurants will include a Chipotlane.\n\nPartner-Operated Restaurants. \n\nDuring the three months ended September 30, 2025, we opened two partner-operated restaurants in the Middle East.\n\nRestaurant Activity\n\nThe following table details company-owned restaurant unit data for the periods indicated.\n\nThree months endedSeptember 30, Nine months endedSeptember 30,\n\n2025 2024 2025 2024\n\nBeginning of period 3,839 3,530 3,726 3,437\n\nChipotle openings 84 86 202 185\n\nChipotle permanent closures (4) (1) (8) (5)\n\nChipotle relocations (3) - (4) (2)\n\nTotal at end of period 3,916 3,615 3,916 3,615\n\nThe following table details partner-operated restaurant unit data for the periods indicated.\n\nThree months endedSeptember 30, Nine months endedSeptember 30,\n\n2025 2024 2025 2024\n\nBeginning of period 5 1 3 -\n\nPartner-operated openings 2 1 4 2"
       }
     ],
-    "retrieval_time_s": 633.5
-  },
-  {
-    "question": "Why did Cracker Barrel's operating costs change?",
-    "ticker": "CBRL",
-    "answer": "- [CBRL 10-Q filed 2024-12-04 | relevance: 1.02]\n  - No impairment was recorded in the second quarter and first six months of 2024.\n  - No stores were closed in the second quarter or first six months of 2024.\n\n- [CBRL 10-Q filed 2025-03-06 | relevance: 1.03]\n  - No impairment was recorded in the second quarter and first six months of 2024.\n  - No stores were closed in the second quarter or first six months of 2024.\n\n- [CBRL 10-Q filed 2025-06-05 | relevance: 1.09]\n  - During the third quarter of 2025, we recorded impairment charges of $718 as a result of the deterioration in operating performance in two MSBC locations.\n  - During the first nine months of 2025, we recorded impairment charges of $3,581 as a result of the deterioration in operating performance in five MSBC locations and two Cracker Barrel locations.\n  - One Cracker Barrel store was closed in the first nine months of 2025 resulting in closing costs of $288.\n\n- [CBRL 10-Q filed 2026-03-04 | relevance: 1.14]\n  - In the second quarter and first six months of 2026, operating income (loss) decreased from the same periods in the prior year primarily due to the decreases in total revenue partially offset by lower cost of goods sold expenses, lower labor expenses, lower incentive compensation expense, and lower professional fees.\n  - Additionally, for the first six months of 2026, higher media advertising and higher maintenance expenses further contributed to the operating loss in 2026.\n\n- [CBRL 10-K filed 2025-09-26 | relevance: 1.10]\n  - During 2025 and 2024, we recorded impairment charges of $19,772 and $17,448, respectively, as a result of the deterioration in operating performance of seven Cracker Barrel locations and twenty-five MSBC locations in 2025 and six Cracker Barrel locations and thirteen MSBC locations in 2024.\n  - Additionally, during 2025 and 2024, we incurred costs of $287 and $5,494, respectively, in connection with the closure of two Cracker Barrel and two MSBC locations in 2025 and four Cracker Barrel and two MSBC locations in 2024 because of poor operating",
-    "sources": [
-      {
-        "chunk_id": "CBRL_0001104659-26-023455_15",
-        "relevance": 0.7258619666099548,
-        "text_preview": ", as a result of the deterioration in operating performance of three MSBC locations and two Cracker Barrel locations. One Cracker Barrel store was closed in the second quarter and first six months of "
-      },
-      {
-        "chunk_id": "CBRL_0001104659-25-093663_11",
-        "relevance": 0.7286566495895386,
-        "text_preview": "5 as compared to 2024 resulted primarily from unfavorable claim experience.\nThe increase in other store operating expenses as a percentage of total revenue in 2025 as compared to 2024 resulted primari"
-      },
-      {
-        "chunk_id": "CBRL_0001558370-25-008421_14",
-        "relevance": 0.7021592855453491,
-        "text_preview": " same period in the prior year resulted primarily from the following:\n \n Third Quarter\n Decrease as a Percentage\n of Total Revenue\nProfessional fees (1.0) %\nIncentive compensation expense (0.2) %\n25\n\n"
-      },
-      {
-        "chunk_id": "CBRL_0001558370-25-002351_12",
-        "relevance": 0.7256075739860535,
-        "text_preview": " January 26, January 31, January 26, \n 2025 2024 2025 2024\nGeneral and administrative expenses 6.5 % 5.6 % 6.8 % 5.8 %\n\nThis percentage change for the second quarter and first six months of 2025 as co"
-      },
-      {
-        "chunk_id": "CBRL_0001558370-24-016001_6",
-        "relevance": 0.714788556098938,
-        "text_preview": "0\n\nOther store operating expenses 25.0 24.7\n\nGeneral and administrative expenses 7.1 5.9\n\nImpairment and store closing costs 0.1 \u2014\n\nOperating income 0.8 1.4\n\nInterest expense, net 0.7 0.6\n\nIncome befo"
-      }
-    ],
-    "retrieval_time_s": 907.8
+    "retrieval_time_s": 13.0
   },
   {
     "question": "What drove Chipotle's food and beverage costs as a percentage of revenue?",
     "ticker": "CMG",
-    "answer": "- [CMG 10-Q filed 2024-07-25 | relevance: 0.95]\n  - Restaurant operating costs (food, beverage and packaging; labor; occupancy; and other operating costs) were 71.1% of total revenue, a decrease from 72.5% during the three months ended June 30, 2023.\n  - The decrease was driven by the benefit of sales leverage, partially offset by wage inflation and, to a lesser extent, inflation across several food costs.\n\n- [CMG 10-Q filed 2025-04-24 | relevance: 0.85]\n  - Comparable restaurant sales decreased 0.4% for the three months ended March 31, 2025. The decrease is attributable to lower transactions of 2.3% which is offset by a 1.9% increase in average check.\n  - Transactions have been impacted by both a slowdown in consumer spending, which has continued into April, as well as periods of inclement weather across the country.\n\n- [CMG 10-Q filed 2025-10-30 | relevance: 1.08]\n  - Comparable restaurant sales increased 0.3% for the three months ended September 30, 2025. The increase is attributable to a 1.1% increase in average check, partially offset by lower transactions of 0.8%.\n\n- [CMG 10-Q filed 2026-04-30 | relevance: 1.07]\n  - Comparable restaurant sales increased 0.5% for the three months ended March 31, 2026. The increase is attributable to an increase in transactions of 0.6",
+    "answer": "- [CMG 10-Q filed 2025-10-30 | relevance: 1.06] - The context does not provide specific details about food and beverage costs as a percentage of revenue for the third quarter of 2025.\n- [CMG 10-Q filed 2026-04-30 | relevance: 1.05] - The context does not provide specific details about food and beverage costs as a percentage of revenue for the first quarter of 2026.\n- [CMG 2024-07-25 10-Q | relevance: 0.93] - The context does not provide specific details about food and beverage costs as a percentage of revenue for the third quarter of 2024.\n- [CMG 2025-02-05 10-K | relevance: 0.87] - The context does not provide specific details about food and beverage costs as a percentage of revenue for the year ended December 31, 2024.\n- [CMG 2025-04-24 10-Q | relevance: 0.83] - The context does not provide specific details about food and beverage costs as a percentage of revenue for the third quarter of 2025.\n\nSince the context does not provide the specific percentage of food and beverage costs as a percentage of revenue for the relevant periods, we cannot determine what drove these costs. The context only provides information about the overall revenue and comparable restaurant sales, but not the specific cost percentages.",
     "sources": [
       {
         "chunk_id": "CMG_0001058090-25-000088_3",
         "relevance": 0.7065945863723755,
-        "text_preview": " of total revenue\n\n\u2022\n\nOccupancy as a percentage of total revenue\n\n\u2022\n\nOther operating costs as a percentage of total revenue\n\n\u2022\n\nNew restaurant openings\n\n14\n\nTable of Contents\n\nThird Quarter 2025 Finan"
+        "text_preview": " of total revenue\n\n\u2022\n\nOccupancy as a percentage of total revenue\n\n\u2022\n\nOther operating costs as a percentage of total revenue\n\n\u2022\n\nNew restaurant openings\n\n14\n\nTable of Contents\n\nThird Quarter 2025 Financial Highlights, year-over-year: \n\n\u2022\n\nTotal revenue increased 7.5% to $3.0 billion\n\n\u2022\n\nComparable restaurant sales increased 0.3%\n\n\u2022\n\nDiluted earnings per share was $0.29, a 3.6% increase from $0.28\n\nSales Trends\n\n. Comparable restaurant sales increased 0.3% for the three months ended September 30, 2025. The increase is attributable to a 1.1% increase in average check, partially offset by lower transactions of 0.8%. Comparable restaurant sales represent the change in period-over-period total revenue for company-owned restaurants in operation for at least 13 full calendar months. Digital sales represented 36.7% of total food and beverage revenue. For full-year 2025, management is anticipating comparable restaurant sales declines in the low-single digit range.\n\nRestaurant Development. \n\nDuring the three months ended September 30, 2025, we opened 84 restaurants, which included 64 restaurants with a Chipotlane. We remain on track to open approximately 315 to 345 company-owned restaurants in 2025 and expect to open approximately 350 to 370 restaurants in 2026, which includes 10 to 15 international partner-operated restaurants. We expect that at least 80% of our new company-owned restaurants will include a Chipotlane.\n\nPartner-Operated Restaurants. \n\nDuring the three months ended September 30, 2025, we opened two partner-operated restaurants in the Middle East.\n\nRestaurant Activity\n\nThe following table details company-owned restaurant unit data for the periods indicated.\n\nThree months endedSeptember 30, Nine months endedSeptember 30,\n\n2025 2024 2025 2024\n\nBeginning of period 3,839 3,530 3,726 3,437\n\nChipotle openings 84 86 202 185\n\nChipotle permanent closures (4) (1) (8) (5)\n\nChipotle relocations (3) - (4) (2)\n\nTotal at end of period 3,916 3,615 3,916 3,615\n\nThe following table details partner-operated restaurant unit data for the periods indicated.\n\nThree months endedSeptember 30, Nine months endedSeptember 30,\n\n2025 2024 2025 2024\n\nBeginning of period 5 1 3 -\n\nPartner-operated openings 2 1 4 2"
       },
       {
         "chunk_id": "CMG_0001058090-26-000028_3",
         "relevance": 0.7157753705978394,
-        "text_preview": "\u2022\n\nFood, beverage, and packaging as a percentage of total revenue\n\n\u2022\n\nLabor as a percentage of total revenue\n\n\u2022\n\nOccupancy as a percentage of total revenue\n\n\u2022\n\nOther operating costs as a percentage of"
+        "text_preview": "\u2022\n\nFood, beverage, and packaging as a percentage of total revenue\n\n\u2022\n\nLabor as a percentage of total revenue\n\n\u2022\n\nOccupancy as a percentage of total revenue\n\n\u2022\n\nOther operating costs as a percentage of total revenue\n\n\u2022\n\nNew restaurant openings\n\n14\n\nFirst Quarter 2026 Financial Highlights, year-over-year: \n\n\u2022\n\nTotal revenue increased 7.4% to $3.1 billion\n\n\u2022\n\nComparable restaurant sales increased 0.5%\n\n\u2022\n\nDiluted earnings per share was $0.23, a 17.9% decrease from $0.28\n\nSales Trends\n\n. Comparable restaurant sales increased 0.5% for the three months ended March 31, 2026. The increase is attributable to an increase in transactions of 0.6%, partially offset by a 0.1% decrease in average check. Comparable restaurant sales represent the change in period-over-period total revenue for company-owned restaurants in operation for at least 13 full calendar months. Digital sales represented 38.6% of total food and beverage revenue. For full-year 2026, management is anticipating comparable restaurant sales to be about flat.\n\nRestaurant Development. \n\nDuring the three months ended March 31, 2026, we opened 49 company-owned restaurants, which included 42 restaurants with a Chipotlane. We expect to open approximately 350 to 370 restaurants in 2026, which includes 10 to 15 international partner-operated restaurants. We expect around 80% of our new company-owned restaurants will include a Chipotlane.\n\nRestaurant Activity\n\nThe following table details company-owned restaurant unit data for the periods indicated.\n\nThree months endedMarch 31,\n\n2026 2025\n\nBeginning of period 4,042 3,726\n\nOpenings 49 57\n\nPermanent closures (1) (2)\n\nTotal at end of period 4,090 3,781\n\nThe following table details partner-operated restaurant unit data for the periods indicated.\n\nThree months endedMarch 31,\n\n2026 2025\n\nBeginning of period 14 3\n\nOpenings - 2\n\nTotal at end of period 14 5\n\n15\n\nResults of Operations\n\nOur results of operations as a percentage of total revenue and period-over-period change are discussed in the following section.\n\nRevenue\n\n \n\nThree months endedMarch 31, Percentage\n\n2026 2025 change\n\n(dollars in millions)\n\nFood and beverage revenue $ 3,072.7 $ 2,859.8 7.4 %\n\nDelivery service revenue 15.5 15.4 0.6 %\n\nTotal revenue $ 3,088.2 $ 2,875.3 7.4 %"
       },
       {
         "chunk_id": "CMG_0001058090-24-000032_3",
         "relevance": 0.7273576259613037,
-        "text_preview": " per share was $0.33, a 32.0% increase from $0.25, which includes a $0.01 after-tax impact from an unrealized loss on a long-term investment and an increase in legal reserves.\n\nSales Trends\n\n. Compara"
+        "text_preview": " per share was $0.33, a 32.0% increase from $0.25, which includes a $0.01 after-tax impact from an unrealized loss on a long-term investment and an increase in legal reserves.\n\nSales Trends\n\n. Comparable restaurant sales increased 11.1% for the three months ended June 30, 2024. The increase is primarily attributable to higher transactions and, to a lesser extent, an increase in average check. Comparable restaurant sales represent the change in period-over-period total revenue for restaurants in operation for at least 13 full calendar months. Digital sales represented 35.3% of total food and beverage revenue.\n\n14\n\nTable of Contents\n\nRestaurant Operating Costs.\n\n During the three months ended June 30, 2024, our restaurant operating costs (food, beverage and packaging; labor; occupancy; and other operating costs) were 71.1% of total revenue, a decrease from 72.5% during the three months ended June 30, 2023. The decrease was driven by the benefit of sales leverage, partially offset by wage inflation and, to a lesser extent, inflation across several food costs.\n\nRestaurant Development. \n\nDuring the three months ended June 30, 2024, we opened 52 company-operated restaurants, which included 46 restaurants with a Chipotlane. We are on track to open approximately 285-315 new restaurants in 2024. We expect that at least 80% of our new restaurants will include a Chipotlane.\n\nLicensing.\n\n In April 2024, our first licensed location opened in Kuwait City in partnership with international licensed retail operator Alshaya Group. Our location in Kuwait marks the first time the we have entered a new country in over 10 years, and is our only licensed restaurant.\n\nCultivate Next Fund.\n\n Our Cultivate Next Fund is a venture formed to make early-stage investments into strategically aligned companies that further our mission to Cultivate a Better World. The Fund has a size of $100.0 million, which is financed almost entirely by Chipotle. As of June 30, 2024, we have made $34.0 million in investments through this Fund.\n\nRestaurant Activity\n\nThe following table details company-operated restaurant unit data for the periods indicated.\n\nThree months ended June 30, Six months ended June 30,\n\n2024 2023 2024 2023\n\nBeginning of period 3,479 3,224 3,437 3,187\n\nChipotle openings 52 47 99 87\n\nNon-Chipotle openings - - - 1\n\nChipotle permanent closures (1) - (4) -"
       },
       {
         "chunk_id": "CMG_0001058090-25-000014_1",
         "relevance": 0.7010084986686707,
-        "text_preview": ".6% to $11.3 billion\n\n\u2022\n\nComparable restaurant sales increased 7.4%\n\n\u2022\n\nDiluted earnings per share was $1.11, a 24.7% increase from $0.89\n\nSales Trends. \n\nComparable restaurant sales increased 7.4% fo"
+        "text_preview": ".6% to $11.3 billion\n\n\u2022\n\nComparable restaurant sales increased 7.4%\n\n\u2022\n\nDiluted earnings per share was $1.11, a 24.7% increase from $0.89\n\nSales Trends. \n\nComparable restaurant sales increased 7.4% for the year ended December 31, 2024. The increase is attributable to higher transactions of 5.3% and a 2.1% increase in average check. Comparable restaurant sales represent the change in period-over-period total revenue for restaurants in operation for at least 13 full calendar months. Digital sales represented 35.1% of total food and beverage revenue. For 2025, management is anticipating comparable restaurant sales growth in the low to mid-single digit range.\n\nRestaurant Development. \n\nDuring the year ended December 31, 2024, we opened 304 restaurants, which included 257 restaurants with a Chipotlane. We expect to open approximately 315 to 345 company-owned restaurants in 2025. We expect that at least 80% of our new company-owned restaurants will include a Chipotlane. \n\nLicensing\n\n. During the year ended December 31, 2024, three licensed restaurants were opened in the Middle East.\n\nCultivate Next Fund\n\n. Our Cultivate Next Fund is a venture formed to make early-stage investments into strategically aligned companies that further our purpose to Cultivate a Better World. The Fund is authorized to invest up to $100.0 million, which is financed almost entirely by Chipotle. As of December 31, 2024, we have made $63.0 million in investments through this Fund. \n\n26\n\nTable of Contents\n\nRestaurant Activity\n\nThe following table details company-owned restaurant unit data for the years indicated. \n\nYear ended December 31,\n\n2024 2023\n\nBeginning of period 3,437 3,187\n\nChipotle openings 304 270\n\nNon-Chipotle openings - 1\n\nChipotle permanent closures (7) (3)\n\nChipotle relocations (8) (12)\n\nNon-Chipotle permanent closures - (6)\n\nTotal at end of period 3,726 3,437\n\nThe following table details licensed restaurant unit data for the years indicated.\n\nYear ended December 31,\n\n2024 2023\n\nBeginning of period - -\n\nLicensed restaurant openings 3 -\n\nTotal at end of period 3 -\n\nResults of Operations\n\nOur results of operations as a percentage of total revenue and period-over-period change are discussed in the following section. \n\nRevenue\n\nYear ended December 31, Percentage\n\n2024 2023 change\n\n(dollars in millions)"
       },
       {
         "chunk_id": "CMG_0001058090-25-000031_3",
         "relevance": 0.7118259072303772,
-        "text_preview": " $2.9 billion\n\n\u2022\n\nComparable restaurant sales decreased 0.4%\n\n\u2022\n\nDiluted earnings per share was $0.28, a 7.7% increase from $0.26\n\n14\n\nTable of Contents\n\nSales Trends\n\n. Comparable restaurant sales de"
+        "text_preview": " $2.9 billion\n\n\u2022\n\nComparable restaurant sales decreased 0.4%\n\n\u2022\n\nDiluted earnings per share was $0.28, a 7.7% increase from $0.26\n\n14\n\nTable of Contents\n\nSales Trends\n\n. Comparable restaurant sales decreased 0.4% for the three months ended March 31, 2025. The decrease is attributable to lower transactions of 2.3% which is offset by a 1.9% increase in average check. Transactions have been impacted by both a slowdown in consumer spending, which has continued into April, as well as periods of inclement weather across the country. Comparable restaurant sales represent the change in period-over-period total revenue for restaurants in operation for at least 13 full calendar months. Digital sales represented 35.4% of total food and beverage revenue.\n\nRestaurant Development. \n\nDuring the three months ended March 31, 2025, we opened 57 restaurants, which included 48 restaurants with a Chipotlane. We expect to open approximately 315 to 345 company-owned restaurants in 2025. We expect that at least 80% of our new company-owned restaurants will include a Chipotlane.\n\nLicensing.\n\n During the three months ended March 31, 2025, two licensed restaurants were opened in the Middle East.\n\nRestaurant Activity\n\nThe following table details company-owned restaurant unit data for the periods indicated.\n\nThree months ended March 31,\n\n2025 2024\n\nBeginning of period 3,726 3,437\n\nChipotle openings 57 47\n\nChipotle permanent closures (2) (3)\n\nChipotle relocations - (2)\n\nTotal at end of period 3,781 3,479\n\nThe following table details licensed restaurant unit data for the periods indicated.\n\nThree months ended March 31,\n\n2025 2024\n\nBeginning of period 3 -\n\nLicensed restaurant openings 2 -\n\nTotal at end of period 5 -\n\n15\n\nTable of Contents\n\nResults of Operations\n\nOur results of operations as a percentage of total revenue and period-over-period change are discussed in the following section.\n\nRevenue\n\n \n\nThree months ended March 31, Percentage\n\n2025 2024 change\n\n(dollars in millions)\n\nFood and beverage revenue $ 2,859.8 $ 2,684.4 6.5 %\n\nDelivery service revenue 15.4 17.4 (11.4 %)\n\nTotal revenue $ 2,875.3 $ 2,701.8 6.4 %\n\nAverage restaurant sales(1) $ 3.186 $ 3.082 3.4 %"
       }
     ],
-    "retrieval_time_s": 597.5
-  },
-  {
-    "question": "How did Chipotle's comparable restaurant sales change in recent quarters?",
-    "ticker": "CMG",
-    "answer": "- [CMG 10-K filed 2025-02-05 | relevance: 1.01]\n  - Comparable restaurant sales increased 7.4% for the year ended December 31, 2024.\n\n- [CMG 10-Q filed 2025-04-24 | relevance: 1.01]\n  - Comparable restaurant sales decreased 0.4% for the three months ended March 31, 2025.\n\n- [CMG 10-Q filed 2025-07-24 | relevance: 1.10]\n  - Comparable restaurant sales decreased 4.0% for the three months ended June 30, 2025.\n\n- [CMG 10-Q filed 2025-10-30 | relevance: 0.90]\n  - Comparable restaurant sales increased 0.3% for the three months ended September 30, 2025.\n\n- [CMG 10-K filed 2026-02-04 | relevance: 0.89]\n  - Comparable restaurant sales decreased 1.7% for the year ended December 31, 2025.",
-    "sources": [
-      {
-        "chunk_id": "CMG_0001058090-25-000056_3",
-        "relevance": 0.8180167078971863,
-        "text_preview": " $3.1 billion\n\n\u2022\n\nComparable restaurant sales decreased 4.0%\n\n\u2022\n\nDiluted earnings per share was $0.32, a 3.0% decrease from $0.33\n\n14\n\nTable of Contents\n\nSales Trends\n\n. Comparable restaurant sales de"
-      },
-      {
-        "chunk_id": "CMG_0001058090-25-000014_1",
-        "relevance": 0.7898660898208618,
-        "text_preview": ".6% to $11.3 billion\n\n\u2022\n\nComparable restaurant sales increased 7.4%\n\n\u2022\n\nDiluted earnings per share was $1.11, a 24.7% increase from $0.89\n\nSales Trends. \n\nComparable restaurant sales increased 7.4% fo"
-      },
-      {
-        "chunk_id": "CMG_0001058090-25-000031_3",
-        "relevance": 0.8099290132522583,
-        "text_preview": " $2.9 billion\n\n\u2022\n\nComparable restaurant sales decreased 0.4%\n\n\u2022\n\nDiluted earnings per share was $0.28, a 7.7% increase from $0.26\n\n14\n\nTable of Contents\n\nSales Trends\n\n. Comparable restaurant sales de"
-      },
-      {
-        "chunk_id": "CMG_0001058090-25-000088_3",
-        "relevance": 0.74876868724823,
-        "text_preview": " of total revenue\n\n\u2022\n\nOccupancy as a percentage of total revenue\n\n\u2022\n\nOther operating costs as a percentage of total revenue\n\n\u2022\n\nNew restaurant openings\n\n14\n\nTable of Contents\n\nThird Quarter 2025 Finan"
-      },
-      {
-        "chunk_id": "CMG_0001058090-26-000009_1",
-        "relevance": 0.7889090776443481,
-        "text_preview": ".4% to $11.9 billion\n\n\u2022\n\nComparable restaurant sales decreased 1.7%\n\n\u2022\n\nDiluted earnings per share was $1.14, a 2.7% increase from $1.11\n\nSales Trends. \n\nComparable restaurant sales decreased 1.7% for"
-      }
-    ],
-    "retrieval_time_s": 440.1
-  },
-  {
-    "question": "How did Chipotle's restaurant development and new openings evolve?",
-    "ticker": "CMG",
-    "answer": "- [CMG 10-Q filed 2024-07-25 | relevance: 1.02]\n  - Chipotle opened 52 company-operated restaurants during the three months ended June 30, 2024, which included 46 restaurants with a Chipotlane.\n  - The company is on track to open approximately 285-315 new restaurants in 2024.\n  - Management expects that at least 80% of new restaurants will include a Chipotlane.\n\n- [CMG 10-Q filed 2024-10-30 | relevance: 1.12]\n  - Chipotle opened 86 company-operated restaurants during the three months ended September 30, 2024, which included 73 restaurants with a Chipotlane.\n  - The company is on track to open approximately 285 to 315 new company-operated restaurants in 2024 and expects to open approximately 315 to 345 new company-operated restaurants in 2025.\n  - Management expects that at least 80% of new company-operated restaurants will include a Chipotlane.\n\n- [CMG 10-K filed 2025-02-05 | relevance: 1.03]\n  - Chipotle opened 304 restaurants during the year ended December 31, 2024, which included 257 restaurants with a Chipotlane.\n  - The company expects to open approximately 315 to 345 company-owned restaurants in 2025.\n  - Management expects that at least 80% of new company-owned restaurants will include a Chipotlane.\n\n- [CMG 10-Q",
-    "sources": [
-      {
-        "chunk_id": "CMG_0001058090-24-000050_3",
-        "relevance": 0.7477216720581055,
-        "text_preview": " percentage of total revenue\n\n\u2022\n\nNew restaurant openings\n\nThird Quarter 2024 Financial Highlights, year-over-year: \n\n\u2022\n\nTotal revenue increased 13.0% to $2.8 billion\n\n\u2022\n\nComparable restaurant sales in"
-      },
-      {
-        "chunk_id": "CMG_0001058090-25-000014_1",
-        "relevance": 0.7678371071815491,
-        "text_preview": ".6% to $11.3 billion\n\n\u2022\n\nComparable restaurant sales increased 7.4%\n\n\u2022\n\nDiluted earnings per share was $1.11, a 24.7% increase from $0.89\n\nSales Trends. \n\nComparable restaurant sales increased 7.4% fo"
-      },
-      {
-        "chunk_id": "CMG_0001058090-24-000032_3",
-        "relevance": 0.7791871428489685,
-        "text_preview": " per share was $0.33, a 32.0% increase from $0.25, which includes a $0.01 after-tax impact from an unrealized loss on a long-term investment and an increase in legal reserves.\n\nSales Trends\n\n. Compara"
-      },
-      {
-        "chunk_id": "CMG_0001058090-25-000088_3",
-        "relevance": 0.7348723411560059,
-        "text_preview": " of total revenue\n\n\u2022\n\nOccupancy as a percentage of total revenue\n\n\u2022\n\nOther operating costs as a percentage of total revenue\n\n\u2022\n\nNew restaurant openings\n\n14\n\nTable of Contents\n\nThird Quarter 2025 Finan"
-      },
-      {
-        "chunk_id": "CMG_0001058090-25-000031_3",
-        "relevance": 0.7526106238365173,
-        "text_preview": " $2.9 billion\n\n\u2022\n\nComparable restaurant sales decreased 0.4%\n\n\u2022\n\nDiluted earnings per share was $0.28, a 7.7% increase from $0.26\n\n14\n\nTable of Contents\n\nSales Trends\n\n. Comparable restaurant sales de"
-      }
-    ],
-    "retrieval_time_s": 606.3
-  },
-  {
-    "question": "What drove Chipotle's general and administrative expenses?",
-    "ticker": "CMG",
-    "answer": "- [CMG 10-Q filed 2024-07-25 | relevance: 0.63]\n  - Restaurant operating costs decreased from 72.5% to 71.1% of total revenue, driven by sales leverage, partially offset by wage inflation and food cost inflation.\n\n- [CMG 10-Q filed 2024-10-30 | relevance: 1.03]\n  - General and administrative expenses decreased by 20.6% from $159.5 million to $126.6 million for the three months ended September 30, 2024. This decrease was primarily due to lower stock-based compensation, performance bonuses, and legal contingencies.\n  - For the nine months ended September 30, 2024, general and administrative expenses increased by 9.0% from $464.3 million to $506.3 million. This increase was driven by higher stock-based compensation, primarily forfeitures and performance-based awards, and increased legal contingencies.\n\n- [CMG 10-Q filed 2025-10-30 | relevance: 1.03]\n  - General and administrative expenses increased by 15.9% from $126.6 million to $146.7 million for the three months ended September 30, 2025. This increase was partially offset by a 0.2% increase from the benefit of menu price increases in the prior year.\n  - For the nine months ended September 30, 2025, general and administrative expenses decreased by 2.9% from $506.3 million to $491.7 million. This decrease was driven by lower stock-based compensation, primarily August 2024 retention awards, and performance bonuses.\n\n- [CMG 10-Q filed 2026-04-30 | relevance: 0.87]\n  - General and administrative expenses increased by 17.9% from $172.8 million to $203.7 million for the three months ended March 31, 2026. This increase was driven by higher conferences, performance bonuses, wages, and restructuring costs, partially offset by lower stock-based compensation from August 2024 retention awards.\n  - For the three months ended March 31, 2026, general and administrative expenses as a percentage of total revenue increased by 0.6% from 6.0",
-    "sources": [
-      {
-        "chunk_id": "CMG_0001058090-25-000088_8",
-        "relevance": 0.6503152847290039,
-        "text_preview": " of lower sales volumes. This increase was partially offset by a 0.2% from the benefit of menu price increases in the prior year.\n\nGeneral and Administrative Expenses\n\nThree months endedSeptember 30, "
-      },
-      {
-        "chunk_id": "CMG_0001058090-24-000050_8",
-        "relevance": 0.6516678333282471,
-        "text_preview": " Contents\n\nGeneral and Administrative Expenses\n\nThree months ended September 30, Percentage Nine months ended September 30, Percentage\n\n2024 2023 change 2024 2023 change\n\n(dollars in millions) (dollar"
-      },
-      {
-        "chunk_id": "CMG_0001058090-26-000028_6",
-        "relevance": 0.6424775123596191,
-        "text_preview": "5 change\n\n(dollars in millions)\n\nGeneral and administrative expenses $ 203.7 $ 172.8 17.9 %\n\nAs a percentage of total revenue 6.6 % 6.0 % 0.6 %\n\n17\n\nThe following is a summary of the change in general"
-      },
-      {
-        "chunk_id": "CMG_0001058090-24-000032_3",
-        "relevance": 0.6733846068382263,
-        "text_preview": " per share was $0.33, a 32.0% increase from $0.25, which includes a $0.01 after-tax impact from an unrealized loss on a long-term investment and an increase in legal reserves.\n\nSales Trends\n\n. Compara"
-      },
-      {
-        "chunk_id": "CMG_0001058090-25-000031_2",
-        "relevance": 0.6928263306617737,
-        "text_preview": " including through licensed restaurants in the Middle East and Mexico; increases in ingredient and other operating costs due to inflation, global conflicts, severe weather and climate change, our Food"
-      }
-    ],
-    "retrieval_time_s": 827.9
-  },
-  {
-    "question": "How did Darden's total revenue change year-over-year and what drove the change?",
-    "ticker": "DRI",
-    "answer": "- [DRI 10-K filed 2025-07-18 | relevance: 1.02]\n  - Darden's total revenue increased by 6.0% from fiscal 2024 to fiscal 2025.\n  - The increase was driven by a U.S. same-restaurant sales increase combined with revenue from new restaurants.\n  - For Olive Garden, the increase in U.S. same-restaurant sales resulted from a 4.1% increase in average check, partially offset by a 2.3% decrease in same-restaurant guest counts.\n  - For LongHorn Steakhouse, the increase in same-restaurant sales resulted from a 3.1% increase in average check and a 1.9% increase in same-restaurant guest counts.\n  - For Other Business, the increase in same-restaurant sales resulted from a 2.6% increase in average check offset by a 2.4% decrease in same-restaurant guest counts.\n\n- [DRI 10-Q filed 2025-12-30 | relevance: 1.12]\n  - Darden's total revenue increased by 16.8% from the six months of fiscal 2025 to the six months of fiscal 2026.\n  - The increase was driven by same-restaurant sales increases, as well as revenue from new restaurants.\n  - For Olive Garden, the increase in U.S. same-restaurant sales resulted from a 2.2% increase in same-restaurant guest counts, combined with a 3.0% increase in average check, which includes a 0.9% increase in off-premise catering sales.\n  - For LongHorn Steakhouse, the increase in same-restaurant sales resulted from a 2.1% increase in average check combined with a 3.5% increase in same-restaurant guest counts.\n\n- [DRI 10-Q filed 2025-04-01 | relevance: 0.84]\n  - Darden's total revenue increased by 10.8% from the nine months of fiscal 2024 to the nine months of fiscal 2025.\n  - The increase was driven by same-restaurant sales increases combined with revenue from new restaurants.\n  - For Olive Garden, the increase in U.S. same-restaurant sales resulted from a 4.6% increase in average check, partially offset by a 3.9% decrease in same-restaurant guest counts.\n  - For LongHorn Steakhouse, the increase in same-restaurant sales resulted from a 3.1% increase in average check combined with a 1.4% increase in same-restaurant guest counts.",
-    "sources": [
-      {
-        "chunk_id": "DRI_0000940944-25-000071_5",
-        "relevance": 0.6926529407501221,
-        "text_preview": " %\n\nOther Business $ 647.3 $ 581.4 11.3 % 3.1 % $ 1,328.0 $ 1,136.9 16.8 % 3.2 %\n\n(1)\n\nSame-restaurant sales is a year-over-year comparison of each period\u2019s sales volumes for a 52-week year and is lim"
-      },
-      {
-        "chunk_id": "DRI_0000940944-25-000038_4",
-        "relevance": 0.6847662925720215,
-        "text_preview": ",533.5 $ 2,225.3 13.8 % 0.2 % $ 5.8 $ 6.0\n\n$ 12,076.7 $ 11,390.0\n\n(1)\n\nSame-restaurant sales is a year-over-year comparison of each period\u2019s sales volumes for a 52-week year and is limited to restaura"
-      },
-      {
-        "chunk_id": "DRI_0000940944-24-000035_4",
-        "relevance": 0.6801404356956482,
-        "text_preview": "225.3 $ 2,166.9 2.7 % (0.7) % $ 6.0 $ 6.0\n\n$ 11,390.0 $ 10,487.8\n\n(1)\n\nSame-restaurant sales is a year-over-year comparison of each period\u2019s sales volumes for a 52-week year and is limited to restaura"
-      },
-      {
-        "chunk_id": "DRI_0000940944-25-000038_2",
-        "relevance": 0.6605204939842224,
-        "text_preview": "6, we expect our annual effective tax rate to be 13 percent, and we expect capital expenditures incurred to build new restaurants, remodel and maintain existing restaurants and technology initiatives "
-      },
-      {
-        "chunk_id": "DRI_0000940944-25-000018_5",
-        "relevance": 0.6538604497909546,
-        "text_preview": " % 4.5 %\n\nFine Dining $ 385.3 $ 372.9 3.3 % (0.8) % $ 970.2 $ 964.4 0.6 % (3.4) %\n\nOther Business $ 674.3 $ 561.0 20.2 % (0.4) % $ 1,811.2 $ 1,635.3 10.8 % (0.5) %\n\n(1)\n\nSame-restaurant sales is a yea"
-      }
-    ],
-    "retrieval_time_s": 872.4
-  },
-  {
-    "question": "What drove Darden's food and beverage costs as a percentage of sales?",
-    "ticker": "DRI",
-    "answer": "- [DRI 10-Q filed 2025-01-02 | relevance: 0.93]: Food and beverage costs decreased as a percent of sales primarily due to a 0.9% impact from pricing leverage and a 0.2% impact from cost savings, partially offset by a 0.5% impact from mix and other.",
-    "sources": [
-      {
-        "chunk_id": "DRI_0000940944-25-000038_4",
-        "relevance": 0.7042056918144226,
-        "text_preview": ",533.5 $ 2,225.3 13.8 % 0.2 % $ 5.8 $ 6.0\n\n$ 12,076.7 $ 11,390.0\n\n(1)\n\nSame-restaurant sales is a year-over-year comparison of each period\u2019s sales volumes for a 52-week year and is limited to restaura"
-      },
-      {
-        "chunk_id": "DRI_0000940944-24-000035_4",
-        "relevance": 0.7064774036407471,
-        "text_preview": "225.3 $ 2,166.9 2.7 % (0.7) % $ 6.0 $ 6.0\n\n$ 11,390.0 $ 10,487.8\n\n(1)\n\nSame-restaurant sales is a year-over-year comparison of each period\u2019s sales volumes for a 52-week year and is limited to restaura"
-      },
-      {
-        "chunk_id": "DRI_0000940944-25-000038_2",
-        "relevance": 0.7404954433441162,
-        "text_preview": "6, we expect our annual effective tax rate to be 13 percent, and we expect capital expenditures incurred to build new restaurants, remodel and maintain existing restaurants and technology initiatives "
-      },
-      {
-        "chunk_id": "DRI_0000940944-24-000035_2",
-        "relevance": 0.6974403262138367,
-        "text_preview": "\u2019s have not been included in our fiscal 2025 outlook below.\n\nWe expect fiscal 2025 sales from continuing operations to increase between 3.5 percent and 4.5 percent, driven by same-restaurant sales gro"
-      },
-      {
-        "chunk_id": "DRI_0000940944-25-000003_8",
-        "relevance": 0.7105701565742493,
-        "text_preview": " and beverage costs decreased as a percent of sales primarily due to a 0.9% impact from pricing leverage and a 0.2% impact from cost savings, partially offset by a 0.5% impact from mix and other.\n\n\u2022\n\n"
-      }
-    ],
-    "retrieval_time_s": 157.0
-  },
-  {
-    "question": "How did Olive Garden's segment results perform?",
-    "ticker": "DRI",
-    "answer": "- [DRI 10-K filed 2024-07-19 | relevance: 1.05] Olive Garden's segment profit margin increased from 21.0% in fiscal 2023 to 21.9% in fiscal 2024. This increase was driven primarily by positive same-restaurant sales and lower food and beverage costs and restaurant expenses, partially offset by higher marketing costs.\n- [DRI 10-Q filed 2025-01-02 | relevance: 1.02] Olive Garden's segment profit margin increased from 21.0% in the first six months of fiscal 2024 to 21.2% in the first six months of fiscal 2025. However, it decreased from 21.4% in the second quarter of fiscal 2025 to 21.0% in the first six months of fiscal 2025. The increase for the first six months of fiscal 2025 was driven primarily by positive same-restaurant sales, lower food and beverage costs, and restaurant labor costs, partially offset by increased marketing costs. The decrease for the first six months of fiscal 2025 was driven primarily by negative same-restaurant sales, higher restaurant expenses, and marketing costs, partially offset by lower food and beverage costs.\n- [DRI 10-Q filed 2025-09-26 | relevance: 1.00] Olive Garden's segment profit margin decreased from 20.7% in the third quarter of fiscal 2024 to 20.6% in the third quarter of fiscal 2025. Olive Garden's segment profit margin for the first nine months of fiscal 2025 remained flat compared to fiscal 2024.\n- [DRI 10-Q filed 2026-03-27 | relevance: 1.00] Olive Garden's segment profit margin decreased from 23.1% in the first nine months of fiscal 2025 to 21.8% in the first nine months of fiscal 2026. Olive Garden's segment profit margin for the third quarter of fiscal 2026 was 23.0%, a slight decrease from the third quarter of fiscal 2025. The decrease in the first nine months of fiscal 2026 was driven primarily by higher restaurant expenses and marketing costs, partially offset by lower restaurant labor costs.",
-    "sources": [
-      {
-        "chunk_id": "DRI_0000940944-24-000035_7",
-        "relevance": 0.742650032043457,
-        "text_preview": " for fiscal 2024 were a net loss of $2.9 million ($0.02 per diluted share) compared with a net loss for fiscal 2023 of $1.6 million ($0.01 per diluted share).\n\nSEGMENT RESULTS\n\nWe manage our restauran"
-      },
-      {
-        "chunk_id": "DRI_0000940944-25-000003_10",
-        "relevance": 0.74699866771698,
-        "text_preview": " presents segment profit margin\n\n1\n\n for the periods indicated.\n\nThree Months Ended Six Months Ended\n\nSegment November 24, 2024 November 26, 2023 Change November 24, 2024 November 26, 2023 Change\n\nOli"
-      },
-      {
-        "chunk_id": "DRI_0000940944-25-000054_7",
-        "relevance": 0.7586026191711426,
-        "text_preview": "2026 were $0.1 million ($0.00 per diluted share) compared with losses from discontinued operations for the first three months of fiscal 2025 of $0.4 million ($0.00 per diluted share). \n\nSEGMENT RESULT"
-      },
-      {
-        "chunk_id": "DRI_0000940944-26-000009_11",
-        "relevance": 0.7550131678581238,
-        "text_preview": " quarter and first nine months of fiscal 2025 of $0.3 million ($0.00 per diluted share) and $1.2 million ($0.01 per diluted share), respectively. \n\n30\n\nTable of Contents\n\nSEGMENT RESULTS\n\nWe manage ou"
-      },
-      {
-        "chunk_id": "DRI_0000940944-26-000009_12",
-        "relevance": 0.7202358245849609,
-        "text_preview": " quarter of 2025, we changed our reporting of segment profit to exclude pre-opening costs in order to better align with our internal reporting and provide a better representation of restaurant-level o"
-      }
-    ],
-    "retrieval_time_s": 833.3
-  },
-  {
-    "question": "What drove Darden's same-restaurant sales growth or decline?",
-    "ticker": "DRI",
-    "answer": "- [DRI 10-K filed 2024-07-19 | relevance: 0.99]\n  - Olive Garden's sales increase for fiscal 2024 was primarily driven by a U.S. same-restaurant sales increase combined with revenue from new restaurants. The increase in U.S. same-restaurant sales in fiscal 2024 resulted from a 3.3 percent increase in average check, partially offset by a 1.7 percent decrease in same-restaurant guest counts.\n  - LongHorn Steakhouse\u2019s sales increase for fiscal 2024 was primarily driven by a same-restaurant sales increase combined with revenue from new restaurants. The increase in same-restaurant sales in fiscal 2024 resulted from a 5.2 percent increase in average check, partially offset by a 0.4 percent decrease in same-restaurant guest counts.\n  - Fine Dining\u2019s sales increase for fiscal 2024 was driven by the acquisition of Ruth\u2019s Chris, offset by same-restaurant sales decreases. The decrease in same-restaurant sales in fiscal 2024 resulted from a 6.9 percent decrease in same-restaurant guest counts offset by a 4.9 percent increase in average check.\n  - Other Business\u2019s sales increase for fiscal 2024 was driven by revenue from new restaurants offset by same-restaurant sales decreases. The decrease in same-restaurant sales in fiscal 2024 resulted from a 3.3 percent decrease in same-restaurant guest counts offset by a 2.6 percent increase in average check.\n\n- [DRI 10-Q filed 2025-01-02 | relevance: 1.02]\n  - Olive Garden\u2019s sales increase for the second quarter of fiscal 2025 was primarily driven by same-restaurant sales increases, as well as revenue from new restaurants. The increase in U.S. same-restaurant sales for the second quarter of fiscal 2025 resulted from a 3.7 percent increase in average check, which includes a 0.6 percent increase in off premise catering sales, partially offset by a 1.6 percent decrease in same-restaurant guest counts.\n  - Olive Garden\u2019s sales increase for the six months of fiscal 2025 was primarily driven by revenue from new restaurants offset by same-restaurant sales decreases. The decrease in U.S. same restaurant sales for the six months of fiscal 2025 resulted from a 3.6 percent decrease in same-restaurant guest counts, partially offset by a 3.3 percent increase in average check.\n  - LongHorn Steakhouse\u2019s sales increase for the second quarter and six months of fiscal 2025 was primarily driven by same-restaurant sales increases combined with revenue from new restaurants. The increase in same-restaurant sales for the second quarter of",
-    "sources": [
-      {
-        "chunk_id": "DRI_0000940944-25-000071_5",
-        "relevance": 0.7684015035629272,
-        "text_preview": " %\n\nOther Business $ 647.3 $ 581.4 11.3 % 3.1 % $ 1,328.0 $ 1,136.9 16.8 % 3.2 %\n\n(1)\n\nSame-restaurant sales is a year-over-year comparison of each period\u2019s sales volumes for a 52-week year and is lim"
-      },
-      {
-        "chunk_id": "DRI_0000940944-25-000071_4",
-        "relevance": 0.747177004814148,
-        "text_preview": ".5 and 9.3 percent, driven by growth of 2.0 percent related to the fifty-third week in fiscal 2026; same-restaurant sales growth to be between 3.5 and 4.3 percent\n\n2\n\n; and new restaurant openings to "
-      },
-      {
-        "chunk_id": "DRI_0000940944-25-000003_5",
-        "relevance": 0.6936514377593994,
-        "text_preview": " and operated by Darden, for at least 16 months. Accordingly, Chuy\u2019s results will not be included in this calculation until the fourth quarter of fiscal 2026 and Ruth\u2019s Chris results are included for "
-      },
-      {
-        "chunk_id": "DRI_0000940944-24-000035_4",
-        "relevance": 0.7722505331039429,
-        "text_preview": "225.3 $ 2,166.9 2.7 % (0.7) % $ 6.0 $ 6.0\n\n$ 11,390.0 $ 10,487.8\n\n(1)\n\nSame-restaurant sales is a year-over-year comparison of each period\u2019s sales volumes for a 52-week year and is limited to restaura"
-      },
-      {
-        "chunk_id": "DRI_0000940944-25-000038_4",
-        "relevance": 0.7693268060684204,
-        "text_preview": ",533.5 $ 2,225.3 13.8 % 0.2 % $ 5.8 $ 6.0\n\n$ 12,076.7 $ 11,390.0\n\n(1)\n\nSame-restaurant sales is a year-over-year comparison of each period\u2019s sales volumes for a 52-week year and is limited to restaura"
-      }
-    ],
-    "retrieval_time_s": 877.4
-  },
-  {
-    "question": "How did Darden's acquisition of Chuy's impact financial results?",
-    "ticker": "DRI",
-    "answer": "- [DRI 10-Q filed 2025-01-02 | relevance: 1.05]\n  - Darden acquired 100 percent of the equity interest of Chuy\u2019s Holdings, Inc. in an all-cash transaction of $649.1 million in total consideration, net of $35.3 million of cash on Chuy\u2019s Holdings balance sheet at closing.\n\n- [DRI 10-Q filed 2025-01-02 | relevance: 1.04]\n  - The acquisition was financed with a portion of the proceeds from the issuance of a $400.0 million aggregate principal amount of 4.350 percent senior notes due 2027 and a $350.0 million aggregate principal amount of 4.550 percent senior notes due 2029.\n\n- [DRI 10-Q filed 2025-04-01 | relevance: 0.95]\n  - Depreciation and amortization expenses increased as a percent of sales primarily due to the acquisition of Chuy\u2019s as well as incremental depreciation on new restaurants and other capital investments.\n\n- [DRI 10-Q filed 2026-03-27 | relevance: 1.10]\n  - The acquisition of 103 Chuy\u2019s restaurants during the second quarter of fiscal 2025 and 31 net new restaurants contributed to the blended same-restaurant sales increase of 4.2 percent and 4.4 percent.\n\n- [DRI 10-Q filed 2026-03-27 | relevance: 1.10]\n  - The impacts of the planned acquisition of Chuy\u2019s have not been included in our fiscal 2025 outlook below.\n\n- [DRI 10-K filed 2024-07-19 | relevance: 1.15]\n  - The provided filings do not discuss the impact of Chuy's acquisition on financial results for fiscal 2024.",
-    "sources": [
-      {
-        "chunk_id": "DRI_0000940944-24-000035_1",
-        "relevance": 0.7397816181182861,
-        "text_preview": " of tax) during the twelve months ended May 26, 2024. As of May 26, 2024, all Ruth\u2019s Chris operations have been fully integrated into Darden\u2019s operations.\n\nFiscal 2024 Financial Highlights\n\n\u2022\n\nTotal s"
-      },
-      {
-        "chunk_id": "DRI_0000940944-26-000009_4",
-        "relevance": 0.7260628938674927,
-        "text_preview": " acquisition of 103 Chuy\u2019s restaurants during the second quarter of fiscal 2025 and 31 net new restaurants and a blended same-restaurant sales increase of 4.2 percent\n\n1\n\n and 4.4 percent.\n\n1\n\n\u2022\n\nOur "
-      },
-      {
-        "chunk_id": "DRI_0000940944-25-000003_4",
-        "relevance": 0.7116866111755371,
-        "text_preview": " expenditures incurred to build new restaurants, remodel and maintain existing restaurants and for technology initiatives to be approximately $650 million. These amounts now all include the addition o"
-      },
-      {
-        "chunk_id": "DRI_0000940944-25-000003_3",
-        "relevance": 0.740151584148407,
-        "text_preview": " operations were $1.82 and $3.57 for the second quarter and first six months of fiscal 2025 compared to $1.76 and $3.35 for the second quarter and six months of fiscal 2024.\n\n \n\n1\n\n Same-restaurant sa"
-      },
-      {
-        "chunk_id": "DRI_0000940944-25-000018_8",
-        "relevance": 0.7046449780464172,
-        "text_preview": " adjustments and a 0.1% impact from pricing leverage.\n\n\u2022\n\nDepreciation and amortization expenses increased as a percent of sales primarily due to the acquisition of Chuy\u2019s as well as incremental depre"
-      }
-    ],
-    "retrieval_time_s": 662.4
-  },
-  {
-    "question": "What drove Cracker Barrel's total revenue changes?",
-    "ticker": "CBRL",
-    "answer": "- [CBRL 10-Q filed 2024-12-04 | relevance: 1.03]\n  - Total revenue for the first quarter of 2025 increased 2.6% compared to the same period in the prior year.\n  - The increase was driven by a 2.9% increase in comparable restaurant sales and a 5.8% increase in the average check.\n\n- [CBRL 10-Q filed 2025-03-06 | relevance: 1.09]\n  - Total revenue for the second quarter and first six months of 2025 increased 1.5% and 2.0%, respectively, compared to the same periods in the prior year.\n  - The increase was driven by a 4.7% increase in comparable restaurant sales and a 7.4% increase in the average check.\n\n- [CBRL 10-Q filed 2026-03-04 | relevance: 1.15]\n  - Total revenue for the second quarter and first six months of 2026 decreased 7.9% and 6.8%, respectively, compared to the same periods in the prior year.\n  - The decrease was driven by a 7.1% decrease in comparable restaurant sales and a 9.2% decrease in comparable retail sales.\n\n- [CBRL 10-Q filed 2026-06-09 | relevance: 1.10]\n  - Total revenue for the third quarter and first nine months of 2026 decreased 2.9% and 5.6%, respectively, compared to the same periods in the prior year.\n  - The decrease was driven by a 2.6% decrease in comparable restaurant sales and a 1.8% decrease in comparable retail sales.",
-    "sources": [
-      {
-        "chunk_id": "CBRL_0001104659-26-023455_7",
-        "relevance": 0.7646400928497314,
-        "text_preview": " in operation at end of the period: \nCracker Barrel 656 657 656 657\nMSBC 54 69 54 69\nTotal units at end of the period 710 726 710 726\n\nTotal Revenue\n\nTotal revenue for the second quarter and first six"
-      },
-      {
-        "chunk_id": "CBRL_0001558370-24-013061_6",
-        "relevance": 0.7521213293075562,
-        "text_preview": " 0.5\nIncome before income taxes 0.7 3.0\nProvision for income taxes (income tax benefit) (0.5) 0.1\nNet income 1.2 % 2.9 %\n\nThe following table sets forth the change in the number of stores in operation"
-      },
-      {
-        "chunk_id": "CBRL_0001104659-26-071825_7",
-        "relevance": 0.755035936832428,
-        "text_preview": " in operation at end of the period: \nCracker Barrel 657 658 657 658\nMSBC 52 70 52 70\nTotal units at end of the period 709 728 709 728\n\nTotal Revenue\n\nTotal revenue for the third quarter and first nine"
-      },
-      {
-        "chunk_id": "CBRL_0001558370-25-002351_7",
-        "relevance": 0.7535544633865356,
-        "text_preview": "Units in operation at end of the period:\nCracker Barrel 657 662 657 662\nMSBC 69 63 69 63\nTotal units at end of the period 726 725 726 725\n\nTotal Revenue\n\nTotal revenue for the second quarter and first"
-      },
-      {
-        "chunk_id": "CBRL_0001558370-24-016001_6",
-        "relevance": 0.7436056733131409,
-        "text_preview": "0\n\nOther store operating expenses 25.0 24.7\n\nGeneral and administrative expenses 7.1 5.9\n\nImpairment and store closing costs 0.1 \u2014\n\nOperating income 0.8 1.4\n\nInterest expense, net 0.7 0.6\n\nIncome befo"
-      }
-    ],
-    "retrieval_time_s": 594.0
+    "retrieval_time_s": 8.5
   },
   {
     "question": "How did Cracker Barrel's cost of goods sold change?",
     "ticker": "CBRL",
-    "answer": "- [CBRL 10-Q filed 2024-12-04 | relevance: 0.82]\n  - Cost of goods sold (exclusive of depreciation and rent) was 32.6% of total revenue in the first quarter of 2025.\n\n- [CBRL 10-Q filed 2025-03-06 | relevance: 1.12]\n  - Cost of goods sold (exclusive of depreciation and rent) was 33.7% of total revenue in the second quarter of 2025.\n\n- [CBRL 10-Q filed 2025-03-06 | relevance: 1.12]\n  - Cost of goods sold (exclusive of depreciation and rent) was 31.7% of total revenue in the first six months of 2025.\n\n- [CBRL 10-Q filed 2026-03-04 | relevance: 1.01]\n  - Cost of goods sold (exclusive of depreciation and rent) was 32.4% of total revenue in the first six months of 2026.\n\n- [CBRL 10-Q filed 2026-06-09 | relevance: 0.87]\n  - The provided filings do not discuss cost of goods sold for the third quarter of 2026 or the first nine months of 2026.",
+    "answer": "- [CBRL 10-Q filed 2025-03-06 | relevance: 1.12]\n  - Cost of goods sold (exclusive of depreciation and rent) decreased from 33.7% in the first six months of 2024 to 32.6% in the first six months of 2025. This decrease is attributed to the deterioration in operating performance of three MSBC locations and two Cracker Barrel locations, which may have led to more efficient inventory management or cost reductions.\n\n- [CBRL 10-Q filed 2026-03-04 | relevance: 1.01]\n  - Cost of goods sold (exclusive of depreciation and rent) decreased from 35.7% in the first six months of 2025 to 32.4% in the first six months of 2026. This decrease is attributed to the decreases in total revenue partially offset by lower cost of goods sold expenses, lower labor expenses, lower incentive compensation expense, and lower professional fees. Additionally, higher media advertising and higher maintenance expenses contributed to the operating loss in 2026.",
     "sources": [
       {
         "chunk_id": "CBRL_0001558370-25-002351_6",
         "relevance": 0.7230876088142395,
-        "text_preview": " %\n\nCost of goods sold (exclusive of depreciation and rent) 32.6 33.7 31.7 32.4\n\nLabor and other related expenses 34.4 34.5 35.3 35.7\n\nOther store operating expenses 23.2 22.9 24.0 23.7\n\nGeneral and a"
+        "text_preview": " %\n\nCost of goods sold (exclusive of depreciation and rent) 32.6 33.7 31.7 32.4\n\nLabor and other related expenses 34.4 34.5 35.3 35.7\n\nOther store operating expenses 23.2 22.9 24.0 23.7\n\nGeneral and administrative expenses 6.5 5.6 6.8 5.8\n\nImpairment and store closing costs 0.2 \u2014 0.2 \u2014\n\nOperating income 3.1 3.3 2.0 2.4\n\nInterest expense, net 0.6 0.6 0.6 0.6\n\nIncome before income taxes 2.5 2.7 1.4 1.8\n\nProvision for income taxes (income tax benefit) 0.2 (0.1) (0.1) \u2014\n\nNet income 2.3 % 2.8 % 1.5 % 1.8 %\n\n20\n\nTable of Contents\nThe following table sets forth the change in the number of units in operation for the specified periods:\n \n Quarter Ended Six Months Ended\n January 31, January 26, January 31, January 26,\n 2025 2024 2025 2024\nNet change in units:\nCracker Barrel (1) 1 (1) 2\nMSBC \u2014 3 3 4\n \nUnits in operation at end of the period:\nCracker Barrel 657 662 657 662\nMSBC 69 63 69 63\nTotal units at end of the period 726 725 726 725\n\nTotal Revenue"
       },
       {
         "chunk_id": "CBRL_0001104659-26-023455_15",
         "relevance": 0.724361002445221,
-        "text_preview": ", as a result of the deterioration in operating performance of three MSBC locations and two Cracker Barrel locations. One Cracker Barrel store was closed in the second quarter and first six months of "
+        "text_preview": ", as a result of the deterioration in operating performance of three MSBC locations and two Cracker Barrel locations. One Cracker Barrel store was closed in the second quarter and first six months of 2025 resulting in closing costs of $288.\n\n27\n\nTable of Contents\nOperating Income (Loss)\nOperating income (loss) consisted of the following for the specified periods:\n \n Quarter Ended Six Months Ended\n January 30, January 31, January 30, January 31,\n 2026 2025 2026 2025\nOperating income (loss) $ 463 $ 29,123 $ (32,334) $ 36,194\nIn the second quarter and first six months of 2026, operating income (loss) decreased from the same periods in the prior year primarily due to the decreases in total revenue partially offset by lower cost of goods sold expenses, lower labor expenses, lower incentive compensation expense and lower professional fees. Additionally, for the first six months of 2026, higher media advertising and higher maintenance expenses further contributed to the operating loss in 2026. \nInterest Expense, Net\nThe following table highlights interest expense in dollars for the specified periods:\n \n Quarter Ended Six Months Ended\n January 30, January 31, January 30, January 31,\n 2026 2025 2026 2025\nInterest expense, net $ 4,033 $ 4,978 $ 7,757 $ 10,800\n\nThe decreases in interest expense for the second quarter and first six months of 2026 as compared to the same periods in the prior year resulted primarily from lower weighted average debt levels under our revolving credit facility partially offset by the interest related to the 2030 Notes. \nProvision for Income Taxes (Income Tax Benefit)\nThe following table highlights the provision for income taxes (income tax benefit) as a percentage of income (loss) before income taxes (\u201ceffective tax rate\u201d) for the specified periods:\n \n Quarter Ended Six Months Ended \n January 30, January 31, January 30, January 31, \n 2026 2025 2026 2025 \nEffective tax rate 135.9 % 8.0 % 41.8 % (6.5) %"
       },
       {
         "chunk_id": "CBRL_0001558370-25-002351_12",
         "relevance": 0.7249234914779663,
-        "text_preview": " January 26, January 31, January 26, \n 2025 2024 2025 2024\nGeneral and administrative expenses 6.5 % 5.6 % 6.8 % 5.8 %\n\nThis percentage change for the second quarter and first six months of 2025 as co"
+        "text_preview": " January 26, January 31, January 26, \n 2025 2024 2025 2024\nGeneral and administrative expenses 6.5 % 5.6 % 6.8 % 5.8 %\n\nThis percentage change for the second quarter and first six months of 2025 as compared to the same periods in the prior year resulted primarily from higher professional fees related to legal fees and proxy contest expenses. Additionally, the Company incurred higher costs of approximately $2,300 associated with the Company\u2019s strategic transformation plan for the first six months of 2025 as compared to the same period in the prior year. Higher legal fees for the first six months of 2025 included an approximate $3,300 charge in connection with our settlement of a series of wage and hour arbitrations. The Company incurred proxy contest expenses of $5,263 and $8,220, respectively, in the second quarter and first six months of 2025 related to a proxy contest in connection with the Company\u2019s 2024 annual shareholders meeting held on November 21, 2024. \n\n24\n\nTable of Contents\nImpairment and Store Closing Costs\nDuring the second quarter and first six months of 2025, we recorded impairment charges of $2,163 and $2,863, respectively, as a result of the deterioration in operating performance in three MSBC locations and two Cracker Barrel locations. No impairment was recorded in the second quarter and first six months of 2024. One Cracker Barrel store was closed in the second quarter and first six months of 2025 resulting in closing costs of $288. No stores were closed in the second quarter or first six months of 2024.\nInterest Expense, Net\nThe following table highlights interest expense in dollars for the specified periods:\n \n Quarter Ended Six Months Ended \n January 31, January 26, January 31, January 26, \n 2025 2024 2025 2024\nInterest expense, net $ 4,978 $ 5,067 $ 10,800 $ 10,005 "
       },
       {
         "chunk_id": "CBRL_0001104659-26-071825_14",
         "relevance": 0.7086694836616516,
-        "text_preview": " in payroll and related expense as a percentage of total revenue in the first nine months of 2026 as compared to the same period in the prior year resulted primarily from severance costs related to a "
+        "text_preview": " in payroll and related expense as a percentage of total revenue in the first nine months of 2026 as compared to the same period in the prior year resulted primarily from severance costs related to a corporate restructuring. \n\nImpairment and Store Closing Costs\n\nDuring the first nine months of 2026, impairment charges of $418 were recorded for three Maple Street Biscuit Company (\u201cMSBC\u201d) locations as a result of the Company\u2019s decision not to extend the leases for these locations. During the first nine months of 2026, one Cracker Barrel store and sixteen MSBC locations were closed because of poor operating performance, resulting in closing costs of $3,473 which included lease termination costs. \n\n28\n\nTable of Contents\nDuring the third quarter of 2025, we recorded impairment charges of $718 as a result of the deterioration in operating performance of two MSBC locations. During the first nine months of 2025, we recorded impairment charges of $3,581 as a result of the deterioration in operating performance of five MSBC locations and two Cracker Barrel locations. One Cracker Barrel store was closed in the first nine months of 2025 resulting in closing costs of $288.\nOperating Income (Loss)\nOperating income (loss) consisted of the following for the specified periods:\n \n Quarter Ended Nine Months Ended\n May 01, May 02, May 01, May 02,\n 2026 2025 2026 2025\nOperating income (loss) $ 6,720 $ 14,857 $ (25,614) $ 51,051\nIn the third quarter of 2026, operating income decreased from the same period in the prior year primarily due to the decrease in total revenue partially offset by lower labor expenses and lower advertising expense. In the first nine months of 2026, operating income (loss) decreased primarily due to the decrease in total revenue partially offset by lower cost of goods sold expenses, lower labor expenses, lower incentive compensation expense and lower professional fees. \nLitigation Settlement Income\nIn the third quarter of 2026, the Company received and recorded $47,422, net of legal fees, pursuant to a settlement agreement resolving interchange fee litigation. \nInterest Expense, Net\nThe following table highlights interest expense in dollars for the specified periods:\n \n Quarter Ended Nine Months Ended\n May 01, May 02, May 01, May 02,\n 2026 2025 2026 2025\nInterest expense, net $ 3,668 $ 4,984 $ 11,425 $ 15,784"
       },
       {
         "chunk_id": "CBRL_0001558370-24-016001_6",
         "relevance": 0.7050611972808838,
-        "text_preview": "0\n\nOther store operating expenses 25.0 24.7\n\nGeneral and administrative expenses 7.1 5.9\n\nImpairment and store closing costs 0.1 \u2014\n\nOperating income 0.8 1.4\n\nInterest expense, net 0.7 0.6\n\nIncome befo"
+        "text_preview": "0\n\nOther store operating expenses 25.0 24.7\n\nGeneral and administrative expenses 7.1 5.9\n\nImpairment and store closing costs 0.1 \u2014\n\nOperating income 0.8 1.4\n\nInterest expense, net 0.7 0.6\n\nIncome before income taxes 0.1 0.8\n\nProvision for income taxes (income tax benefit) (0.5) 0.1\n\nNet income 0.6 % 0.7 %\n\n19\n\nTable of Contents\n\nThe following table sets forth the change in the number of units in operation for the specified periods:\n \n Quarter Ended\n November 01, October 27, \n 2024 2023\nNet change in units:\nCracker Barrel \u2014 1\nMSBC 3 1\n \nUnits in operation at end of the period:\nCracker Barrel 658 661\nMSBC 69 60\nTotal units at end of the period 727 721\n\nTotal Revenue\n\nTotal revenue for the first quarter of 2025 increased 2.6% as compared to the same period in the prior year.\nThe following table highlights the key components of revenue for the specified periods:\n \n Quarter Ended \n November 01, October 27, \n 2024 2023\nRevenue in dollars: \nRestaurant $ 683,271 $ 660,793 \nRetail 161,818 163,046 \nTotal revenue $ 845,089 $ 832,389 \nTotal revenue by percentage relationships: \nRestaurant 80.9 % 80.2 %\nRetail 19.1 % 19.8 %\nAverage store volumes(1): \nRestaurant $ 1,012.8 $ 975.6 \nRetail 245.6 246.7 \nTotal revenue $ 1,258.4 $ 1,222.3 \nComparable store sales increase (decrease)(2): \nRestaurant 2.9 % (0.5) %\nRetail (1.6) % (8.1) %\nRestaurant and retail 2.0 % (2.1) %\nAverage check increase 5.8 % 6.6 %\nComparable restaurant guest traffic decrease(2): (2.9) % (7.1) %"
       }
     ],
-    "retrieval_time_s": 474.3
-  },
-  {
-    "question": "What drove Cracker Barrel's labor and related expenses?",
-    "ticker": "CBRL",
-    "answer": "- [CBRL 10-K filed 2024-09-27 | relevance: 1.02] The increase in labor and related expenses as a percentage of total revenue in 2024 compared to 2023 resulted primarily from higher staffing levels, the investment of additional labor hours to improve the guest experience, and wage inflation, partially offset by higher average check.\n- [CBRL 10-Q filed 2026-06-09 | relevance: 1.12] In the first nine months of 2026, the increase in payroll and related expense as a percentage of total revenue compared to the same period in the prior year resulted primarily from severance costs related to a corporate restructuring.",
-    "sources": [
-      {
-        "chunk_id": "CBRL_0001104659-26-071825_14",
-        "relevance": 0.657644510269165,
-        "text_preview": " in payroll and related expense as a percentage of total revenue in the first nine months of 2026 as compared to the same period in the prior year resulted primarily from severance costs related to a "
-      },
-      {
-        "chunk_id": "CBRL_0001558370-24-013061_8",
-        "relevance": 0.6424189805984497,
-        "text_preview": " costs incurred in store operations. The following table highlights labor and other related expenses as a percentage of total revenue for the past two years:\n \n 2024 2023\nLabor and related expenses 36"
-      },
-      {
-        "chunk_id": "CBRL_0001558370-25-002351_6",
-        "relevance": 0.628593921661377,
-        "text_preview": " %\n\nCost of goods sold (exclusive of depreciation and rent) 32.6 33.7 31.7 32.4\n\nLabor and other related expenses 34.4 34.5 35.3 35.7\n\nOther store operating expenses 23.2 22.9 24.0 23.7\n\nGeneral and a"
-      },
-      {
-        "chunk_id": "CBRL_0001104659-26-023455_15",
-        "relevance": 0.6726709604263306,
-        "text_preview": ", as a result of the deterioration in operating performance of three MSBC locations and two Cracker Barrel locations. One Cracker Barrel store was closed in the second quarter and first six months of "
-      },
-      {
-        "chunk_id": "CBRL_0001104659-26-023455_14",
-        "relevance": 0.6334246397018433,
-        "text_preview": " of total revenue in the second quarter and the first six months of 2026 as compared to the same periods in the prior year resulted primarily from lower performance against financial objectives in 202"
-      }
-    ],
-    "retrieval_time_s": 261.4
-  },
-  {
-    "question": "How did Cracker Barrel's store operating expenses change?",
-    "ticker": "CBRL",
-    "answer": "- [CBRL 10-Q filed 2024-12-04 | relevance: 1.15]\n  - Other store operating expenses increased from 24.7% to 25.0% of total revenue.\n\n- [CBRL 10-Q filed 2025-06-05 | relevance: 0.96]\n  - Other store operating expenses increased from 24.0% to 24.4% of total revenue for the first nine months of 2025 compared to the same period in 2024.\n\n- [CBRL 10-Q filed 2025-06-05 | relevance: 0.95]\n  - Other store operating expenses increased from 24.5% to 25.3% of total revenue for the third quarter of 2025 compared to the same period in 2024.\n\n- [CBRL 10-K filed 2025-09-26 | relevance: 0.91]\n  - The increase in other store operating expenses as a percentage of total revenue in 2025 as compared to 2024 resulted primarily from costs associated with the off-premise business.",
-    "sources": [
-      {
-        "chunk_id": "CBRL_0001558370-24-016001_6",
-        "relevance": 0.774359941482544,
-        "text_preview": "0\n\nOther store operating expenses 25.0 24.7\n\nGeneral and administrative expenses 7.1 5.9\n\nImpairment and store closing costs 0.1 \u2014\n\nOperating income 0.8 1.4\n\nInterest expense, net 0.7 0.6\n\nIncome befo"
-      },
-      {
-        "chunk_id": "CBRL_0001104659-26-023455_15",
-        "relevance": 0.7480664253234863,
-        "text_preview": ", as a result of the deterioration in operating performance of three MSBC locations and two Cracker Barrel locations. One Cracker Barrel store was closed in the second quarter and first six months of "
-      },
-      {
-        "chunk_id": "CBRL_0001558370-25-008421_13",
-        "relevance": 0.7480752468109131,
-        "text_preview": " 26, May 02, April 26, \n 2025 2024 2025 2024\nOther store operating expenses 25.3 % 24.5 % 24.4 % 24.0 %\n\n24\n\nTable of Contents\nThis percentage change for the third quarter of 2025 as compared to the s"
-      },
-      {
-        "chunk_id": "CBRL_0001558370-25-008421_7",
-        "relevance": 0.7296562790870667,
-        "text_preview": " changes. We believe these performance indicators are useful for investors by providing a consistent comparison of sales results and trends across comparable periods within our core, established store"
-      },
-      {
-        "chunk_id": "CBRL_0001104659-25-093663_11",
-        "relevance": 0.7358747720718384,
-        "text_preview": "5 as compared to 2024 resulted primarily from unfavorable claim experience.\nThe increase in other store operating expenses as a percentage of total revenue in 2025 as compared to 2024 resulted primari"
-      }
-    ],
-    "retrieval_time_s": 431.4
-  },
-  {
-    "question": "What is Cracker Barrel's business model and store concept?",
-    "ticker": "CBRL",
-    "answer": "- [CBRL 10-K filed 2024-09-27 | relevance: 1.15]\n  - Cracker Barrel Old Country Store, Inc. operates Cracker Barrel stores, each consisting of a restaurant with a gift shop.\n  - The restaurants serve breakfast, lunch, and dinner.\n  - The gift shop offers a variety of decorative and functional items, specializing in rocking chairs, holiday gifts, toys, apparel, and foods.\n  - As of September 13, 2024, the Company operated 658 Cracker Barrel stores located in 44 states.\n  - The Company also owns Maple Street Biscuit Company (MSBC), a breakfast and lunch fast casual concept.\n  - As of September 13, 2024, the Company operated 68 MSBC locations in ten states.\n\n- [CBRL 10-K filed 2025-09-26 | relevance: 1.11]\n  - Cracker Barrel Old Country Store, Inc. operates Cracker Barrel stores, each consisting of a restaurant with a gift shop.\n  - The restaurants serve breakfast, lunch, and dinner.\n  - The gift shop offers a variety of decorative and functional items, specializing in rocking chairs, holiday gifts, toys, apparel, and foods.\n  - As of September 12, 2025, the Company operated 657 Cracker Barrel stores located in 43 states.\n  - The Company also owns Maple Street Biscuit Company (MSBC), a breakfast and lunch fast casual concept.\n  - As of September 12, 2025, the Company operated 68 MSBC locations in ten states.\n\n- [CBRL 10-Q filed 2026-03-04 | relevance: 1.02]\n  - Cracker Barrel Old Country Store, Inc., and its subsidiaries operate Cracker Barrel stores in the United States.\n  - As of January 30, 2026, the Company operated 656 Cracker Barrel stores in 43 states and 54 Maple Street Biscuit Company (MSBC) locations in ten states.\n\n- [CBRL 10-Q filed 2025-12-09 | relevance: 1.02]\n  - Cracker Barrel Old Country Store, Inc., and its subsidiaries operate Cracker Barrel stores in the United States.\n  - As of October 31, 2025, the Company operated 656 Cracker Barrel stores in 43 states and 54 Maple Street Biscuit Company (MSBC) locations in ten states.\n\n- [CBRL 10-Q filed 2026-06-09 | relevance: 1.01]",
-    "sources": [
-      {
-        "chunk_id": "CBRL_0001558370-24-013061_1",
-        "relevance": 0.8324164748191833,
-        "text_preview": " and Results of Operations\u201d of our annual report on Form 10-K for the year ended July 28, 2023, filed with the SEC on September 26, 2023.\n35\n\nTable of Contents\n\nEXECUTIVE OVERVIEW\n\nCracker Barrel Old "
-      },
-      {
-        "chunk_id": "CBRL_0001104659-25-093663_1",
-        "relevance": 0.8277266621589661,
-        "text_preview": " Discussion and Analysis of Financial Condition and Results of Operations\u201d of our annual report on Form 10-K for the year ended August 02, 2024, filed with the SEC on September 27, 2024.\n\nEXECUTIVE OV"
-      },
-      {
-        "chunk_id": "CBRL_0001104659-26-023455_0",
-        "relevance": 0.7927433252334595,
-        "text_preview": "ITEM 2. Management\u2019s Discussion and Analysis of Financial Condition and Results of Operations\n\nCracker Barrel Old Country Store, Inc., and its subsidiaries (collectively, the \u201cCompany,\u201d \u201cour\u201d or \u201cwe\u201d)"
-      },
-      {
-        "chunk_id": "CBRL_0001104659-25-119676_0",
-        "relevance": 0.7920488119125366,
-        "text_preview": "ITEM 2. Management\u2019s Discussion and Analysis of Financial Condition and Results of Operations\n\nCracker Barrel Old Country Store, Inc., and its subsidiaries (collectively, the \u201cCompany,\u201d \u201cour\u201d or \u201cwe\u201d)"
-      },
-      {
-        "chunk_id": "CBRL_0001104659-26-071825_0",
-        "relevance": 0.7908111810684204,
-        "text_preview": "ITEM 2. Management\u2019s Discussion and Analysis of Financial Condition and Results of Operations\n\nCracker Barrel Old Country Store, Inc., and its subsidiaries (collectively, the \u201cCompany,\u201d \u201cour\u201d or \u201cwe\u201d)"
-      }
-    ],
-    "retrieval_time_s": 819.5
-  },
-  {
-    "question": "How did Cracker Barrel's general and administrative expenses change?",
-    "ticker": "CBRL",
-    "answer": "- [CBRL 10-K filed 2024-09-27 | relevance: 1.09]\n  - General and administrative expenses increased from 5.0% of total revenue in 2023 to 6.0% in 2024.\n  - The increase was primarily due to higher professional fees, payroll and related expenses, and incentive compensation expense.\n  - Professional fees increased by 0.6% due to strategic transformation plan costs.\n  - Payroll and related expenses increased by 0.2% due to severance costs from corporate restructuring and CEO transition costs.\n  - Incentive compensation increased by 0.1% due to CEO transition costs.\n\n- [CBRL 10-K filed 2025-09-26 | relevance: 1.06]\n  - General and administrative expenses increased from 6.0% of total revenue in 2024 to 6.2% in 2025.\n  - The increase was primarily due to higher professional fees and incentive compensation expense.\n  - Professional fees increased by 0.1% due to proxy contest expenses and higher legal fees.\n  - Incentive compensation increased by 0.1% due to higher bonus payouts from better performance against financial objectives.\n\n- [CBRL 10-Q filed 2025-12-09 | relevance: 1.05]\n  - General and administrative expenses decreased from 7.1% of total revenue in the first quarter of 2025 to 6.0% in the first quarter of 2026.\n  - The decrease was primarily due to lower incentive compensation expense and lower professional fees.\n  - Incentive compensation decreased by 1.0% due to lower performance against financial objectives.\n  - Professional fees decreased by 0.6% due to lower legal fees and lower proxy contest expenses.\n  - Payroll and related expenses increased by 0.4% due to severance costs from corporate restructuring.",
-    "sources": [
-      {
-        "chunk_id": "CBRL_0001558370-25-002351_12",
-        "relevance": 0.7188422679901123,
-        "text_preview": " January 26, January 31, January 26, \n 2025 2024 2025 2024\nGeneral and administrative expenses 6.5 % 5.6 % 6.8 % 5.8 %\n\nThis percentage change for the second quarter and first six months of 2025 as co"
-      },
-      {
-        "chunk_id": "CBRL_0001558370-24-013061_9",
-        "relevance": 0.7526865005493164,
-        "text_preview": " initiatives.\nGeneral and Administrative Expenses\nThe following table highlights general and administrative expenses as a percentage of total revenue for the past two years:\n \n 2024 2023\nGeneral and a"
-      },
-      {
-        "chunk_id": "CBRL_0001104659-25-093663_11",
-        "relevance": 0.7413733005523682,
-        "text_preview": "5 as compared to 2024 resulted primarily from unfavorable claim experience.\nThe increase in other store operating expenses as a percentage of total revenue in 2025 as compared to 2024 resulted primari"
-      },
-      {
-        "chunk_id": "CBRL_0001104659-25-119676_11",
-        "relevance": 0.719680666923523,
-        "text_preview": " table highlights general and administrative expenses as a percentage of total revenue for the specified periods:\n \n Quarter Ended \n October 31, November 01,\n 2025 2024\nGeneral and administrative expe"
-      },
-      {
-        "chunk_id": "CBRL_0001558370-24-016001_6",
-        "relevance": 0.7107809782028198,
-        "text_preview": "0\n\nOther store operating expenses 25.0 24.7\n\nGeneral and administrative expenses 7.1 5.9\n\nImpairment and store closing costs 0.1 \u2014\n\nOperating income 0.8 1.4\n\nInterest expense, net 0.7 0.6\n\nIncome befo"
-      }
-    ],
-    "retrieval_time_s": 662.6
+    "retrieval_time_s": 6.6
   }
 ]

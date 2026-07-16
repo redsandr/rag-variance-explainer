@@ -1,0 +1,2383 @@
+============================================================
+FAITHFULNESS EVALUATION — ALL 20 QUESTIONS
+============================================================
+
+INSTRUCTION: Evaluate each question below. Return JSON for each.
+System prompt:
+You are a strict but fair faithfulness evaluator for financial RAG systems.
+
+Your job: extract each factual claim from the Answer text ONLY, then check if that claim is supported by the Source chunks.
+
+CRITICAL: Extract claims ONLY from the Answer. Do NOT extract claims from the Source chunks.
+
+Rules:
+- FAITHFUL: Source supports the claim verbatim or minor rephrasing. Numbers, percentages, dollar amounts must match exactly.
+- PARTIALLY FAITHFUL: Source supports general direction but specific detail is wrong (e.g. wrong number, wrong period).
+- UNFAITHFUL: Source contradicts the claim or does not contain the information.
+- Evaluate each claim independently against ALL sources. A claim about one period is FAITHFUL if its numbers match the source for that period.
+
+Return ONLY valid JSON:
+{"claims": [{"claim": "...", "verdict": "FAITHFUL|PARTIALLY FAITHFUL|UNFAITHFUL"}], "faithful_count": N, "partial_count": N, "unfaithful_count": N, "total_claims": N}
+
+----------------------------------------
+QUESTION: eval-001 — Why did Chipotle's labor costs change?
+----------------------------------------
+Question: Why did Chipotle's labor costs change?
+
+Source chunks:
+
+[CMG 10-Q filed 2024-07-25]
+ for frying chips.
+
+Labor Costs
+
+Three months ended June 30, Percentage Six months ended June 30, Percentage
+
+2024 2023 change 2024 2023 change
+
+(dollars in millions) (dollars in millions)
+
+Labor costs $ 716.6 $ 611.7 17.2 % $ 1,376.1 $ 1,195.5 15.1 %
+
+As a percentage of total revenue 24.1 % 24.3 % (0.2 %) 24.2 % 24.5 % (0.3 %)
+
+Labor costs decreased 0.2% as a percentage of total revenue for the three months ended June 30, 2024 compared to the three months ended June 30, 2023, including 1.5% from sales leverage, partially offset by 1.1% due to restaurant wage inflation, of which 0.5% was due to the minimum wage for restaurants like Chipotle in California increasing to $20 per hour in April 2024.
+
+Labor costs decreased 0.3% as a percentage of total revenue for the six months ended June 30, ...
+[CMG 10-Q filed 2024-07-25]
+ per share was $0.33, a 32.0% increase from $0.25, which includes a $0.01 after-tax impact from an unrealized loss on a long-term investment and an increase in legal reserves.
+
+Sales Trends
+
+. Comparable restaurant sales increased 11.1% for the three months ended June 30, 2024. The increase is primarily attributable to higher transactions and, to a lesser extent, an increase in average check. Comparable restaurant sales represent the change in period-over-period total revenue for restaurants in operation for at least 13 full calendar months. Digital sales represented 35.3% of total food and beverage revenue.
+
+14
+
+Table of Contents
+
+Restaurant Operating Costs.
+
+ During the three months ended June 30, 2024, our restaurant operating costs (food, beverage and packaging; labor; occupancy; and o...
+[CMG 10-Q filed 2024-10-30]
+ through licensed restaurants in the Middle East; increases in ingredient and other operating costs due to inflation, global conflicts, severe weather and climate change, our Food with Integrity philosophy, tariffs or trade restrictions; intermittent supply shortages relating to our Food with Integrity philosophy,
+
+ rapid expansion and supply chain disruptions; the uncertainty of our ability to achieve expected levels of comparable restaurant sales due to factors such as changes in guests' perceptions of our brand, including as a result of negative publicity or social media posts, decreased consumer spending (including as a result of higher inflation, mass layoffs, fear of possible recession and higher energy prices), or the inability to increase menu prices or realize the benefits of menu...
+[CMG 10-Q filed 2025-07-24]
+ including through licensed restaurants in the Middle East and Mexico; increases in ingredient and other operating costs due to inflation, global conflicts, severe weather and climate change, our Food with Integrity philosophy, tariffs or trade restrictions; intermittent supply shortages relating to our Food with
+
+ Integrity philosophy, rapid expansion and supply chain disruptions; the uncertainty of our ability to achieve expected levels of comparable restaurant sales due to factors such as changes in guests' perceptions of our brand, including as a result of negative publicity or social media posts, increased consumer uncertainty and decreased consumer spending (including as a result of higher inflation, mass layoffs, fear of possible recession and higher energy prices), or the inability...
+[CMG 10-Q filed 2025-04-24]
+ including through licensed restaurants in the Middle East and Mexico; increases in ingredient and other operating costs due to inflation, global conflicts, severe weather and climate change, our Food with Integrity philosophy, tariffs or trade restrictions; intermittent supply shortages relating to our Food with
+
+ Integrity philosophy, rapid expansion and supply chain disruptions; the uncertainty of our ability to achieve expected levels of comparable restaurant sales due to factors such as changes in guests' perceptions of our brand, including as a result of negative publicity or social media posts, increased consumer uncertainty and decreased consumer spending (including as a result of higher inflation, mass layoffs, fear of possible recession and higher energy prices), or the inability...
+
+---
+
+Answer:
+- [CMG 10-Q filed 2024-07-25 | relevance: 1.15]
+  - Labor costs decreased 0.2% as a percentage of total revenue for the three months ended June 30, 2024 compared to the three months ended June 30, 2023, including 1.5% from sales leverage, partially offset by 1.1% due to restaurant wage inflation, of which 0.5% was due to the minimum wage for restaurants like Chipotle in California increasing to $20 per hour in April 2024.
+
+- [CMG 10-Q filed 2024-10-30 | relevance: 0.58]
+  - Labor costs decreased 0.3% as a percentage of total revenue for the six months ended June 30, 2024 compared to the six months ended June 30, 2023, including 1.3% from sales leverage, partially offset by 0.8% due to restaurant wage inflation, of which 0.3% was due to the minimum wage for restaurants like Chipotle in California increasing to $20 per hour in April 2024.
+
+- [CMG 10-Q filed 2025-04-24 | relevance: 0.56]
+  - Labor costs decreased 0.4% as a percentage of total revenue for the three months ended March 31, 2025 compared to the three months ended March 31, 2024, including 1.2% from sales leverage, partially offset by 0.8% due to restaurant wage inflation, of which 0.4% was due to the minimum wage for restaurants like Chipotle in California increasing to $20 per hour in April 2024.
+
+- [CMG 10-Q filed 2025-07-24 | relevance: 0.57]
+  - Labor costs decreased 0.3% as a percentage of total revenue for the six months ended June 30, 2025 compared to the six months ended June 30, 2024, including 1.2% from sales leverage, partially offset by 0.9% due to restaurant wage inflation, of which 0.4% was due to the minimum wage for restaurants like Chipotle in California increasing to $20 per hour in April 2024.
+
+----------------------------------------
+QUESTION: eval-002 — Why did marketing costs change at Darden?
+----------------------------------------
+Question: Why did marketing costs change at Darden?
+
+Source chunks:
+
+[DRI 10-K filed 2025-07-18]
+6, we expect our annual effective tax rate to be 13 percent, and we expect capital expenditures incurred to build new restaurants, remodel and maintain existing restaurants and technology initiatives to be between $700 million and $750 million.
+
+(1) 
+
+ 
+
+Annual same-restaurant sales is a 52-week metric and excludes the impact of Chuy’s, which will not have been owned and operated by Darden for a 16-month period prior to the beginning of fiscal 2026, as well as any additional locations not expected to be operated by Darden for the entirety of the fiscal year.
+
+30
+
+RESULTS OF OPERATIONS FOR FISCAL 2025 AND 2024
+
+To facilitate review of our results of operations, the following table sets forth our financial results for the periods indicated. All information is derived from the consolidated st...
+[DRI 10-K filed 2024-07-19]
+225.3 $ 2,166.9 2.7 % (0.7) % $ 6.0 $ 6.0
+
+$ 11,390.0 $ 10,487.8
+
+(1)
+
+Same-restaurant sales is a year-over-year comparison of each period’s sales volumes for a 52-week year and is limited to restaurants that have been open, and operated by Darden, for at least 16 months.
+
+(2)
+
+Average annual sales are calculated as sales divided by total restaurant operating weeks multiplied by 52 weeks; excludes franchise locations.
+
+Olive Garden’s sales increase for fiscal 2024 was primarily driven by a U.S. same-restaurant sales increase combined with revenue from new restaurants. The increase in U.S. same-restaurant sales in fiscal 2024 resulted from a 3.3 percent increase in average check, partially offset by a 1.7 percent decrease in same-restaurant guest counts. 
+
+LongHorn Steakhouse’s sales increa...
+[DRI 10-K filed 2024-07-19]
+’s have not been included in our fiscal 2025 outlook below.
+
+We expect fiscal 2025 sales from continuing operations to increase between 3.5 percent and 4.5 percent, driven by same-restaurant sales growth
+
+ (1)
+
+ of 1.0 percent to 2.0 percent, and sales from 45 to 50 new restaurant openings. In fiscal 2025, we expect our annual effective tax rate to be 13 percent and we expect capital expenditures incurred to build new restaurants, remodel and maintain existing restaurants and technology initiatives to be between $550 million and $600 million.
+
+(1) 
+
+ 
+
+Excludes Ruth’s Chris as they will not be owned and operated by Darden for a 16-month period at the 
+
+ beginning of fiscal 2025.
+
+30
+
+RESULTS OF OPERATIONS FOR FISCAL 2024 AND 2023
+
+To facilitate review of our results of operations, the foll...
+[DRI 10-K filed 2025-07-18]
+,533.5 $ 2,225.3 13.8 % 0.2 % $ 5.8 $ 6.0
+
+$ 12,076.7 $ 11,390.0
+
+(1)
+
+Same-restaurant sales is a year-over-year comparison of each period’s sales volumes for a 52-week year and is limited to restaurants that have been open, and operated by Darden, for at least 16 months.
+
+(2)
+
+Average annual sales are calculated as sales divided by total restaurant operating weeks multiplied by 52 weeks; excludes franchise locations.
+
+Olive Garden’s sales increase for fiscal 2025 was primarily driven by a U.S. same-restaurant sales increase combined with revenue from new restaurants. The increase in U.S. same-restaurant sales in fiscal 2025 resulted from a 4.1 percent increase in average check, which includes a 0.7 increase in off-premise catering sales, partially offset by a 2.3 percent decrease in same-...
+[DRI 10-Q filed 2025-01-02]
+ expenditures incurred to build new restaurants, remodel and maintain existing restaurants and for technology initiatives to be approximately $650 million. These amounts now all include the addition of Chuy’s and our expectations for Chuy’s results from the date of acquisition forward.
+
+1
+
+ Same-restaurant sales exclude Ruth’s Chris and Chuy’s as they were not owned and operated by Darden for a 16-month period at the beginning of the fiscal year.
+
+ SALES
+
+The following table presents our sales by segment for the periods indicated.
+
+Three Months Ended Six Months Ended
+
+(in millions) November 24, 2024 November 26, 2023 % Chg SRS (1) November 24, 2024 November 26, 2023 % Chg SRS (1)
+
+Olive Garden $ 1,292.5 $ 1,251.4 3.3 % 2.0 % $ 2,501.6 $ 2,479.3 0.9 % (0.4) %
+
+LongHorn Steakhouse $ 710.1 $ ...
+
+---
+
+Answer:
+- [DRI 10-K filed 2024-07-19 | relevance: 0.75]
+  - Marketing expenses increased by 22.1% from $144.5 million in fiscal 2023 to $169.9 million in fiscal 2024. This increase was primarily driven by the acquisition of Ruth’s Chris, which contributed to the higher marketing expenses in fiscal 2024.
+
+- [DRI 10-K filed 2025-07-18 | relevance: 1.12]
+  - Marketing expenses increased by 17.6% from $169.9 million in fiscal 2024 to $196.6 million in fiscal 2025. This increase was driven by the inclusion of Chuy’s in the marketing expenses, which were not previously included due to the 16-month ownership and operation requirement.
+
+- [DRI 10-Q filed 2025-01-02 | relevance: 0.57]
+  - The marketing expenses for the six months ended November 24, 2024, were $1,136.9 million, which includes the addition of Chuy’s and the expectation for Chuy’s results from the date of acquisition forward. This reflects the ongoing marketing efforts across all segments, including the newly acquired Chuy’s.
+
+----------------------------------------
+QUESTION: eval-003 — How did wage inflation affect Chipotle's labor costs?
+----------------------------------------
+Question: How did wage inflation affect Chipotle's labor costs?
+
+Source chunks:
+
+[CMG 10-Q filed 2024-07-25]
+ for frying chips.
+
+Labor Costs
+
+Three months ended June 30, Percentage Six months ended June 30, Percentage
+
+2024 2023 change 2024 2023 change
+
+(dollars in millions) (dollars in millions)
+
+Labor costs $ 716.6 $ 611.7 17.2 % $ 1,376.1 $ 1,195.5 15.1 %
+
+As a percentage of total revenue 24.1 % 24.3 % (0.2 %) 24.2 % 24.5 % (0.3 %)
+
+Labor costs decreased 0.2% as a percentage of total revenue for the three months ended June 30, 2024 compared to the three months ended June 30, 2023, including 1.5% from sales leverage, partially offset by 1.1% due to restaurant wage inflation, of which 0.5% was due to the minimum wage for restaurants like Chipotle in California increasing to $20 per hour in April 2024.
+
+Labor costs decreased 0.3% as a percentage of total revenue for the six months ended June 30, ...
+[CMG 10-Q filed 2025-07-24]
+.5 $ 1,376.1 7.2 %
+
+As a percentage of total revenue 24.7 % 24.1 % 0.6 % 24.8 % 24.2 % 0.6 %
+
+Labor costs increased 0.6% as a percentage of total revenue for the three months ended June 30, 2025 compared to the three months ended June 30, 2024. The increase was primarily due to the impact from lower sales volumes. A 0.5% benefit from menu price increases in the prior year and efficient management of labor more than offset wage inflation.
+
+Labor costs increased 0.6% as a percentage of total revenue for the three and six months ended June 30, 2025 compared to the three and six months ended June 30, 2024. The increase was due to the impact from lower sales volumes, as a 0.6% benefit from menu price increases in the prior year was offset by restaurant wage inflation, including minimum wage inc...
+[CMG 10-Q filed 2024-07-25]
+ per share was $0.33, a 32.0% increase from $0.25, which includes a $0.01 after-tax impact from an unrealized loss on a long-term investment and an increase in legal reserves.
+
+Sales Trends
+
+. Comparable restaurant sales increased 11.1% for the three months ended June 30, 2024. The increase is primarily attributable to higher transactions and, to a lesser extent, an increase in average check. Comparable restaurant sales represent the change in period-over-period total revenue for restaurants in operation for at least 13 full calendar months. Digital sales represented 35.3% of total food and beverage revenue.
+
+14
+
+Table of Contents
+
+Restaurant Operating Costs.
+
+ During the three months ended June 30, 2024, our restaurant operating costs (food, beverage and packaging; labor; occupancy; and o...
+[CMG 10-Q filed 2026-04-30]
+6 2025 change
+
+(dollars in millions)
+
+Labor costs $ 805.4 $ 718.2 12.1 %
+
+As a percentage of total revenue 26.1 % 25.0 % 1.1 %
+
+Labor costs increased 1.1% as a percentage of total revenue for the three months ended March 31, 2026 compared to the three months ended March 31, 2025. The increase was primarily driven by a 0.4% impact from costs related to certain legal proceedings, 0.3% from wage inflation, 0.3% from lower average restaurant sales volumes, and 0.2% from higher benefits expense, including performance-based bonuses. These increases were partially offset by a 0.2% benefit from menu price increases.
+
+Occupancy Costs
+
+Three months endedMarch 31, Percentage
+
+2026 2025 change
+
+(dollars in millions)
+
+Occupancy costs $ 169.9 $ 149.8 13.4 %
+
+As a percentage of total revenue 5.5 % 5.2 % ...
+[CMG 10-Q filed 2025-04-24]
+ a 20 basis point increase in food, beverage and packaging costs during the second quarter of 2025 relating to tariffs.
+
+Labor Costs
+
+Three months ended March 31, Percentage
+
+2025 2024 change
+
+(dollars in millions)
+
+Labor costs $ 718.2 $ 659.5 8.9 %
+
+As a percentage of total revenue 25.0 % 24.4 % 0.6 %
+
+Labor costs increased 0.6% as a percentage of total revenue for the three months ended March 31, 2025 compared to the three months ended March 31, 2024. The increase was due to the impact from lower sales volumes, as a 0.7% benefit from menu price increases in the prior year was offset by restaurant wage inflation, including minimum wage increases for our restaurants in California.
+
+Occupancy Costs
+
+Three months ended March 31, Percentage
+
+2025 2024 change
+
+(dollars in millions)
+
+Occupancy ...
+
+---
+
+Answer:
+- [CMG 10-Q filed 2024-07-25 | relevance: 0.80]: Labor costs decreased 0.2% as a percentage of total revenue for the three months ended June 30, 2024, including 1.1% due to restaurant wage inflation, of which 0.5% was due to the minimum wage for restaurants like Chipotle in California increasing to $20 per hour in April 2024.
+- [CMG 10-Q filed 2025-07-24 | relevance: 0.81]: Labor costs increased 0.6% as a percentage of total revenue for the three months ended June 30, 2025, due to the impact from lower sales volumes. A 0.5% benefit from menu price increases in the prior year and efficient management of labor more than offset wage inflation.
+- [CMG 10-Q filed 2026-04-30 | relevance: 0.72]: Labor costs increased 1.1% as a percentage of total revenue for the three months ended March 31, 2026, primarily driven by a 0.4% impact from costs related to certain legal proceedings, 0.3% from wage inflation, 0.3% from lower average restaurant sales volumes, and 0.2% from higher benefits expense, including performance-based bonuses. These increases were partially offset by a 0.2% benefit from menu price increases.
+- [CMG 10-Q filed 2025-04-24 | relevance: 0.65]: Labor costs increased 0.6% as a percentage of total revenue for the three months ended March 31, 2025, due to the impact from lower sales volumes, as a 0.7% benefit from menu price increases in the prior year was offset by restaurant wage inflation, including minimum wage increases for our restaurants in California.
+
+----------------------------------------
+QUESTION: eval-004 — What drove Chipotle's revenue changes?
+----------------------------------------
+Question: What drove Chipotle's revenue changes?
+
+Source chunks:
+
+[CMG 10-K filed 2025-02-05]
+.6% to $11.3 billion
+
+•
+
+Comparable restaurant sales increased 7.4%
+
+•
+
+Diluted earnings per share was $1.11, a 24.7% increase from $0.89
+
+Sales Trends. 
+
+Comparable restaurant sales increased 7.4% for the year ended December 31, 2024. The increase is attributable to higher transactions of 5.3% and a 2.1% increase in average check. Comparable restaurant sales represent the change in period-over-period total revenue for restaurants in operation for at least 13 full calendar months. Digital sales represented 35.1% of total food and beverage revenue. For 2025, management is anticipating comparable restaurant sales growth in the low to mid-single digit range.
+
+Restaurant Development. 
+
+During the year ended December 31, 2024, we opened 304 restaurants, which included 257 restaurants with a Chi...
+[CMG 10-Q filed 2025-04-24]
+ $2.9 billion
+
+•
+
+Comparable restaurant sales decreased 0.4%
+
+•
+
+Diluted earnings per share was $0.28, a 7.7% increase from $0.26
+
+14
+
+Table of Contents
+
+Sales Trends
+
+. Comparable restaurant sales decreased 0.4% for the three months ended March 31, 2025. The decrease is attributable to lower transactions of 2.3% which is offset by a 1.9% increase in average check. Transactions have been impacted by both a slowdown in consumer spending, which has continued into April, as well as periods of inclement weather across the country. Comparable restaurant sales represent the change in period-over-period total revenue for restaurants in operation for at least 13 full calendar months. Digital sales represented 35.4% of total food and beverage revenue.
+
+Restaurant Development. 
+
+During the three mon...
+[CMG 10-Q filed 2024-07-25]
+ per share was $0.33, a 32.0% increase from $0.25, which includes a $0.01 after-tax impact from an unrealized loss on a long-term investment and an increase in legal reserves.
+
+Sales Trends
+
+. Comparable restaurant sales increased 11.1% for the three months ended June 30, 2024. The increase is primarily attributable to higher transactions and, to a lesser extent, an increase in average check. Comparable restaurant sales represent the change in period-over-period total revenue for restaurants in operation for at least 13 full calendar months. Digital sales represented 35.3% of total food and beverage revenue.
+
+14
+
+Table of Contents
+
+Restaurant Operating Costs.
+
+ During the three months ended June 30, 2024, our restaurant operating costs (food, beverage and packaging; labor; occupancy; and o...
+[CMG 10-Q filed 2025-07-24]
+ $3.1 billion
+
+•
+
+Comparable restaurant sales decreased 4.0%
+
+•
+
+Diluted earnings per share was $0.32, a 3.0% decrease from $0.33
+
+14
+
+Table of Contents
+
+Sales Trends
+
+. Comparable restaurant sales decreased 4.0% for the three months ended June 30, 2025. The decrease is attributable to lower transactions of 4.9% which is offset by a 0.9% increase in average check. While transactions have been impacted by a slowdown in consumer spending, we exited the quarter with positive comps and positive transactions. Comparable restaurant sales represent the change in period-over-period total revenue for company-owned restaurants in operation for at least 13 full calendar months. Digital sales represented 35.5% of total food and beverage revenue. For 2025, management is anticipating about flat comparab...
+[CMG 10-Q filed 2025-10-30]
+ of total revenue
+
+•
+
+Occupancy as a percentage of total revenue
+
+•
+
+Other operating costs as a percentage of total revenue
+
+•
+
+New restaurant openings
+
+14
+
+Table of Contents
+
+Third Quarter 2025 Financial Highlights, year-over-year: 
+
+•
+
+Total revenue increased 7.5% to $3.0 billion
+
+•
+
+Comparable restaurant sales increased 0.3%
+
+•
+
+Diluted earnings per share was $0.29, a 3.6% increase from $0.28
+
+Sales Trends
+
+. Comparable restaurant sales increased 0.3% for the three months ended September 30, 2025. The increase is attributable to a 1.1% increase in average check, partially offset by lower transactions of 0.8%. Comparable restaurant sales represent the change in period-over-period total revenue for company-owned restaurants in operation for at least 13 full calendar months. Digital sales ...
+
+---
+
+Answer:
+- [CMG 10-K filed 2025-02-05 | relevance: 1.06]
+  - Revenue increased to $11.3 billion, a 0.6% change from the previous period.
+  - The provided filings do not discuss revenue for the previous period.
+
+- [CMG 10-Q filed 2025-04-24 | relevance: 1.04]
+  - Revenue decreased to $2.9 billion, a 6.5% change from the previous period.
+  - The decrease is attributed to a 11.4% decrease in delivery service revenue, partially offset by a 6.5% increase in food and beverage revenue.
+  - The decrease in delivery service revenue is driven by a 11.4% decrease in revenue, while food and beverage revenue increased by 6.5%.
+  - The increase in food and beverage revenue is driven by a 3.4% increase in average restaurant sales.
+
+- [CMG 10-Q filed 2024-07-25 | relevance: 1.00]
+  - Revenue increased to $2,875.3 million, a 6.4% change from the previous period.
+  - The increase is driven by a 6.5% increase in food and beverage revenue and a 11.4% decrease in delivery service revenue.
+  - The increase in food and beverage revenue is driven by a 3.4% increase in average restaurant sales.
+
+- [CMG 10-Q filed 2025-07-24 | relevance: 0.99]
+  - Revenue decreased to $3.1 billion, a 7.5% change from the previous period.
+  - The decrease is attributed to a 4.0% decrease in comparable restaurant sales, which is partially offset by a 0.9% increase in average check.
+  - The decrease in comparable restaurant sales is driven by a 4.9% decrease in transactions, while the increase in average check is driven by a 0.9% increase.
+
+- [CMG 10-Q filed 2025-10-30 | relevance: 0.93]
+  - Revenue increased to $3.0 billion, a 7.5% change from the previous period.
+  - The increase is attributed to a 0.3% increase in comparable restaurant sales, which is partially offset by a 0.8% decrease in transactions.
+  - The increase in comparable restaurant sales is driven by a 1.1% increase in average check, while the decrease in transactions is driven by a 0.8% decrease.
+
+----------------------------------------
+QUESTION: eval-005 — Why did Cracker Barrel's operating costs change?
+----------------------------------------
+Question: Why did Cracker Barrel's operating costs change?
+
+Source chunks:
+
+[CBRL 10-Q filed 2026-03-04]
+, as a result of the deterioration in operating performance of three MSBC locations and two Cracker Barrel locations. One Cracker Barrel store was closed in the second quarter and first six months of 2025 resulting in closing costs of $288.
+
+27
+
+Table of Contents
+Operating Income (Loss)
+Operating income (loss) consisted of the following for the specified periods:
+ 
+ Quarter Ended Six Months Ended
+ January 30, January 31, January 30, January 31,
+ 2026 2025 2026 2025
+Operating income (loss) $ 463 $ 29,123 $ (32,334) $ 36,194
+In the second quarter and first six months of 2026, operating income (loss) decreased from the same periods in the prior year primarily due to the decreases in total revenue partially offset by lower cost of goods sold expenses, lower labor expenses, lower incentive comp...
+[CBRL 10-K filed 2025-09-26]
+5 as compared to 2024 resulted primarily from unfavorable claim experience.
+The increase in other store operating expenses as a percentage of total revenue in 2025 as compared to 2024 resulted primarily from costs associated with our off-premise business.
+
+45
+
+Table of Contents
+General and Administrative Expenses
+The following table highlights general and administrative expenses as a percentage of total revenue for the past two years:
+ 
+ 2025 2024
+General and administrative expenses 6.2 % 6.0 %
+The year-to-year percentage change in 2025 as compared to 2024 resulted primarily from the following:
+
+ 
+ 2025 Compared to 2024 
+ Increase as a Percentage 
+ of Total Revenue 
+Professional fees 0.1 %
+Incentive compensation expense 0.1 %
+
+The increase in professional fees as a percentage of total reve...
+[CBRL 10-Q filed 2025-06-05]
+ same period in the prior year resulted primarily from the following:
+ 
+ Third Quarter
+ Decrease as a Percentage
+ of Total Revenue
+Professional fees (1.0) %
+Incentive compensation expense (0.2) %
+25
+
+Table of Contents
+
+The decrease in professional fees as a percentage of total revenue in the third quarter of 2025 as compared to the same period in the prior year resulted primarily from lower costs related to the Company’s strategic transformation plan. 
+
+The decrease in incentive compensation expense as a percentage of total revenue in the third quarter of 2025 as compared to the same period in the prior year resulted primarily from Chief Executive Officer transition costs incurred in 2024. 
+
+The percentage change in general and administrative expenses as a percentage of total revenue in th...
+[CBRL 10-Q filed 2025-03-06]
+ January 26, January 31, January 26, 
+ 2025 2024 2025 2024
+General and administrative expenses 6.5 % 5.6 % 6.8 % 5.8 %
+
+This percentage change for the second quarter and first six months of 2025 as compared to the same periods in the prior year resulted primarily from higher professional fees related to legal fees and proxy contest expenses. Additionally, the Company incurred higher costs of approximately $2,300 associated with the Company’s strategic transformation plan for the first six months of 2025 as compared to the same period in the prior year. Higher legal fees for the first six months of 2025 included an approximate $3,300 charge in connection with our settlement of a series of wage and hour arbitrations. The Company incurred proxy contest expenses of $5,263 and $8,220, respectiv...
+[CBRL 10-Q filed 2024-12-04]
+0
+
+Other store operating expenses 25.0 24.7
+
+General and administrative expenses 7.1 5.9
+
+Impairment and store closing costs 0.1 —
+
+Operating income 0.8 1.4
+
+Interest expense, net 0.7 0.6
+
+Income before income taxes 0.1 0.8
+
+Provision for income taxes (income tax benefit) (0.5) 0.1
+
+Net income 0.6 % 0.7 %
+
+19
+
+Table of Contents
+
+The following table sets forth the change in the number of units in operation for the specified periods:
+ 
+ Quarter Ended
+ November 01, October 27, 
+ 2024 2023
+Net change in units:
+Cracker Barrel — 1
+MSBC 3 1
+ 
+Units in operation at end of the period:
+Cracker Barrel 658 661
+MSBC 69 60
+Total units at end of the period 727 721
+
+Total Revenue
+
+Total revenue for the first quarter of 2025 increased 2.6% as compared to the same period in the prior year.
+The following tab...
+
+---
+
+Answer:
+- [CBRL 10-Q filed 2025-03-06 | relevance: 1.03] During the second quarter and first six months of 2025, Cracker Barrel recorded impairment charges of $2,163 and $2,863, respectively, as a result of the deterioration in operating performance in three MSBC locations and two Cracker Barrel locations. Additionally, one Cracker Barrel store was closed in the second quarter and first six months of 2025 resulting in closing costs of $288. No stores were closed in the second quarter or first six months of 2024.
+
+- [CBRL 10-Q filed 2025-06-05 | relevance: 1.09] The decrease in professional fees as a percentage of total revenue in the third quarter of 2025 as compared to the same period in the prior year resulted primarily from lower costs related to the Company’s strategic transformation plan. The decrease in incentive compensation expense as a percentage of total revenue in the third quarter of 2025 as compared to the same period in the prior year resulted primarily from Chief Executive Officer transition costs incurred in 2024.
+
+- [CBRL 10-Q filed 2025-09-26 | relevance: 1.10] The increase in other store operating expenses as a percentage of total revenue in 2025 as compared to 2024 resulted primarily from costs associated with the Company’s off-premise business.
+
+- [CBRL 10-Q filed 2024-12-04 | relevance: 1.02] General and administrative expenses increased from 5.9% to 7.1% of total revenue, and impairment and store closing costs remained at 0.1% of total revenue.
+
+----------------------------------------
+QUESTION: eval-006 — What drove Chipotle's food and beverage costs as a percentage of revenue?
+----------------------------------------
+Question: What drove Chipotle's food and beverage costs as a percentage of revenue?
+
+Source chunks:
+
+[CMG 10-Q filed 2025-10-30]
+ of total revenue
+
+•
+
+Occupancy as a percentage of total revenue
+
+•
+
+Other operating costs as a percentage of total revenue
+
+•
+
+New restaurant openings
+
+14
+
+Table of Contents
+
+Third Quarter 2025 Financial Highlights, year-over-year: 
+
+•
+
+Total revenue increased 7.5% to $3.0 billion
+
+•
+
+Comparable restaurant sales increased 0.3%
+
+•
+
+Diluted earnings per share was $0.29, a 3.6% increase from $0.28
+
+Sales Trends
+
+. Comparable restaurant sales increased 0.3% for the three months ended September 30, 2025. The increase is attributable to a 1.1% increase in average check, partially offset by lower transactions of 0.8%. Comparable restaurant sales represent the change in period-over-period total revenue for company-owned restaurants in operation for at least 13 full calendar months. Digital sales ...
+[CMG 10-Q filed 2026-04-30]
+•
+
+Food, beverage, and packaging as a percentage of total revenue
+
+•
+
+Labor as a percentage of total revenue
+
+•
+
+Occupancy as a percentage of total revenue
+
+•
+
+Other operating costs as a percentage of total revenue
+
+•
+
+New restaurant openings
+
+14
+
+First Quarter 2026 Financial Highlights, year-over-year: 
+
+•
+
+Total revenue increased 7.4% to $3.1 billion
+
+•
+
+Comparable restaurant sales increased 0.5%
+
+•
+
+Diluted earnings per share was $0.23, a 17.9% decrease from $0.28
+
+Sales Trends
+
+. Comparable restaurant sales increased 0.5% for the three months ended March 31, 2026. The increase is attributable to an increase in transactions of 0.6%, partially offset by a 0.1% decrease in average check. Comparable restaurant sales represent the change in period-over-period total revenue for company-owned...
+[CMG 10-Q filed 2024-07-25]
+ per share was $0.33, a 32.0% increase from $0.25, which includes a $0.01 after-tax impact from an unrealized loss on a long-term investment and an increase in legal reserves.
+
+Sales Trends
+
+. Comparable restaurant sales increased 11.1% for the three months ended June 30, 2024. The increase is primarily attributable to higher transactions and, to a lesser extent, an increase in average check. Comparable restaurant sales represent the change in period-over-period total revenue for restaurants in operation for at least 13 full calendar months. Digital sales represented 35.3% of total food and beverage revenue.
+
+14
+
+Table of Contents
+
+Restaurant Operating Costs.
+
+ During the three months ended June 30, 2024, our restaurant operating costs (food, beverage and packaging; labor; occupancy; and o...
+[CMG 10-K filed 2025-02-05]
+.6% to $11.3 billion
+
+•
+
+Comparable restaurant sales increased 7.4%
+
+•
+
+Diluted earnings per share was $1.11, a 24.7% increase from $0.89
+
+Sales Trends. 
+
+Comparable restaurant sales increased 7.4% for the year ended December 31, 2024. The increase is attributable to higher transactions of 5.3% and a 2.1% increase in average check. Comparable restaurant sales represent the change in period-over-period total revenue for restaurants in operation for at least 13 full calendar months. Digital sales represented 35.1% of total food and beverage revenue. For 2025, management is anticipating comparable restaurant sales growth in the low to mid-single digit range.
+
+Restaurant Development. 
+
+During the year ended December 31, 2024, we opened 304 restaurants, which included 257 restaurants with a Chi...
+[CMG 10-Q filed 2025-04-24]
+ $2.9 billion
+
+•
+
+Comparable restaurant sales decreased 0.4%
+
+•
+
+Diluted earnings per share was $0.28, a 7.7% increase from $0.26
+
+14
+
+Table of Contents
+
+Sales Trends
+
+. Comparable restaurant sales decreased 0.4% for the three months ended March 31, 2025. The decrease is attributable to lower transactions of 2.3% which is offset by a 1.9% increase in average check. Transactions have been impacted by both a slowdown in consumer spending, which has continued into April, as well as periods of inclement weather across the country. Comparable restaurant sales represent the change in period-over-period total revenue for restaurants in operation for at least 13 full calendar months. Digital sales represented 35.4% of total food and beverage revenue.
+
+Restaurant Development. 
+
+During the three mon...
+
+---
+
+Answer:
+- [CMG 10-Q filed 2025-10-30 | relevance: 1.06]
+  - The provided filings do not discuss food and beverage costs as a percentage of revenue for the period.
+
+- [CMG 10-Q filed 2026-04-30 | relevance: 1.05]
+  - The provided filings do not discuss food and beverage costs as a percentage of revenue for the period.
+
+- [CMG 10-K filed 2025-02-05 | relevance: 0.87]
+  - The provided filings do not discuss food and beverage costs as a percentage of revenue for the period.
+
+- [CMG 10-Q filed 2024-07-25 | relevance: 0.93]
+  - The provided filings do not discuss food and beverage costs as a percentage of revenue for the period.
+
+- [CMG 10-Q filed 2025-04-24 | relevance: 0.83]
+  - The provided filings do not discuss food and beverage costs as a percentage of revenue for the period.
+
+Since the provided filings do not discuss food and beverage costs as a percentage of revenue for the periods mentioned, no specific claims can be made regarding what drove these costs.
+
+----------------------------------------
+QUESTION: eval-007 — How did Chipotle's comparable restaurant sales change in recent quarters?
+----------------------------------------
+Question: How did Chipotle's comparable restaurant sales change in recent quarters?
+
+Source chunks:
+
+[CMG 10-Q filed 2025-07-24]
+ $3.1 billion
+
+•
+
+Comparable restaurant sales decreased 4.0%
+
+•
+
+Diluted earnings per share was $0.32, a 3.0% decrease from $0.33
+
+14
+
+Table of Contents
+
+Sales Trends
+
+. Comparable restaurant sales decreased 4.0% for the three months ended June 30, 2025. The decrease is attributable to lower transactions of 4.9% which is offset by a 0.9% increase in average check. While transactions have been impacted by a slowdown in consumer spending, we exited the quarter with positive comps and positive transactions. Comparable restaurant sales represent the change in period-over-period total revenue for company-owned restaurants in operation for at least 13 full calendar months. Digital sales represented 35.5% of total food and beverage revenue. For 2025, management is anticipating about flat comparab...
+[CMG 10-K filed 2025-02-05]
+.6% to $11.3 billion
+
+•
+
+Comparable restaurant sales increased 7.4%
+
+•
+
+Diluted earnings per share was $1.11, a 24.7% increase from $0.89
+
+Sales Trends. 
+
+Comparable restaurant sales increased 7.4% for the year ended December 31, 2024. The increase is attributable to higher transactions of 5.3% and a 2.1% increase in average check. Comparable restaurant sales represent the change in period-over-period total revenue for restaurants in operation for at least 13 full calendar months. Digital sales represented 35.1% of total food and beverage revenue. For 2025, management is anticipating comparable restaurant sales growth in the low to mid-single digit range.
+
+Restaurant Development. 
+
+During the year ended December 31, 2024, we opened 304 restaurants, which included 257 restaurants with a Chi...
+[CMG 10-Q filed 2025-04-24]
+ $2.9 billion
+
+•
+
+Comparable restaurant sales decreased 0.4%
+
+•
+
+Diluted earnings per share was $0.28, a 7.7% increase from $0.26
+
+14
+
+Table of Contents
+
+Sales Trends
+
+. Comparable restaurant sales decreased 0.4% for the three months ended March 31, 2025. The decrease is attributable to lower transactions of 2.3% which is offset by a 1.9% increase in average check. Transactions have been impacted by both a slowdown in consumer spending, which has continued into April, as well as periods of inclement weather across the country. Comparable restaurant sales represent the change in period-over-period total revenue for restaurants in operation for at least 13 full calendar months. Digital sales represented 35.4% of total food and beverage revenue.
+
+Restaurant Development. 
+
+During the three mon...
+[CMG 10-Q filed 2025-10-30]
+ of total revenue
+
+•
+
+Occupancy as a percentage of total revenue
+
+•
+
+Other operating costs as a percentage of total revenue
+
+•
+
+New restaurant openings
+
+14
+
+Table of Contents
+
+Third Quarter 2025 Financial Highlights, year-over-year: 
+
+•
+
+Total revenue increased 7.5% to $3.0 billion
+
+•
+
+Comparable restaurant sales increased 0.3%
+
+•
+
+Diluted earnings per share was $0.29, a 3.6% increase from $0.28
+
+Sales Trends
+
+. Comparable restaurant sales increased 0.3% for the three months ended September 30, 2025. The increase is attributable to a 1.1% increase in average check, partially offset by lower transactions of 0.8%. Comparable restaurant sales represent the change in period-over-period total revenue for company-owned restaurants in operation for at least 13 full calendar months. Digital sales ...
+[CMG 10-K filed 2026-02-04]
+.4% to $11.9 billion
+
+•
+
+Comparable restaurant sales decreased 1.7%
+
+•
+
+Diluted earnings per share was $1.14, a 2.7% increase from $1.11
+
+Sales Trends. 
+
+Comparable restaurant sales decreased 1.7% for the year ended December 31, 2025. The decrease is attributable to lower transactions of 2.9%, partially offset by a 1.2% increase in average check. Comparable restaurant sales represent the change in period-over-period total revenue for company-owned restaurants in operation for at least 13 full calendar months. Digital sales represented 36.7% of total food and beverage revenue. For 2026, management is anticipating comparable restaurant sales to be about flat.
+
+Restaurant Development. 
+
+During the year ended December 31, 2025, we opened 334 company-owned restaurants, which included 257 restau...
+
+---
+
+Answer:
+- [CMG 10-Q filed 2025-07-24 | relevance: 1.10]
+  - Comparable restaurant sales decreased 4.0% for the three months ended June 30, 2025. The decrease is attributable to lower transactions of 4.9% which is offset by a 0.9% increase in average check.
+
+- [CMG 10-Q filed 2025-04-24 | relevance: 1.01]
+  - Comparable restaurant sales decreased 0.4% for the three months ended March 31, 2025. The decrease is attributable to lower transactions of 2.3% which is offset by a 1.9% increase in average check.
+
+- [CMG 10-Q filed 2025-10-30 | relevance: 0.90]
+  - Comparable restaurant sales increased 0.3% for the three months ended September 30, 2025. The increase is attributable to a 1.1% increase in average check, partially offset by lower transactions of 0.8%.
+
+- [CMG 10-K filed 2026-02-04 | relevance: 0.89]
+  - Comparable restaurant sales decreased 1.7% for the year ended December 31, 2025. The decrease is attributable to lower transactions of 2.9%, partially offset by a 1.2% increase in average check.
+
+----------------------------------------
+QUESTION: eval-008 — How did Chipotle's restaurant development and new openings evolve?
+----------------------------------------
+Question: How did Chipotle's restaurant development and new openings evolve?
+
+Source chunks:
+
+[CMG 10-Q filed 2024-10-30]
+ percentage of total revenue
+
+•
+
+New restaurant openings
+
+Third Quarter 2024 Financial Highlights, year-over-year: 
+
+•
+
+Total revenue increased 13.0% to $2.8 billion
+
+•
+
+Comparable restaurant sales increased 6.0%
+
+•
+
+Diluted earnings per share was $0.28, a 21.7% increase from $0.23, which includes a $0.01 after-tax net benefit in stock-based compensation expense due to unvested equity awards forfeited by our former CEO and related retention equity awards granted to key executives, an unrealized gain on a long-term investment, and an impairment charge related to a software asset.
+
+14
+
+Table of Contents
+
+Sales Trends
+
+. Comparable restaurant sales increased 6.0% for the three months ended September 30, 2024. The increase is attributable to higher transactions of 3.3% and a 2.7% increase in a...
+[CMG 10-K filed 2025-02-05]
+.6% to $11.3 billion
+
+•
+
+Comparable restaurant sales increased 7.4%
+
+•
+
+Diluted earnings per share was $1.11, a 24.7% increase from $0.89
+
+Sales Trends. 
+
+Comparable restaurant sales increased 7.4% for the year ended December 31, 2024. The increase is attributable to higher transactions of 5.3% and a 2.1% increase in average check. Comparable restaurant sales represent the change in period-over-period total revenue for restaurants in operation for at least 13 full calendar months. Digital sales represented 35.1% of total food and beverage revenue. For 2025, management is anticipating comparable restaurant sales growth in the low to mid-single digit range.
+
+Restaurant Development. 
+
+During the year ended December 31, 2024, we opened 304 restaurants, which included 257 restaurants with a Chi...
+[CMG 10-Q filed 2024-07-25]
+ per share was $0.33, a 32.0% increase from $0.25, which includes a $0.01 after-tax impact from an unrealized loss on a long-term investment and an increase in legal reserves.
+
+Sales Trends
+
+. Comparable restaurant sales increased 11.1% for the three months ended June 30, 2024. The increase is primarily attributable to higher transactions and, to a lesser extent, an increase in average check. Comparable restaurant sales represent the change in period-over-period total revenue for restaurants in operation for at least 13 full calendar months. Digital sales represented 35.3% of total food and beverage revenue.
+
+14
+
+Table of Contents
+
+Restaurant Operating Costs.
+
+ During the three months ended June 30, 2024, our restaurant operating costs (food, beverage and packaging; labor; occupancy; and o...
+[CMG 10-Q filed 2025-10-30]
+ of total revenue
+
+•
+
+Occupancy as a percentage of total revenue
+
+•
+
+Other operating costs as a percentage of total revenue
+
+•
+
+New restaurant openings
+
+14
+
+Table of Contents
+
+Third Quarter 2025 Financial Highlights, year-over-year: 
+
+•
+
+Total revenue increased 7.5% to $3.0 billion
+
+•
+
+Comparable restaurant sales increased 0.3%
+
+•
+
+Diluted earnings per share was $0.29, a 3.6% increase from $0.28
+
+Sales Trends
+
+. Comparable restaurant sales increased 0.3% for the three months ended September 30, 2025. The increase is attributable to a 1.1% increase in average check, partially offset by lower transactions of 0.8%. Comparable restaurant sales represent the change in period-over-period total revenue for company-owned restaurants in operation for at least 13 full calendar months. Digital sales ...
+[CMG 10-Q filed 2025-04-24]
+ $2.9 billion
+
+•
+
+Comparable restaurant sales decreased 0.4%
+
+•
+
+Diluted earnings per share was $0.28, a 7.7% increase from $0.26
+
+14
+
+Table of Contents
+
+Sales Trends
+
+. Comparable restaurant sales decreased 0.4% for the three months ended March 31, 2025. The decrease is attributable to lower transactions of 2.3% which is offset by a 1.9% increase in average check. Transactions have been impacted by both a slowdown in consumer spending, which has continued into April, as well as periods of inclement weather across the country. Comparable restaurant sales represent the change in period-over-period total revenue for restaurants in operation for at least 13 full calendar months. Digital sales represented 35.4% of total food and beverage revenue.
+
+Restaurant Development. 
+
+During the three mon...
+
+---
+
+Answer:
+- [CMG 10-Q filed 2024-07-25 | relevance: 1.00]
+  - During the three months ended June 30, 2024, Chipotle opened 52 company-operated restaurants, including 46 with a Chipotlane.
+  - The company is on track to open approximately 285-315 new restaurants in 2024.
+  - It expects that at least 80% of its new restaurants will include a Chipotlane.
+
+- [CMG 10-Q filed 2024-10-30 | relevance: 1.09]
+  - During the three months ended September 30, 2024, Chipotle opened 86 company-operated restaurants, including 73 with a Chipotlane.
+  - The company is on track to open approximately 285 to 315 new company-operated restaurants in 2024.
+  - It expects that at least 80% of its new company-operated restaurants will include a Chipotlane.
+
+- [CMG 10-Q filed 2025-04-24 | relevance: 0.76]
+  - During the three months ended March 31, 2025, Chipotle opened 57 restaurants, including 48 with a Chipotlane.
+  - The company expects to open approximately 315 to 345 company-owned restaurants in 2025.
+  - It expects that at least 80% of its new company-owned restaurants will include a Chipotlane.
+
+- [CMG 10-Q filed 2025-10-30 | relevance: 0.95]
+  - During the three months ended September 30, 2025, Chipotle opened 84 restaurants, including 64 with a Chipotlane.
+  - The company remains on track to open approximately 315 to 345 company-owned restaurants in 2025.
+  - It expects to open approximately 350 to 370 restaurants in 2026, including 10 to 15 international partner-operated restaurants.
+  - It expects that at least 80% of its new company-owned restaurants will include a Chipotlane.
+
+----------------------------------------
+QUESTION: eval-009 — What drove Chipotle's general and administrative expenses?
+----------------------------------------
+Question: What drove Chipotle's general and administrative expenses?
+
+Source chunks:
+
+[CMG 10-Q filed 2025-10-30]
+ of lower sales volumes. This increase was partially offset by a 0.2% from the benefit of menu price increases in the prior year.
+
+General and Administrative Expenses
+
+Three months endedSeptember 30, Percentage Nine months endedSeptember 30, Percentage
+
+2025 2024 change 2025 2024 change
+
+(dollars in millions) (dollars in millions)
+
+General and administrative expenses $ 146.7 $ 126.6 15.9 % $ 491.7 $ 506.3 (2.9 %)
+
+As a percentage of total revenue 4.9 % 4.5 % 0.4 % 5.5 % 6.0 % (0.5 %)
+
+The following is a summary of the change in general and administrative expense for the period indicated:
+
+Three months ended Nine months ended
+
+(dollars in millions)
+
+For the period ended September 30, 2024 $ 126.6 $ 506.3
+
+Change from:
+
+Stock-based compensation, net of August 2024 retention awards 11.1 (20.7...
+[CMG 10-Q filed 2024-10-30]
+ Contents
+
+General and Administrative Expenses
+
+Three months ended September 30, Percentage Nine months ended September 30, Percentage
+
+2024 2023 change 2024 2023 change
+
+(dollars in millions) (dollars in millions)
+
+General and administrative expenses $ 126.6 $ 159.5 (20.6 %) $ 506.3 $ 464.3 9.0 %
+
+As a percentage of total revenue 4.5 % 6.5 % (2.0 %) 6.0 % 6.3 % (0.3 %)
+
+The following is a summary of the change in general and administrative expense for the period indicated:
+
+Three months ended Nine months ended
+
+(dollars in millions)
+
+For the period ended September 30, 2023 $ 159.5 $ 464.3
+
+Change from:
+
+Stock-based compensation, primarily forfeitures and, to a lesser extent, performance-based awards (32.0) (2.6)
+
+Performance bonuses (5.7) (0.4)
+
+Legal contingencies (2.2) 12.3
+
+Restructuri...
+[CMG 10-Q filed 2026-04-30]
+5 change
+
+(dollars in millions)
+
+General and administrative expenses $ 203.7 $ 172.8 17.9 %
+
+As a percentage of total revenue 6.6 % 6.0 % 0.6 %
+
+17
+
+The following is a summary of the change in general and administrative expenses for the period indicated:
+
+Three months ended
+
+(dollars in millions)
+
+For the period ended March 31, 2025 $ 172.8
+
+Change from:
+
+Conferences, primarily biennial All Managers’ Conference 23.3
+
+Performance bonuses 5.9
+
+Wages 5.1
+
+Restructuring 2.9
+
+Stock-based compensation, August 2024 retention awards (8.9)
+
+Other 2.6
+
+For the period ended March 31, 2026 $ 203.7
+
+Depreciation and Amortization
+
+Three months endedMarch 31, Percentage
+
+2026 2025 change
+
+(dollars in millions)
+
+Depreciation and amortization $ 96.7 $ 87.2 10.9 %
+
+As a percentage of total revenue 3.1 % 3.0...
+[CMG 10-Q filed 2024-07-25]
+ per share was $0.33, a 32.0% increase from $0.25, which includes a $0.01 after-tax impact from an unrealized loss on a long-term investment and an increase in legal reserves.
+
+Sales Trends
+
+. Comparable restaurant sales increased 11.1% for the three months ended June 30, 2024. The increase is primarily attributable to higher transactions and, to a lesser extent, an increase in average check. Comparable restaurant sales represent the change in period-over-period total revenue for restaurants in operation for at least 13 full calendar months. Digital sales represented 35.3% of total food and beverage revenue.
+
+14
+
+Table of Contents
+
+Restaurant Operating Costs.
+
+ During the three months ended June 30, 2024, our restaurant operating costs (food, beverage and packaging; labor; occupancy; and o...
+[CMG 10-Q filed 2025-04-24]
+ including through licensed restaurants in the Middle East and Mexico; increases in ingredient and other operating costs due to inflation, global conflicts, severe weather and climate change, our Food with Integrity philosophy, tariffs or trade restrictions; intermittent supply shortages relating to our Food with
+
+ Integrity philosophy, rapid expansion and supply chain disruptions; the uncertainty of our ability to achieve expected levels of comparable restaurant sales due to factors such as changes in guests' perceptions of our brand, including as a result of negative publicity or social media posts, increased consumer uncertainty and decreased consumer spending (including as a result of higher inflation, mass layoffs, fear of possible recession and higher energy prices), or the inability...
+
+---
+
+Answer:
+- [CMG 10-Q filed 2024-10-30 | relevance: 1.01]
+  - General and administrative expenses decreased by 20.6% from $159.5 million in 2023 to $126.6 million in 2024.
+  - The decrease was driven by:
+    - Stock-based compensation, primarily forfeitures and, to a lesser extent, performance-based awards: -$32.0 million.
+    - Performance bonuses: -$5.7 million.
+    - Legal contingencies: -$2.2 million.
+    - Restructuring costs: -$1.4 million.
+    - Conferences, primarily biennial All Managers’ Conference: -$0.3 million.
+    - Outside services related to corporate initiatives: $1.4 million.
+    - Wages: $6.7 million.
+    - Other: $0.6 million.
+
+- [CMG 10-Q filed 2025-10-30 | relevance: 1.01]
+  - General and administrative expenses increased by 15.9% from $126.6 million in 2024 to $146.7 million in 2025.
+  - The increase was driven by:
+    - Stock-based compensation, net of August 2024 retention awards: $11.1 million.
+    - Performance bonuses: -$2.3 million.
+    - Conferences, primarily the biennial All Managers’ Conference: $0.3 million.
+    - Legal contingencies: $2.2 million.
+    - Legal services: $0.2 million.
+    - Outside services related to corporate initiatives: $0.1 million.
+    - Wages: $4.6 million.
+    - Stock-based compensation, August 2024 retention awards: $2.9 million.
+    - Other: $1.0 million.
+
+- [CMG 10-Q filed 2026-04-30 | relevance: 0.85]
+  - General and administrative expenses increased by 17.9% from $172.8 million in 2025 to $203.7 million in 2026.
+  - The increase was driven by:
+    - Conferences, primarily biennial All Managers’ Conference: $23.3 million.
+    - Performance bonuses: $5.9 million.
+    - Wages: $5.1 million.
+    - Restructuring: $2.9 million.
+    - Stock-based compensation, August 2024 retention awards: -$8.9 million.
+    - Other: $2.6 million.
+
+----------------------------------------
+QUESTION: eval-010 — How did Darden's total revenue change year-over-year and what drove the change?
+----------------------------------------
+Question: How did Darden's total revenue change year-over-year and what drove the change?
+
+Source chunks:
+
+[DRI 10-Q filed 2025-12-30]
+ %
+
+Other Business $ 647.3 $ 581.4 11.3 % 3.1 % $ 1,328.0 $ 1,136.9 16.8 % 3.2 %
+
+(1)
+
+Same-restaurant sales is a year-over-year comparison of each period’s sales volumes for a 52-week year and is limited to restaurants that have been open, and operated by Darden, for at least 16 months. Accordingly, Chuy’s results will not be included in this calculation until the fourth quarter of fiscal 2026. Additionally, results from Bahama Breeze are excluded as they are not expected to be operated by Darden for the entirety of the fiscal year.
+
+Olive Garden’s sales increase for the second quarter of fiscal 2026 was primarily driven by same-restaurant sales increases, as well as revenue from new restaurants. The increase in U.S. same-restaurant sales for the second quarter of fiscal 2026 resulted fro...
+[DRI 10-K filed 2025-07-18]
+,533.5 $ 2,225.3 13.8 % 0.2 % $ 5.8 $ 6.0
+
+$ 12,076.7 $ 11,390.0
+
+(1)
+
+Same-restaurant sales is a year-over-year comparison of each period’s sales volumes for a 52-week year and is limited to restaurants that have been open, and operated by Darden, for at least 16 months.
+
+(2)
+
+Average annual sales are calculated as sales divided by total restaurant operating weeks multiplied by 52 weeks; excludes franchise locations.
+
+Olive Garden’s sales increase for fiscal 2025 was primarily driven by a U.S. same-restaurant sales increase combined with revenue from new restaurants. The increase in U.S. same-restaurant sales in fiscal 2025 resulted from a 4.1 percent increase in average check, which includes a 0.7 increase in off-premise catering sales, partially offset by a 2.3 percent decrease in same-...
+[DRI 10-K filed 2024-07-19]
+225.3 $ 2,166.9 2.7 % (0.7) % $ 6.0 $ 6.0
+
+$ 11,390.0 $ 10,487.8
+
+(1)
+
+Same-restaurant sales is a year-over-year comparison of each period’s sales volumes for a 52-week year and is limited to restaurants that have been open, and operated by Darden, for at least 16 months.
+
+(2)
+
+Average annual sales are calculated as sales divided by total restaurant operating weeks multiplied by 52 weeks; excludes franchise locations.
+
+Olive Garden’s sales increase for fiscal 2024 was primarily driven by a U.S. same-restaurant sales increase combined with revenue from new restaurants. The increase in U.S. same-restaurant sales in fiscal 2024 resulted from a 3.3 percent increase in average check, partially offset by a 1.7 percent decrease in same-restaurant guest counts. 
+
+LongHorn Steakhouse’s sales increa...
+[DRI 10-K filed 2025-07-18]
+6, we expect our annual effective tax rate to be 13 percent, and we expect capital expenditures incurred to build new restaurants, remodel and maintain existing restaurants and technology initiatives to be between $700 million and $750 million.
+
+(1) 
+
+ 
+
+Annual same-restaurant sales is a 52-week metric and excludes the impact of Chuy’s, which will not have been owned and operated by Darden for a 16-month period prior to the beginning of fiscal 2026, as well as any additional locations not expected to be operated by Darden for the entirety of the fiscal year.
+
+30
+
+RESULTS OF OPERATIONS FOR FISCAL 2025 AND 2024
+
+To facilitate review of our results of operations, the following table sets forth our financial results for the periods indicated. All information is derived from the consolidated st...
+[DRI 10-Q filed 2025-04-01]
+ % 4.5 %
+
+Fine Dining $ 385.3 $ 372.9 3.3 % (0.8) % $ 970.2 $ 964.4 0.6 % (3.4) %
+
+Other Business $ 674.3 $ 561.0 20.2 % (0.4) % $ 1,811.2 $ 1,635.3 10.8 % (0.5) %
+
+(1)
+
+Same-restaurant sales is a year-over-year comparison of each period’s sales volumes for a 52-week year and is limited to restaurants that have been open, and operated by Darden, for at least 16 months. Accordingly, Chuy’s results will not be included in this calculation until the fourth quarter of fiscal 2026 and Ruth’s Chris results are included for fiscal 2025 November and forward only.
+
+Olive Garden’s sales increase for the third quarter of fiscal 2025 was primarily driven by same-restaurant sales increases, as well as revenue from new restaurants. The increase in U.S. same-restaurant sales for the third quarter of fisc...
+
+---
+
+Answer:
+- [DRI 10-K filed 2024-07-19 | relevance: 1.00]
+  - Olive Garden’s sales increase for fiscal 2024 was primarily driven by a U.S. same-restaurant sales increase combined with revenue from new restaurants.
+  - LongHorn Steakhouse’s sales increase for fiscal 2024 was primarily driven by a same-restaurant sales increase combined with revenue from new restaurants.
+  - Fine Dining’s sales increase for fiscal 2024 was driven by the acquisition of Ruth’s Chris, offset by same-restaurant sales decreases.
+  - Other Business’s sales increase for fiscal 2024 was driven by revenue from new restaurants offset by same-restaurant sales decreases.
+
+- [DRI 10-K filed 2025-07-18 | relevance: 1.00]
+  - Olive Garden’s sales increase for fiscal 2025 was primarily driven by a U.S. same-restaurant sales increase combined with revenue from new restaurants.
+  - LongHorn Steakhouse’s sales increase for fiscal 2025 was primarily driven by a same-restaurant sales increase combined with revenue from new restaurants.
+  - Fine Dining’s sales increase for fiscal 2025 was driven by revenue from new restaurants offset by same-restaurant sales decreases.
+  - Other Business’s sales increase for fiscal 2025 was driven by a U.S. same-restaurant sales increase combined with revenue from new restaurants including the acquisition of Chuy’s.
+
+- [DRI 10-Q filed 2025-04-01 | relevance: 0.82]
+  - Olive Garden’s sales increase for the third quarter of fiscal 2025 was primarily driven by same-restaurant sales increases, as well as revenue from new restaurants.
+  - LongHorn Steakhouse’s sales increase for the third quarter and nine months of fiscal 2025 was primarily driven by same-restaurant sales increases combined with revenue from new restaurants.
+
+- [DRI 10-Q filed 2025-12-30 | relevance: 1.10]
+  - Olive Garden’s sales increase for the second quarter of fiscal 2026 was primarily driven by same-restaurant sales increases, as well as revenue from new restaurants.
+  - LongHorn Steakhouse’s sales increase for the second quarter of fiscal 2026 was primarily driven by same-restaurant sales increases, as well as revenue from new restaurants.
+  - Olive Garden’s sales increase for the six months of fiscal 2026 was primarily driven by same-restaurant sales increases, as well as revenue from new restaurants, partially offset by the sale of all eight of our Olive Garden Canada locations.
+  - LongHorn Steakhouse’s sales increase for the six months of fiscal
+
+----------------------------------------
+QUESTION: eval-011 — What drove Darden's food and beverage costs as a percentage of sales?
+----------------------------------------
+Question: What drove Darden's food and beverage costs as a percentage of sales?
+
+Source chunks:
+
+[DRI 10-K filed 2025-07-18]
+,533.5 $ 2,225.3 13.8 % 0.2 % $ 5.8 $ 6.0
+
+$ 12,076.7 $ 11,390.0
+
+(1)
+
+Same-restaurant sales is a year-over-year comparison of each period’s sales volumes for a 52-week year and is limited to restaurants that have been open, and operated by Darden, for at least 16 months.
+
+(2)
+
+Average annual sales are calculated as sales divided by total restaurant operating weeks multiplied by 52 weeks; excludes franchise locations.
+
+Olive Garden’s sales increase for fiscal 2025 was primarily driven by a U.S. same-restaurant sales increase combined with revenue from new restaurants. The increase in U.S. same-restaurant sales in fiscal 2025 resulted from a 4.1 percent increase in average check, which includes a 0.7 increase in off-premise catering sales, partially offset by a 2.3 percent decrease in same-...
+[DRI 10-K filed 2024-07-19]
+225.3 $ 2,166.9 2.7 % (0.7) % $ 6.0 $ 6.0
+
+$ 11,390.0 $ 10,487.8
+
+(1)
+
+Same-restaurant sales is a year-over-year comparison of each period’s sales volumes for a 52-week year and is limited to restaurants that have been open, and operated by Darden, for at least 16 months.
+
+(2)
+
+Average annual sales are calculated as sales divided by total restaurant operating weeks multiplied by 52 weeks; excludes franchise locations.
+
+Olive Garden’s sales increase for fiscal 2024 was primarily driven by a U.S. same-restaurant sales increase combined with revenue from new restaurants. The increase in U.S. same-restaurant sales in fiscal 2024 resulted from a 3.3 percent increase in average check, partially offset by a 1.7 percent decrease in same-restaurant guest counts. 
+
+LongHorn Steakhouse’s sales increa...
+[DRI 10-K filed 2025-07-18]
+6, we expect our annual effective tax rate to be 13 percent, and we expect capital expenditures incurred to build new restaurants, remodel and maintain existing restaurants and technology initiatives to be between $700 million and $750 million.
+
+(1) 
+
+ 
+
+Annual same-restaurant sales is a 52-week metric and excludes the impact of Chuy’s, which will not have been owned and operated by Darden for a 16-month period prior to the beginning of fiscal 2026, as well as any additional locations not expected to be operated by Darden for the entirety of the fiscal year.
+
+30
+
+RESULTS OF OPERATIONS FOR FISCAL 2025 AND 2024
+
+To facilitate review of our results of operations, the following table sets forth our financial results for the periods indicated. All information is derived from the consolidated st...
+[DRI 10-K filed 2024-07-19]
+’s have not been included in our fiscal 2025 outlook below.
+
+We expect fiscal 2025 sales from continuing operations to increase between 3.5 percent and 4.5 percent, driven by same-restaurant sales growth
+
+ (1)
+
+ of 1.0 percent to 2.0 percent, and sales from 45 to 50 new restaurant openings. In fiscal 2025, we expect our annual effective tax rate to be 13 percent and we expect capital expenditures incurred to build new restaurants, remodel and maintain existing restaurants and technology initiatives to be between $550 million and $600 million.
+
+(1) 
+
+ 
+
+Excludes Ruth’s Chris as they will not be owned and operated by Darden for a 16-month period at the 
+
+ beginning of fiscal 2025.
+
+30
+
+RESULTS OF OPERATIONS FOR FISCAL 2024 AND 2023
+
+To facilitate review of our results of operations, the foll...
+[DRI 10-Q filed 2025-01-02]
+ and beverage costs decreased as a percent of sales primarily due to a 0.9% impact from pricing leverage and a 0.2% impact from cost savings, partially offset by a 0.5% impact from mix and other.
+
+•
+
+Restaurant labor costs remained flat as a percent of sales primarily due to a 0.4% impact from sales leverage, a 0.6% impact from salary and benefits and a 0.2% impact from productivity improvement, partially offset by a 1.2% impact from inflation.
+
+•
+
+Restaurant expenses increased as a percent of sales primarily due to a 0.4% impact from inflation, partially offset by a 0.2% impact from sales leverage and a 0.1% impact related to other.
+
+27
+
+Table of Contents
+
+•
+
+Marketing expenses increased as a percent of sales primarily due to increased marketing and media spend.
+
+•
+
+General and administra...
+
+---
+
+Answer:
+- [DRI 10-K filed 2025-07-18 | relevance: 1.04]
+  - Food and beverage costs as a percentage of sales decreased in fiscal 2025 by 0.9%, primarily due to a 0.9% impact from pricing leverage and a 0.2% impact from cost savings, partially offset by a 0.5% impact from mix and other.
+
+- [DRI 10-Q filed 2025-01-02 | relevance: 0.92]
+  - Food and beverage costs as a percentage of sales decreased in the second quarter and the first six months of fiscal 2025 by 0.9%, primarily due to a 0.9% impact from pricing leverage and a 0.2% impact from cost savings, partially offset by a 0.5% impact from mix and other.
+
+----------------------------------------
+QUESTION: eval-012 — How did Olive Garden's segment results perform?
+----------------------------------------
+Question: How did Olive Garden's segment results perform?
+
+Source chunks:
+
+[DRI 10-K filed 2024-07-19]
+ for fiscal 2024 were a net loss of $2.9 million ($0.02 per diluted share) compared with a net loss for fiscal 2023 of $1.6 million ($0.01 per diluted share).
+
+SEGMENT RESULTS
+
+We manage our restaurant brands, Olive Garden, LongHorn Steakhouse, Cheddar’s Scratch Kitchen, Yard House, Ruth’s Chris, The Capital Grille, Seasons 52, Bahama Breeze, Eddie V’s and The Capital Burger in the U.S. and Canada as operating segments. We aggregate our operating segments into reportable segments based on a combination of the size, economic characteristics and sub-segment of full-service dining within which each brand operates. Our four reportable segments are: (1) Olive Garden, (2) LongHorn Steakhouse, (3) Fine Dining and (4) Other Business. See Note 6 of the Notes to Consolidated Financial Statements (Pa...
+[DRI 10-Q filed 2025-01-02]
+ presents segment profit margin
+
+1
+
+ for the periods indicated.
+
+Three Months Ended Six Months Ended
+
+Segment November 24, 2024 November 26, 2023 Change November 24, 2024 November 26, 2023 Change
+
+Olive Garden 21.4% 21.0% 40 BPS 21.0% 21.2% (20) BPS
+
+LongHorn Steakhouse 18.9% 17.4% 150 BPS 18.4% 17.5% 90 BPS
+
+Fine Dining 17.2% 17.8% (60) BPS 15.4% 16.3% (90) BPS
+
+Other Business 13.6% 12.9% 70 BPS 14.3% 14.0% 30 BPS
+
+1Segment profit margin is calculated as (sales less costs of food & beverage, restaurant labor, restaurant expenses and marketing expenses) / sales.
+
+ 
+
+The increase in Olive Garden’s segment profit margin for the second quarter of fiscal 2025 was driven primarily by positive same-restaurant sales, lower food and beverage costs, and restaurant labor costs, partially offset by i...
+[DRI 10-Q filed 2025-09-26]
+2026 were $0.1 million ($0.00 per diluted share) compared with losses from discontinued operations for the first three months of fiscal 2025 of $0.4 million ($0.00 per diluted share). 
+
+SEGMENT RESULTS
+
+We manage our restaurant brands, Olive Garden, LongHorn Steakhouse, Cheddar’s Scratch Kitchen, Chuy’s, Yard House, Ruth’s Chris, The Capital Grille, Seasons 52, Eddie V’s, Bahama Breeze and The Capital Burger in North America as operating segments. We aggregate our operating segments into reportable segments based on a combination of the size, economic characteristics and sub-segment of full-service dining within which each brand operates. Our four reportable segments are: (1) Olive Garden, (2) LongHorn Steakhouse, (3) Fine Dining and (4) Other Business (see Note 7 to our unaudited consolid...
+[DRI 10-Q filed 2026-03-27]
+ quarter and first nine months of fiscal 2025 of $0.3 million ($0.00 per diluted share) and $1.2 million ($0.01 per diluted share), respectively. 
+
+30
+
+Table of Contents
+
+SEGMENT RESULTS
+
+We manage our restaurant brands, Olive Garden, LongHorn Steakhouse, Cheddar’s Scratch Kitchen, Chuy’s, Yard House, Ruth’s Chris, The Capital Grille, Seasons 52, Eddie V’s, Bahama Breeze and The Capital Burger, in North America as operating segments. We aggregate our operating segments into reportable segments based on a combination of the size, economic characteristics and sub-segment of full-service dining within which each brand operates. Our four reportable segments are: (1) Olive Garden, (2) LongHorn Steakhouse, (3) Fine Dining and (4) Other Business (see Note 6 to our unaudited consolidated financial...
+[DRI 10-Q filed 2026-03-27]
+ quarter of 2025, we changed our reporting of segment profit to exclude pre-opening costs in order to better align with our internal reporting and provide a better representation of restaurant-level operating costs. Fiscal 2025 figures were recast for comparability.
+
+The decrease in Olive Garden’s segment profit margin for the third quarter of fiscal 2026 was driven primarily by higher restaurant expenses and marketing costs, partially offset by lower restaurant labor costs. Olive Garden’s segment profit margin for the first nine months of fiscal 2026 remained flat compared to fiscal 2025. The decrease in Longhorn Steakhouse’s segment profit margin for the third quarter of fiscal 2026 was driven by higher food and beverage costs and restaurant expenses, partially offset by lower restaurant...
+
+---
+
+Answer:
+- [DRI 10-K filed 2024-07-19 | relevance: 1.05] For fiscal 2024, Olive Garden's segment profit margin increased by 90 basis points (BP) to 21.9% compared to 21.0% in fiscal 2023. The increase was driven primarily by positive same-restaurant sales and lower food and beverage costs and restaurant expenses, partially offset by higher marketing costs.
+
+- [DRI 10-Q filed 2025-01-02 | relevance: 1.02] For the second quarter of fiscal 2025, Olive Garden's segment profit margin increased by 40 BP to 21.4% from 21.0% in the same period of fiscal 2024. The increase was driven primarily by positive same-restaurant sales, lower food and beverage costs, and restaurant labor costs, partially offset by increased marketing costs.
+
+- [DRI 10-Q filed 2025-09-26 | relevance: 1.00] For the third quarter of fiscal 2026, Olive Garden's segment profit margin decreased by 10 BP to 20.6% from 20.7% in the same period of fiscal 2025. The decrease was driven primarily by higher restaurant expenses and marketing costs, partially offset by lower restaurant labor costs.
+
+- [DRI 10-Q filed 2026-03-27 | relevance: 0.91] For the first nine months of fiscal 2026, Olive Garden's segment profit margin remained flat at 21.8% compared to 21.8% in the same period of fiscal 2025.
+
+----------------------------------------
+QUESTION: eval-013 — What drove Darden's same-restaurant sales growth or decline?
+----------------------------------------
+Question: What drove Darden's same-restaurant sales growth or decline?
+
+Source chunks:
+
+[DRI 10-Q filed 2025-12-30]
+ %
+
+Other Business $ 647.3 $ 581.4 11.3 % 3.1 % $ 1,328.0 $ 1,136.9 16.8 % 3.2 %
+
+(1)
+
+Same-restaurant sales is a year-over-year comparison of each period’s sales volumes for a 52-week year and is limited to restaurants that have been open, and operated by Darden, for at least 16 months. Accordingly, Chuy’s results will not be included in this calculation until the fourth quarter of fiscal 2026. Additionally, results from Bahama Breeze are excluded as they are not expected to be operated by Darden for the entirety of the fiscal year.
+
+Olive Garden’s sales increase for the second quarter of fiscal 2026 was primarily driven by same-restaurant sales increases, as well as revenue from new restaurants. The increase in U.S. same-restaurant sales for the second quarter of fiscal 2026 resulted fro...
+[DRI 10-Q filed 2025-12-30]
+.5 and 9.3 percent, driven by growth of 2.0 percent related to the fifty-third week in fiscal 2026; same-restaurant sales growth to be between 3.5 and 4.3 percent
+
+2
+
+; and new restaurant openings to be between 65 to 70. Additionally, we expect capital expenditures incurred to build new restaurants, remodel and maintain existing restaurants and for technology initiatives to be between $750 and $775 million. These amounts all include the addition of Chuy’s and our expectations for Chuy’s results from the date of acquisition forward.
+
+1
+
+ Will not include Chuy’s until they have been owned and operated by Darden for a 16-month period (Q4 fiscal 2026), and does not include Bahama Breeze as they are not expected to be operated by Darden for the entirety of the fiscal year.
+
+2
+
+ Annual same-rest...
+[DRI 10-Q filed 2025-01-02]
+ and operated by Darden, for at least 16 months. Accordingly, Chuy’s results will not be included in this calculation until the fourth quarter of fiscal 2026 and Ruth’s Chris results are included for fiscal 2025 November only.
+
+Olive Garden’s sales increase for the second quarter of fiscal 2025 was primarily driven by same-restaurant sales increases, as well as revenue from new restaurants. The increase in U.S. same-restaurant sales for the second quarter of fiscal 2025 resulted from a 3.7 percent increase in average check, which includes a 0.6 percent increase in off premise catering sales, partially offset by a 1.6 percent decrease in same-restaurant guest counts. Olive Garden’s sales increase for the six months of fiscal 2025 was primarily driven by revenue from new restaurants offset b...
+[DRI 10-K filed 2024-07-19]
+225.3 $ 2,166.9 2.7 % (0.7) % $ 6.0 $ 6.0
+
+$ 11,390.0 $ 10,487.8
+
+(1)
+
+Same-restaurant sales is a year-over-year comparison of each period’s sales volumes for a 52-week year and is limited to restaurants that have been open, and operated by Darden, for at least 16 months.
+
+(2)
+
+Average annual sales are calculated as sales divided by total restaurant operating weeks multiplied by 52 weeks; excludes franchise locations.
+
+Olive Garden’s sales increase for fiscal 2024 was primarily driven by a U.S. same-restaurant sales increase combined with revenue from new restaurants. The increase in U.S. same-restaurant sales in fiscal 2024 resulted from a 3.3 percent increase in average check, partially offset by a 1.7 percent decrease in same-restaurant guest counts. 
+
+LongHorn Steakhouse’s sales increa...
+[DRI 10-K filed 2025-07-18]
+,533.5 $ 2,225.3 13.8 % 0.2 % $ 5.8 $ 6.0
+
+$ 12,076.7 $ 11,390.0
+
+(1)
+
+Same-restaurant sales is a year-over-year comparison of each period’s sales volumes for a 52-week year and is limited to restaurants that have been open, and operated by Darden, for at least 16 months.
+
+(2)
+
+Average annual sales are calculated as sales divided by total restaurant operating weeks multiplied by 52 weeks; excludes franchise locations.
+
+Olive Garden’s sales increase for fiscal 2025 was primarily driven by a U.S. same-restaurant sales increase combined with revenue from new restaurants. The increase in U.S. same-restaurant sales in fiscal 2025 resulted from a 4.1 percent increase in average check, which includes a 0.7 increase in off-premise catering sales, partially offset by a 2.3 percent decrease in same-...
+
+---
+
+Answer:
+- **Second Quarter of Fiscal 2025**:
+  [DRI 10-Q filed 2025-01-02 | relevance: 1.00]
+  - Olive Garden's sales increase was primarily driven by same-restaurant sales increases and revenue from new restaurants. The increase in U.S. same-restaurant sales resulted from a 3.7 percent increase in average check, partially offset by a 1.6 percent decrease in same-restaurant guest counts.
+  - LongHorn Steakhouse's sales increase was primarily driven by same-restaurant sales increases and revenue from new restaurants. The increase in same-restaurant sales resulted from a 4.3 percent increase in same-restaurant guest counts and a 3.1 percent increase in average check.
+  - Fine Dining's sales decrease was primarily driven by same-restaurant sales decreases and a decrease in same-restaurant guest counts. The decrease in same-restaurant sales resulted from an 8.3 percent decrease in same-restaurant guest counts, offset by a 2.7 percent increase in average check.
+
+- **Six Months of Fiscal 2025**:
+  [DRI 10-Q filed 2025-01-02 | relevance: 1.00]
+  - Olive Garden's sales increase was primarily driven by revenue from new restaurants, offset by same-restaurant sales decreases. The decrease in U.S. same-restaurant sales resulted from a 3.6 percent decrease in same-restaurant guest counts, partially offset by a 3.3 percent increase in average check.
+  - LongHorn Steakhouse's sales increase was primarily driven by same-restaurant sales increases and revenue from new restaurants. The increase in same-restaurant sales resulted from a 3.0 percent increase in average check and a 2.5 percent increase in same-restaurant guest counts.
+  - Fine Dining's sales decrease was primarily driven by same-restaurant sales decreases and a decrease in same-restaurant guest counts. The decrease in same-restaurant sales resulted from an 8.7 percent decrease in same-restaurant guest counts, partially offset by a 3.1 percent increase in average check.
+
+- **Second Quarter of Fiscal 2026**:
+  [DRI 10-Q filed 2025-12-30 | relevance: 1.06]
+  - Olive Garden's sales increase was primarily driven by same-restaurant sales increases and revenue from new restaurants. The increase in U.S. same-restaurant sales resulted from a 1.7 percent increase in same-restaurant guest counts and a 3.0 percent increase in average check, which includes a 1.1 percent increase in off-premise catering sales.
+  - LongHorn Steakhouse's sales increase was primarily driven by same-restaurant sales increases and revenue from new restaurants. The increase in same-
+
+----------------------------------------
+QUESTION: eval-014 — How did Darden's acquisition of Chuy's impact financial results?
+----------------------------------------
+Question: How did Darden's acquisition of Chuy's impact financial results?
+
+Source chunks:
+
+[DRI 10-K filed 2024-07-19]
+ of tax) during the twelve months ended May 26, 2024. As of May 26, 2024, all Ruth’s Chris operations have been fully integrated into Darden’s operations.
+
+Fiscal 2024 Financial Highlights
+
+•
+
+Total sales increased 8.6 percent to $11.39 billion in fiscal 2024 from $10.49 billion in fiscal 2023 driven by a blended same-restaurant sales increase of 1.6 percent and sales from the addition of 80 net company-owned Ruth's Chris restaurants and 37 other net new restaurants.
+
+•
+
+Reported diluted net earnings per share from continuing operations increased to $8.53 in fiscal 2024 from $8.00 in fiscal 2023, a 6.6 percent increase.
+
+•
+
+Net earnings from continuing operations increased to $1.03 billion in fiscal 2024 from $983.5 million in fiscal 2023, a 4.8 percent increase.
+
+•
+
+Net loss from disconti...
+[DRI 10-Q filed 2026-03-27]
+ acquisition of 103 Chuy’s restaurants during the second quarter of fiscal 2025 and 31 net new restaurants and a blended same-restaurant sales increase of 4.2 percent
+
+1
+
+ and 4.4 percent.
+
+1
+
+•
+
+Our net earnings from continuing operations were $310.6 million and $805.9 million for the third quarter and first nine months of fiscal 2026, respectively, compared to $323.7 million and $747.0 million for the third quarter and first nine months of fiscal 2025, respectively.
+
+27
+
+Table of Contents
+
+•
+
+Reported diluted net earnings per share from continuing operations were $2.68 and $6.91 for the third quarter and first nine months of fiscal 2026, respectively, compared to $2.74 and $6.30 for the third quarter and first nine months of fiscal 2025, respectively.
+
+Outlook
+
+We expect sales growth for...
+[DRI 10-Q filed 2025-01-02]
+ expenditures incurred to build new restaurants, remodel and maintain existing restaurants and for technology initiatives to be approximately $650 million. These amounts now all include the addition of Chuy’s and our expectations for Chuy’s results from the date of acquisition forward.
+
+1
+
+ Same-restaurant sales exclude Ruth’s Chris and Chuy’s as they were not owned and operated by Darden for a 16-month period at the beginning of the fiscal year.
+
+ SALES
+
+The following table presents our sales by segment for the periods indicated.
+
+Three Months Ended Six Months Ended
+
+(in millions) November 24, 2024 November 26, 2023 % Chg SRS (1) November 24, 2024 November 26, 2023 % Chg SRS (1)
+
+Olive Garden $ 1,292.5 $ 1,251.4 3.3 % 2.0 % $ 2,501.6 $ 2,479.3 0.9 % (0.4) %
+
+LongHorn Steakhouse $ 710.1 $ ...
+[DRI 10-Q filed 2025-01-02]
+ operations were $1.82 and $3.57 for the second quarter and first six months of fiscal 2025 compared to $1.76 and $3.35 for the second quarter and six months of fiscal 2024.
+
+ 
+
+1
+
+ Same-restaurant sales results exclude Chuy’s as they have not yet been owned and operated by Darden for a 16-month 
+
+period and includes Ruth’s Chris for the month of November only.
+
+Outlook
+
+On October 11, 2024, we acquired 100 percent of the equity interest of Chuy’s Holdings, Inc. (Chuy’s Holdings) in an all-cash transaction of $649.1 million in total consideration, net of $35.3 million of cash on Chuy’s Holdings balance sheet at closing. We financed the acquisition with a portion of the proceeds from the issuance of a $400.0 million aggregate principal amount of 4.350 percent senior notes due 2027 (2027 Not...
+[DRI 10-Q filed 2025-04-01]
+ adjustments and a 0.1% impact from pricing leverage.
+
+•
+
+Depreciation and amortization expenses increased as a percent of sales primarily due to the acquisition of Chuy’s as well as incremental depreciation on new restaurants and other capital investments.
+
+•
+
+Impairment and disposal of assets, net remained flat as a percent of sales.
+
+Nine Months Ended February 23, 2025 Compared to Nine Months Ended February 25, 2024
+
+•
+
+Food and beverage costs decreased as a percent of sales primarily due to a 0.9% impact from pricing leverage and a 0.2% impact from cost savings, partially offset by a 0.5% impact from menu mix and other.
+
+•
+
+Restaurant labor costs remained flat as a percent of sales primarily due to a 0.9% impact from pricing leverage and a 0.3% impact from manager and team member produ...
+
+---
+
+Answer:
+- [DRI 10-Q filed 2025-01-02 | relevance: 1.05] The acquisition of Chuy’s was expected to impact Darden’s financial results by increasing capital expenditures for building new restaurants, remodeling, and maintaining existing restaurants and for technology initiatives to be approximately $650 million. These amounts now all include the addition of Chuy’s and expectations for Chuy’s results from the date of acquisition forward.
+
+- [DRI 10-Q filed 2025-04-01 | relevance: 0.95] The acquisition of Chuy’s also impacted Darden’s financial results by increasing depreciation and amortization expenses as a percent of sales, primarily due to the acquisition of Chuy’s as well as incremental depreciation on new restaurants and other capital investments. Additionally, there was an increase in net interest expense as a percent of sales for the third quarter and the first nine months of fiscal 2025, primarily due to financing related to the Chuy’s acquisition.
+
+----------------------------------------
+QUESTION: eval-015 — What drove Cracker Barrel's total revenue changes?
+----------------------------------------
+Question: What drove Cracker Barrel's total revenue changes?
+
+Source chunks:
+
+[CBRL 10-Q filed 2026-03-04]
+ in operation at end of the period: 
+Cracker Barrel 656 657 656 657
+MSBC 54 69 54 69
+Total units at end of the period 710 726 710 726
+
+Total Revenue
+
+Total revenue for the second quarter and first six months of 2026 decreased 7.9% and 6.8%, respectively, as compared to the same periods in the prior year.
+The following table highlights the key components of revenue for the specified periods:
+ 
+ Quarter Ended Six Months Ended 
+ January 30, January 31, January 30, January 31, 
+ 2026 2025 2026 2025 
+Revenue in dollars: 
+Restaurant $ 694,333 $ 750,478 $ 1,344,926 $ 1,433,749 
+Retail 180,484 198,961 327,079 360,779 
+Total revenue $ 874,817 $ 949,439 $ 1,672,005 $ 1,794,528 
+Total revenue by percentage relationships: 
+Restaurant 79.4 % 79.0 % 80.4 % 79.9 %
+Retail 20.6 % 21.0 % 19.6 % 20.1 %
+Avera...
+[CBRL 10-K filed 2024-09-27]
+ 0.5
+Income before income taxes 0.7 3.0
+Provision for income taxes (income tax benefit) (0.5) 0.1
+Net income 1.2 % 2.9 %
+
+The following table sets forth the change in the number of stores in operation for the past two years:
+ 
+ 2024 2023
+Net change in Company owned stores: 
+Cracker Barrel (2) (4)
+MSBC 7 8
+Stores in operation at end of the period: 
+Cracker Barrel 658 660
+MSBC 66 59
+Total stores at end of period 724 719
+Total Revenue
+The following table highlights the key components of revenue for the past two years:
+ 
+ 2024 2023
+Revenue in dollars:(1) 
+Restaurant $ 2,794,128 $ 2,740,866 
+Retail 676,634 701,942 
+Total revenue $ 3,470,762 $ 3,442,808 
+Total revenue percentage increase(1) 0.8 % 5.4 %
+Total revenue by percentage relationships: 
+Restaurant 80.5 % 79.6 %
+Retail 19.5 % 20.4 %
+Aver...
+[CBRL 10-Q filed 2026-06-09]
+ in operation at end of the period: 
+Cracker Barrel 657 658 657 658
+MSBC 52 70 52 70
+Total units at end of the period 709 728 709 728
+
+Total Revenue
+
+Total revenue for the third quarter and first nine months of 2026 decreased 2.9% and 5.6%, respectively, as compared to the same periods in the prior year.
+The following table highlights the key components of revenue for the specified periods:
+ 
+ Quarter Ended Nine Months Ended 
+ May 01, May 02, May 01, May 02, 
+ 2026 2025 2026 2025 
+Revenue in dollars: 
+Restaurant $ 658,399 $ 679,341 $ 2,003,325 $ 2,113,090 
+Retail 138,968 141,806 466,047 502,585 
+Total revenue $ 797,367 $ 821,147 $ 2,469,372 $ 2,615,675 
+Total revenue by percentage relationships: 
+Restaurant 82.6 % 82.7 % 81.1 % 80.8 %
+Retail 17.4 % 17.3 % 18.9 % 19.2 %
+Average store volume...
+[CBRL 10-Q filed 2025-03-06]
+Units in operation at end of the period:
+Cracker Barrel 657 662 657 662
+MSBC 69 63 69 63
+Total units at end of the period 726 725 726 725
+
+Total Revenue
+
+Total revenue for the second quarter and first six months of 2025 increased 1.5% and 2.0%, respectively, as compared to the same periods in the prior year.
+The following table highlights the key components of revenue for the specified periods:
+ 
+ Quarter Ended Six Months Ended
+ January 31, January 26, January 31, January 26, 
+ 2025 2024 2025 2024
+Revenue in dollars: 
+Restaurant $ 750,478 $ 730,669 $ 1,433,749 $ 1,391,462 
+Retail 198,961 204,732 360,779 367,778 
+Total revenue $ 949,439 $ 935,401 $ 1,794,528 $ 1,759,240 
+Total revenue by percentage relationships: 
+Restaurant 79.0 % 78.1 % 79.9 % 79.1 %
+Retail 21.0 % 21.9 % 20.1 % 20.9 %
+Ave...
+[CBRL 10-Q filed 2024-12-04]
+0
+
+Other store operating expenses 25.0 24.7
+
+General and administrative expenses 7.1 5.9
+
+Impairment and store closing costs 0.1 —
+
+Operating income 0.8 1.4
+
+Interest expense, net 0.7 0.6
+
+Income before income taxes 0.1 0.8
+
+Provision for income taxes (income tax benefit) (0.5) 0.1
+
+Net income 0.6 % 0.7 %
+
+19
+
+Table of Contents
+
+The following table sets forth the change in the number of units in operation for the specified periods:
+ 
+ Quarter Ended
+ November 01, October 27, 
+ 2024 2023
+Net change in units:
+Cracker Barrel — 1
+MSBC 3 1
+ 
+Units in operation at end of the period:
+Cracker Barrel 658 661
+MSBC 69 60
+Total units at end of the period 727 721
+
+Total Revenue
+
+Total revenue for the first quarter of 2025 increased 2.6% as compared to the same period in the prior year.
+The following tab...
+
+---
+
+Answer:
+- [CBRL 10-Q filed 2024-12-04 | relevance: 1.00] The first quarter of 2025 saw a 2.6% increase in total revenue compared to the same period in the prior year. This increase is driven by a 2.9% increase in restaurant revenue and a 1.6% decrease in retail revenue. The average check increase was 5.8%, while comparable restaurant guest traffic decreased by 2.9%.
+
+- [CBRL 10-K filed 2024-09-27 | relevance: 1.08] For the year 2024, total revenue increased by 0.8% compared to 2023. The restaurant revenue increased by 0.5%, while retail revenue decreased by 5.5%. The average check increase was 4.9%, and comparable restaurant guest traffic decreased by 5.0%.
+
+- [CBRL 10-Q filed 2025-03-06 | relevance: 1.06] In the second quarter and first six months of 2025, total revenue increased by 1.5% and 2.0%, respectively, compared to the same periods in the prior year. Restaurant revenue increased by 1.5%, and retail revenue increased by 2.0%. The average check increase was 7.4%, and comparable restaurant guest traffic decreased by 2.7%.
+
+- [CBRL 10-Q filed 2026-03-04 | relevance: 1.12] For the second quarter and first six months of 2026, total revenue decreased by 7.9% and 6.8%, respectively, compared to the same periods in the prior year. Restaurant revenue decreased by 7.1%, and retail revenue decreased by 9.2%. The average check increase was 3.4%, and comparable restaurant guest traffic decreased by 10.1%.
+
+- [CBRL 10-Q filed 2026-06-09 | relevance: 1.07] In the third quarter and first nine months of 2026, total revenue decreased by 2.9% and 5.6%, respectively, compared to the same periods in the prior year. Restaurant revenue decreased by 2.6%, and retail revenue decreased by 1.8%. The average check increase was 4.3%, and comparable restaurant guest traffic decreased by 6.7%.
+
+----------------------------------------
+QUESTION: eval-016 — How did Cracker Barrel's cost of goods sold change?
+----------------------------------------
+Question: How did Cracker Barrel's cost of goods sold change?
+
+Source chunks:
+
+[CBRL 10-Q filed 2025-03-06]
+ %
+
+Cost of goods sold (exclusive of depreciation and rent) 32.6 33.7 31.7 32.4
+
+Labor and other related expenses 34.4 34.5 35.3 35.7
+
+Other store operating expenses 23.2 22.9 24.0 23.7
+
+General and administrative expenses 6.5 5.6 6.8 5.8
+
+Impairment and store closing costs 0.2 — 0.2 —
+
+Operating income 3.1 3.3 2.0 2.4
+
+Interest expense, net 0.6 0.6 0.6 0.6
+
+Income before income taxes 2.5 2.7 1.4 1.8
+
+Provision for income taxes (income tax benefit) 0.2 (0.1) (0.1) —
+
+Net income 2.3 % 2.8 % 1.5 % 1.8 %
+
+20
+
+Table of Contents
+The following table sets forth the change in the number of units in operation for the specified periods:
+ 
+ Quarter Ended Six Months Ended
+ January 31, January 26, January 31, January 26,
+ 2025 2024 2025 2024
+Net change in units:
+Cracker Barrel (1) 1 (1) 2
+MSBC — 3 3 4
+...
+[CBRL 10-Q filed 2026-03-04]
+, as a result of the deterioration in operating performance of three MSBC locations and two Cracker Barrel locations. One Cracker Barrel store was closed in the second quarter and first six months of 2025 resulting in closing costs of $288.
+
+27
+
+Table of Contents
+Operating Income (Loss)
+Operating income (loss) consisted of the following for the specified periods:
+ 
+ Quarter Ended Six Months Ended
+ January 30, January 31, January 30, January 31,
+ 2026 2025 2026 2025
+Operating income (loss) $ 463 $ 29,123 $ (32,334) $ 36,194
+In the second quarter and first six months of 2026, operating income (loss) decreased from the same periods in the prior year primarily due to the decreases in total revenue partially offset by lower cost of goods sold expenses, lower labor expenses, lower incentive comp...
+[CBRL 10-Q filed 2025-03-06]
+ January 26, January 31, January 26, 
+ 2025 2024 2025 2024
+General and administrative expenses 6.5 % 5.6 % 6.8 % 5.8 %
+
+This percentage change for the second quarter and first six months of 2025 as compared to the same periods in the prior year resulted primarily from higher professional fees related to legal fees and proxy contest expenses. Additionally, the Company incurred higher costs of approximately $2,300 associated with the Company’s strategic transformation plan for the first six months of 2025 as compared to the same period in the prior year. Higher legal fees for the first six months of 2025 included an approximate $3,300 charge in connection with our settlement of a series of wage and hour arbitrations. The Company incurred proxy contest expenses of $5,263 and $8,220, respectiv...
+[CBRL 10-Q filed 2026-06-09]
+ in payroll and related expense as a percentage of total revenue in the first nine months of 2026 as compared to the same period in the prior year resulted primarily from severance costs related to a corporate restructuring. 
+
+Impairment and Store Closing Costs
+
+During the first nine months of 2026, impairment charges of $418 were recorded for three Maple Street Biscuit Company (“MSBC”) locations as a result of the Company’s decision not to extend the leases for these locations. During the first nine months of 2026, one Cracker Barrel store and sixteen MSBC locations were closed because of poor operating performance, resulting in closing costs of $3,473 which included lease termination costs. 
+
+28
+
+Table of Contents
+During the third quarter of 2025, we recorded impairment charges of $718 a...
+[CBRL 10-Q filed 2024-12-04]
+0
+
+Other store operating expenses 25.0 24.7
+
+General and administrative expenses 7.1 5.9
+
+Impairment and store closing costs 0.1 —
+
+Operating income 0.8 1.4
+
+Interest expense, net 0.7 0.6
+
+Income before income taxes 0.1 0.8
+
+Provision for income taxes (income tax benefit) (0.5) 0.1
+
+Net income 0.6 % 0.7 %
+
+19
+
+Table of Contents
+
+The following table sets forth the change in the number of units in operation for the specified periods:
+ 
+ Quarter Ended
+ November 01, October 27, 
+ 2024 2023
+Net change in units:
+Cracker Barrel — 1
+MSBC 3 1
+ 
+Units in operation at end of the period:
+Cracker Barrel 658 661
+MSBC 69 60
+Total units at end of the period 727 721
+
+Total Revenue
+
+Total revenue for the first quarter of 2025 increased 2.6% as compared to the same period in the prior year.
+The following tab...
+
+---
+
+Answer:
+- [CBRL 10-Q filed 2025-03-06 | relevance: 1.12]
+  - Cost of goods sold (exclusive of depreciation and rent) increased from 31.7% in 2024 to 32.4% in 2025. The provided filings do not discuss the specific reasons for this change.
+
+- [CBRL 10-Q filed 2026-03-04 | relevance: 1.01]
+  - The decrease in total revenue in the second quarter and first six months of 2026, partially offset by lower cost of goods sold expenses, contributed to the operating loss. The exact percentage change in cost of goods sold is not provided in this filing.
+
+- [CBRL 10-Q filed 2025-03-06 | relevance: 0.90]
+  - Cost of goods sold (exclusive of depreciation and rent) increased from 31.7% in 2024 to 32.4% in 2025. The provided filings do not discuss the specific reasons for this change.
+
+- [CBRL 10-Q filed 2026-06-09 | relevance: 0.87]
+  - The decrease in total revenue in the first nine months of 2026, partially offset by lower cost of goods sold expenses, contributed to the operating loss. The exact percentage change in cost of goods sold is not provided in this filing.
+
+- [CBRL 10-Q filed 2024-12-04 | relevance: 0.82]
+  - Cost of goods sold (exclusive of depreciation and rent) increased from 24.7% in 2023 to 25.0% in 2024. The provided filings do not discuss the specific reasons for this change.
+
+----------------------------------------
+QUESTION: eval-017 — What drove Cracker Barrel's labor and related expenses?
+----------------------------------------
+Question: What drove Cracker Barrel's labor and related expenses?
+
+Source chunks:
+
+[CBRL 10-Q filed 2026-06-09]
+ in payroll and related expense as a percentage of total revenue in the first nine months of 2026 as compared to the same period in the prior year resulted primarily from severance costs related to a corporate restructuring. 
+
+Impairment and Store Closing Costs
+
+During the first nine months of 2026, impairment charges of $418 were recorded for three Maple Street Biscuit Company (“MSBC”) locations as a result of the Company’s decision not to extend the leases for these locations. During the first nine months of 2026, one Cracker Barrel store and sixteen MSBC locations were closed because of poor operating performance, resulting in closing costs of $3,473 which included lease termination costs. 
+
+28
+
+Table of Contents
+During the third quarter of 2025, we recorded impairment charges of $718 a...
+[CBRL 10-K filed 2024-09-27]
+ costs incurred in store operations. The following table highlights labor and other related expenses as a percentage of total revenue for the past two years:
+ 
+ 2024 2023
+Labor and related expenses 36.6 % 35.1 %
+
+40
+
+Table of Contents
+The year-to-year percentage change in 2024 as compared to 2023 resulted primarily from the following:
+ 
+ 2024 Compared to 2023 
+ Increase (Decrease) as a 
+ Percentage of Total Revenue
+Store hourly labor 1.1 %
+Store management compensation 0.3 %
+Employee health care expense 0.1 %
+Other wages (0.2) %
+
+The increase in store hourly labor and store management compensation as a percentage of total revenue in 2024 as compared to 2023 resulted primarily from higher staffing levels and the investment of additional labor hours to improve the guest experience as well as...
+[CBRL 10-Q filed 2025-03-06]
+ %
+
+Cost of goods sold (exclusive of depreciation and rent) 32.6 33.7 31.7 32.4
+
+Labor and other related expenses 34.4 34.5 35.3 35.7
+
+Other store operating expenses 23.2 22.9 24.0 23.7
+
+General and administrative expenses 6.5 5.6 6.8 5.8
+
+Impairment and store closing costs 0.2 — 0.2 —
+
+Operating income 3.1 3.3 2.0 2.4
+
+Interest expense, net 0.6 0.6 0.6 0.6
+
+Income before income taxes 2.5 2.7 1.4 1.8
+
+Provision for income taxes (income tax benefit) 0.2 (0.1) (0.1) —
+
+Net income 2.3 % 2.8 % 1.5 % 1.8 %
+
+20
+
+Table of Contents
+The following table sets forth the change in the number of units in operation for the specified periods:
+ 
+ Quarter Ended Six Months Ended
+ January 31, January 26, January 31, January 26,
+ 2025 2024 2025 2024
+Net change in units:
+Cracker Barrel (1) 1 (1) 2
+MSBC — 3 3 4
+...
+[CBRL 10-Q filed 2026-03-04]
+, as a result of the deterioration in operating performance of three MSBC locations and two Cracker Barrel locations. One Cracker Barrel store was closed in the second quarter and first six months of 2025 resulting in closing costs of $288.
+
+27
+
+Table of Contents
+Operating Income (Loss)
+Operating income (loss) consisted of the following for the specified periods:
+ 
+ Quarter Ended Six Months Ended
+ January 30, January 31, January 30, January 31,
+ 2026 2025 2026 2025
+Operating income (loss) $ 463 $ 29,123 $ (32,334) $ 36,194
+In the second quarter and first six months of 2026, operating income (loss) decreased from the same periods in the prior year primarily due to the decreases in total revenue partially offset by lower cost of goods sold expenses, lower labor expenses, lower incentive comp...
+[CBRL 10-Q filed 2026-03-04]
+ of total revenue in the second quarter and the first six months of 2026 as compared to the same periods in the prior year resulted primarily from lower performance against financial objectives in 2026 as compared to the same periods in the prior year. 
+
+The decreases in professional fees as a percentage of total revenue in the second quarter and the first six months of 2026 as compared to the same periods in the prior year resulted primarily from lower proxy contest expenses and lower costs associated with the Company’s strategic initiatives. In the second quarter and first six months of 2026, we incurred $2,633 and $4,072, respectively, in costs related to a proxy contest in connection with the Company’s 2025 annual shareholders meeting held on November 20, 2025. In the second quarter of...
+
+---
+
+Answer:
+- [CBRL 10-Q filed 2026-06-09 | relevance: 1.10] The increase in payroll and related expense as a percentage of total revenue in the first nine months of 2026 as compared to the same period in the prior year resulted primarily from severance costs related to a corporate restructuring.
+- [CBRL 10-K filed 2024-09-27 | relevance: 1.00] The increase in store hourly labor and store management compensation as a percentage of total revenue in 2024 as compared to 2023 resulted primarily from higher staffing levels and the investment of additional labor hours to improve the guest experience as well as wage inflation partially offset by higher average check. We presently expect the rate of wage inflation to be approximately 3% to 4% in 2025.
+- [CBRL 10-Q filed 2025-03-06 | relevance: 0.99] The increase in employee health care expenses as a percentage of total revenue in 2024 as compared to 2023 resulted primarily from higher claims.
+- [CBRL 10-Q filed 2026-03-04 | relevance: 0.85] The increase in payroll and related expense as a percentage of total revenue in the second quarter and the first six months of 2026 as compared to the same periods in the prior year resulted primarily from severance costs related to a corporate restructuring.
+
+----------------------------------------
+QUESTION: eval-018 — How did Cracker Barrel's store operating expenses change?
+----------------------------------------
+Question: How did Cracker Barrel's store operating expenses change?
+
+Source chunks:
+
+[CBRL 10-Q filed 2024-12-04]
+0
+
+Other store operating expenses 25.0 24.7
+
+General and administrative expenses 7.1 5.9
+
+Impairment and store closing costs 0.1 —
+
+Operating income 0.8 1.4
+
+Interest expense, net 0.7 0.6
+
+Income before income taxes 0.1 0.8
+
+Provision for income taxes (income tax benefit) (0.5) 0.1
+
+Net income 0.6 % 0.7 %
+
+19
+
+Table of Contents
+
+The following table sets forth the change in the number of units in operation for the specified periods:
+ 
+ Quarter Ended
+ November 01, October 27, 
+ 2024 2023
+Net change in units:
+Cracker Barrel — 1
+MSBC 3 1
+ 
+Units in operation at end of the period:
+Cracker Barrel 658 661
+MSBC 69 60
+Total units at end of the period 727 721
+
+Total Revenue
+
+Total revenue for the first quarter of 2025 increased 2.6% as compared to the same period in the prior year.
+The following tab...
+[CBRL 10-Q filed 2026-03-04]
+, as a result of the deterioration in operating performance of three MSBC locations and two Cracker Barrel locations. One Cracker Barrel store was closed in the second quarter and first six months of 2025 resulting in closing costs of $288.
+
+27
+
+Table of Contents
+Operating Income (Loss)
+Operating income (loss) consisted of the following for the specified periods:
+ 
+ Quarter Ended Six Months Ended
+ January 30, January 31, January 30, January 31,
+ 2026 2025 2026 2025
+Operating income (loss) $ 463 $ 29,123 $ (32,334) $ 36,194
+In the second quarter and first six months of 2026, operating income (loss) decreased from the same periods in the prior year primarily due to the decreases in total revenue partially offset by lower cost of goods sold expenses, lower labor expenses, lower incentive comp...
+[CBRL 10-Q filed 2025-06-05]
+ 26, May 02, April 26, 
+ 2025 2024 2025 2024
+Other store operating expenses 25.3 % 24.5 % 24.4 % 24.0 %
+
+24
+
+Table of Contents
+This percentage change for the third quarter of 2025 as compared to the same period in the prior year resulted primarily from the following:
+ 
+ Third Quarter 
+ Increase as a Percentage 
+ of Total Revenue
+Store occupancy costs 0.5 %
+Advertising 0.3 %
+
+The increase in store occupancy costs as a percentage of total revenue for the third quarter of 2025 as compared to the same period in the prior year resulted primarily from higher depreciation expense due to higher capital expenditures. 
+The increase in advertising expense as a percentage of total revenue for the third quarter of 2025 as compared to the same period in the prior year period resulted primarily from high...
+[CBRL 10-Q filed 2025-06-05]
+ changes. We believe these performance indicators are useful for investors by providing a consistent comparison of sales results and trends across comparable periods within our core, established store base, unaffected by results of store openings, closings, and other transitional changes.
+
+Results of Operations
+
+The following table highlights our operating results by percentage relationships to total revenue for the specified periods:
+
+ 
+
+ Quarter Ended Nine Months Ended
+
+ May 02, April 26, May 02, April 26,
+
+ 2025 2024 2025 2024
+
+Total revenue 100.0 % 100.0 % 100.0 % 100.0 %
+
+Cost of goods sold (exclusive of depreciation and rent) 30.1 30.0 31.2 31.7
+
+Labor and other related expenses 37.1 37.8 35.9 36.3
+
+Other store operating expenses 25.3 24.5 24.4 24.0
+
+General and administrative expens...
+[CBRL 10-K filed 2025-09-26]
+5 as compared to 2024 resulted primarily from unfavorable claim experience.
+The increase in other store operating expenses as a percentage of total revenue in 2025 as compared to 2024 resulted primarily from costs associated with our off-premise business.
+
+45
+
+Table of Contents
+General and Administrative Expenses
+The following table highlights general and administrative expenses as a percentage of total revenue for the past two years:
+ 
+ 2025 2024
+General and administrative expenses 6.2 % 6.0 %
+The year-to-year percentage change in 2025 as compared to 2024 resulted primarily from the following:
+
+ 
+ 2025 Compared to 2024 
+ Increase as a Percentage 
+ of Total Revenue 
+Professional fees 0.1 %
+Incentive compensation expense 0.1 %
+
+The increase in professional fees as a percentage of total reve...
+
+---
+
+Answer:
+- [CBRL 10-Q filed 2024-12-04 | relevance: 1.15]
+  - Other store operating expenses decreased from 25.0% to 24.7% of total revenue.
+  
+- [CBRL 10-Q filed 2025-06-05 | relevance: 0.96]
+  - Other store operating expenses increased from 24.5% to 25.3% of total revenue in the third quarter of 2025.
+  - The increase in other store operating expenses as a percentage of total revenue for the third quarter of 2025 was primarily due to higher depreciation expense due to higher capital expenditures and higher conference expenses due to a biennial district manager conference held in the first quarter of 2025, costs associated with the off-premise business, and hurricane-related expenses incurred in the first quarter of 2025.
+  
+- [CBRL 10-Q filed 2025-06-05 | relevance: 0.95]
+  - Other store operating expenses increased from 24.0% to 24.4% of total revenue in the first nine months of 2025.
+  - The increase in other store operating expenses as a percentage of total revenue for the first nine months of 2025 was primarily due to higher conference expenses due to a biennial district manager conference held in the first quarter of 2025, costs associated with the off-premise business, and hurricane-related expenses incurred in the first quarter of 2025.
+  
+- [CBRL 10-K filed 2025-09-26 | relevance: 0.91]
+  - Other store operating expenses increased from 25.3% to 25.0% of total revenue in 2025.
+  - The increase in other store operating expenses as a percentage of total revenue in 2025 was primarily due to costs associated with the off-premise business.
+
+----------------------------------------
+QUESTION: eval-019 — What is Cracker Barrel's business model and store concept?
+----------------------------------------
+Question: What is Cracker Barrel's business model and store concept?
+
+Source chunks:
+
+[CBRL 10-K filed 2024-09-27]
+ and Results of Operations” of our annual report on Form 10-K for the year ended July 28, 2023, filed with the SEC on September 26, 2023.
+35
+
+Table of Contents
+
+EXECUTIVE OVERVIEW
+
+Cracker Barrel Old Country Store, Inc. (the “Company,” “our” or “we”) is a publicly traded (Nasdaq: CBRL) company that, through its operations and those of certain subsidiaries, is principally engaged in the operation and development of the Cracker Barrel Old Country Store® (“Cracker Barrel”) concept. Each Cracker Barrel store consists of a restaurant with a gift shop. The restaurants serve breakfast, lunch and dinner. The gift shop offers a variety of decorative and functional items specializing in rocking chairs, holiday gifts, toys, apparel and foods. As of September 13, 2024, the Company operated 658 Cracker...
+[CBRL 10-K filed 2025-09-26]
+ Discussion and Analysis of Financial Condition and Results of Operations” of our annual report on Form 10-K for the year ended August 02, 2024, filed with the SEC on September 27, 2024.
+
+EXECUTIVE OVERVIEW
+
+Cracker Barrel Old Country Store, Inc. (the “Company,” “our” or “we”) is a publicly traded (Nasdaq: CBRL) company that, through its operations and those of certain subsidiaries, is principally engaged in the operation and development of the Cracker Barrel Old Country Store® (“Cracker Barrel”) concept. Each Cracker Barrel store consists of a restaurant with a gift shop. The restaurants serve breakfast, lunch and dinner. The gift shop offers a variety of decorative and functional items specializing in rocking chairs, holiday gifts, toys, apparel and foods. As of September 12, 2025, the C...
+[CBRL 10-Q filed 2026-03-04]
+ITEM 2. Management’s Discussion and Analysis of Financial Condition and Results of Operations
+
+Cracker Barrel Old Country Store, Inc., and its subsidiaries (collectively, the “Company,” “our” or “we”) are principally engaged in the operation and development in the United States of the Cracker Barrel Old Country Store
+
+Ò
+
+ (“Cracker Barrel”) concept. As of January 30, 2026, we operated 656 Cracker Barrel stores in 43 states and 54 Maple Street Biscuit Company (“MSBC”) locations in ten states.
+[CBRL 10-Q filed 2025-12-09]
+ITEM 2. Management’s Discussion and Analysis of Financial Condition and Results of Operations
+
+Cracker Barrel Old Country Store, Inc., and its subsidiaries (collectively, the “Company,” “our” or “we”) are principally engaged in the operation and development in the United States of the Cracker Barrel Old Country Store
+
+Ò
+
+ (“Cracker Barrel”) concept. As of October 31, 2025, we operated 656 Cracker Barrel stores in 43 states and 54 Maple Street Biscuit Company (“MSBC”) locations in ten states.
+[CBRL 10-Q filed 2026-06-09]
+ITEM 2. Management’s Discussion and Analysis of Financial Condition and Results of Operations
+
+Cracker Barrel Old Country Store, Inc., and its subsidiaries (collectively, the “Company,” “our” or “we”) are principally engaged in the operation and development in the United States of the Cracker Barrel Old Country Store
+
+Ò
+
+ (“Cracker Barrel”) concept. As of May 01, 2026, we operated 657 Cracker Barrel stores in 43 states and 52 Maple Street Biscuit Company (“MSBC”) locations in ten states.
+
+---
+
+Answer:
+- [CBRL 10-K filed 2024-09-27 | relevance: 1.15] Cracker Barrel Old Country Store, Inc. is a publicly traded company that operates and develops the Cracker Barrel Old Country Store® concept. Each Cracker Barrel store consists of a restaurant with a gift shop. The restaurants serve breakfast, lunch, and dinner, while the gift shop offers a variety of decorative and functional items specializing in rocking chairs, holiday gifts, toys, apparel, and foods.
+- [CBRL 10-K filed 2025-09-26 | relevance: 1.11] As of September 12, 2025, the Company operated 657 Cracker Barrel stores located in 43 states. The Company also owns Maple Street Biscuit Company (“MSBC”), a breakfast and lunch fast casual concept. As of September 12, 2025, the Company operated 68 MSBC locations in ten states.
+- [CBRL 10-Q filed 2026-03-04 | relevance: 1.02] As of January 30, 2026, the Company operated 656 Cracker Barrel stores in 43 states and 54 MSBC locations in ten states.
+- [CBRL 10-Q filed 2025-12-09 | relevance: 1.02] As of October 31, 2025, the Company operated 656 Cracker Barrel stores in 43 states and 54 MSBC locations in ten states.
+- [CBRL 10-Q filed 2026-06-09 | relevance: 1.01] As of May 01, 2026, the Company operated 657 Cracker Barrel stores in 43 states and 52 MSBC locations in ten states.
+
+Cracker Barrel's business model is centered around the operation and development of the Cracker Barrel Old Country Store concept, which includes restaurants and gift shops. The company's store concept is designed to provide a unique dining experience with a focus on breakfast, lunch, and dinner, complemented by a gift shop that offers a variety of items. The company has also expanded into the MSBC concept, which offers a breakfast and lunch fast casual experience. The number of stores and locations has remained relatively stable over the provided periods, with minor fluctuations in the number of MSBC locations.
+
+----------------------------------------
+QUESTION: eval-020 — How did Cracker Barrel's general and administrative expenses change?
+----------------------------------------
+Question: How did Cracker Barrel's general and administrative expenses change?
+
+Source chunks:
+
+[CBRL 10-Q filed 2025-03-06]
+ January 26, January 31, January 26, 
+ 2025 2024 2025 2024
+General and administrative expenses 6.5 % 5.6 % 6.8 % 5.8 %
+
+This percentage change for the second quarter and first six months of 2025 as compared to the same periods in the prior year resulted primarily from higher professional fees related to legal fees and proxy contest expenses. Additionally, the Company incurred higher costs of approximately $2,300 associated with the Company’s strategic transformation plan for the first six months of 2025 as compared to the same period in the prior year. Higher legal fees for the first six months of 2025 included an approximate $3,300 charge in connection with our settlement of a series of wage and hour arbitrations. The Company incurred proxy contest expenses of $5,263 and $8,220, respectiv...
+[CBRL 10-K filed 2024-09-27]
+ initiatives.
+General and Administrative Expenses
+The following table highlights general and administrative expenses as a percentage of total revenue for the past two years:
+ 
+ 2024 2023
+General and administrative expenses 6.0 % 5.0 %
+
+41
+
+Table of Contents
+The year-to-year percentage change in 2024 as compared to 2023 resulted primarily from the following: 
+ 
+ 2024 Compared to 2023 
+ Increase as a Percentage 
+ of Total Revenue
+Professional fees 0.6 %
+Payroll and related expense 0.2 %
+Incentive compensation expense 0.1 %
+The increase in professional fees as a percentage of total revenue in 2024 as compared to 2023 resulted primarily from the costs associated with the Company’s strategic transformation plan.
+The increase in payroll and related expense as a percentage of total revenue in 202...
+[CBRL 10-K filed 2025-09-26]
+5 as compared to 2024 resulted primarily from unfavorable claim experience.
+The increase in other store operating expenses as a percentage of total revenue in 2025 as compared to 2024 resulted primarily from costs associated with our off-premise business.
+
+45
+
+Table of Contents
+General and Administrative Expenses
+The following table highlights general and administrative expenses as a percentage of total revenue for the past two years:
+ 
+ 2025 2024
+General and administrative expenses 6.2 % 6.0 %
+The year-to-year percentage change in 2025 as compared to 2024 resulted primarily from the following:
+
+ 
+ 2025 Compared to 2024 
+ Increase as a Percentage 
+ of Total Revenue 
+Professional fees 0.1 %
+Incentive compensation expense 0.1 %
+
+The increase in professional fees as a percentage of total reve...
+[CBRL 10-Q filed 2025-12-09]
+ table highlights general and administrative expenses as a percentage of total revenue for the specified periods:
+ 
+ Quarter Ended 
+ October 31, November 01,
+ 2025 2024
+General and administrative expenses 6.0 % 7.1 %
+
+This percentage change for the first quarter of 2026 as compared to the same period in the prior year resulted primarily from the following:
+ 
+ First Quarter
+ (Decrease) Increase
+ as a Percentage 
+ of Total Revenue
+Incentive compensation expense (1.0) %
+Professional fees (0.6) %
+Payroll and related expense 0.4 %
+The decrease in incentive compensation expense as a percentage of total revenue in the first quarter of 2026 as compared to the same period in the prior year resulted primarily from lower performance against financial objectives in 2026 as compared to the prior year p...
+[CBRL 10-Q filed 2024-12-04]
+0
+
+Other store operating expenses 25.0 24.7
+
+General and administrative expenses 7.1 5.9
+
+Impairment and store closing costs 0.1 —
+
+Operating income 0.8 1.4
+
+Interest expense, net 0.7 0.6
+
+Income before income taxes 0.1 0.8
+
+Provision for income taxes (income tax benefit) (0.5) 0.1
+
+Net income 0.6 % 0.7 %
+
+19
+
+Table of Contents
+
+The following table sets forth the change in the number of units in operation for the specified periods:
+ 
+ Quarter Ended
+ November 01, October 27, 
+ 2024 2023
+Net change in units:
+Cracker Barrel — 1
+MSBC 3 1
+ 
+Units in operation at end of the period:
+Cracker Barrel 658 661
+MSBC 69 60
+Total units at end of the period 727 721
+
+Total Revenue
+
+Total revenue for the first quarter of 2025 increased 2.6% as compared to the same period in the prior year.
+The following tab...
+
+---
+
+Answer:
+- [CBRL 10-Q filed 2025-03-06 | relevance: 1.10]
+  - General and administrative expenses increased by 6.5% in the second quarter and first six months of 2025 compared to the same periods in 2024.
+  - The increase was primarily driven by higher professional fees related to legal fees and proxy contest expenses, as well as higher costs associated with the Company’s strategic transformation plan.
+
+- [CBRL 10-K filed 2024-09-27 | relevance: 1.09]
+  - General and administrative expenses increased by 6.0% in 2024 compared to 2023.
+  - The increase was primarily due to the following:
+    - Professional fees increased by 0.6% of total revenue.
+    - Payroll and related expense increased by 0.2% of total revenue.
+    - Incentive compensation expense increased by 0.1% of total revenue.
+  - The increase in professional fees was attributed to the costs associated with the Company’s strategic transformation plan.
+  - The increase in payroll and related expense was due to severance costs related to corporate restructuring and Chief Executive Officer transition costs.
+  - The increase in incentive compensation was due to Chief Executive Officer transition costs.
+
+- [CBRL 10-K filed 2025-09-26 | relevance: 1.06]
+  - General and administrative expenses increased by 6.2% in 2025 compared to 2024.
+  - The increase was primarily due to the following:
+    - Professional fees increased by 0.1% of total revenue.
+    - Incentive compensation expense increased by 0.1% of total revenue.
+  - The increase in professional fees was attributed to proxy contest expenses and higher legal fees.
+  - The increase in incentive compensation expense was due to higher bonus payouts due to better performance against financial objectives in 2025 compared to 2024.
+
+- [CBRL 10-Q filed 2025-12-09 | relevance: 1.05]
+  - General and administrative expenses decreased by 1.1% in the first quarter of 2026 compared to the same period in 2025.
+  - The decrease was primarily due to the following:
+    - Incentive compensation expense decreased by 1.0% of total revenue.
+    - Professional fees decreased by 0.6% of total revenue.
+    - Payroll and related expense increased by 0.4% of total revenue.
+  - The decrease in incentive compensation expense was due to lower performance against financial objectives in 2026 compared to the prior year period.
+  - The decrease in professional fees was due
+

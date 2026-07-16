@@ -159,7 +159,6 @@ def main() -> None:
     logger.info("Running RAG + faithfulness eval for %s questions...", len(eval_set))
     logger.info("(each question = 2 LLM calls: 1 generate + 1 judge)\n")
 
-    llm = LLMClient()
     results = []
     times = []
 
@@ -171,6 +170,8 @@ def main() -> None:
         elapsed_prompt = f" [~{fmt_time(sum(times)/len(times) * (len(eval_set)-i+1))} remaining]" if times else ""
         logger.info("[%s/%s] [%s] %s...%s", i, len(eval_set), qid, question[:50], elapsed_prompt)
 
+        LLMClient.reset()
+        llm = LLMClient()
         t0 = time.time()
 
         try:

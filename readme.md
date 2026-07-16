@@ -101,26 +101,34 @@ Hardest-case turnaround:
 
 Automated evaluation via `eval_faithfulness.py`: for each question, the RAG pipeline generates an answer, then the same LLM judges each factual claim against the source chunks.
 
-**Latest full run (20 questions, Qwen2.5-VL-7B):**
+**Latest full run (20 questions, Qwen2.5-VL-7B, seed=42):**
 ```
-Strict:   59.7% (40F / 20P / 7U)
-Weighted: 74.6%  (partial weighted 0.5)
+Strict:   65.8% (98F / 39P / 12U)
+Weighted: 78.9%  (partial weighted 0.5)
 ```
 
 | Metric | Value |
 |--------|-------|
-| Total claims evaluated | 67 |
-| Faithful | 40 |
-| Partially faithful | 20 |
-| Unfaithful | 7 |
-| Parse failures | 4 (overflow — fixed with n_ctx=8192) |
-| Retrieval gaps | 1 (eval-006: food costs not found) |
+| Total claims evaluated | 149 |
+| Faithful | 98 |
+| Partially faithful | 39 |
+| Unfaithful | 12 |
+| Retrieval gaps | 3 |
+| No-response failures | 4 (eval-002/004/006/016 — claim extraction failed) |
 
-**Scoring:** `faithfulness_score` is computed programmatically from verdict counts (`faithful / total`) — strict score displayed alongside weighted score (partial = 0.5). Results include both in output JSON.
+**Improvements since previous run:**
+- eval-001: 50% → 100% (period integrity prompt fix)
+- eval-003: regressed to 0% then recovered to 100% (seed=42 fix)
+- eval-015: 20% → 67% (period integrity prompt fix)
+
+**Remaining issues:**
+- 4 evals generate 0 claims (extraction failure, not faithfulness issue)
+- eval-009: 17F/9U — model still hallucinates financial table numbers
+- eval-010: all 24 claims PARTIAL — model refuses to commit
 
 **Known patterns:**
 - Multi-period / multi-quarter questions tend toward PARTIAL (judge flags period mismatches)
-- Retrieval gaps logged separately as `retrieval_gap` (not counted in faithfulness)
+- Local 7B judge overestimates ~7.5pp vs Claude (calibration complete — see `data/claude_judge.json`)
 - Checkpoint saving after each question — partial results preserved if interrupted
 
 ## Project Structure

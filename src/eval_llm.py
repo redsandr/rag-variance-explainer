@@ -6,8 +6,10 @@ Runs the RAG pipeline on eval questions, saves Q&A for faithfulness review.
 import argparse
 import json
 import logging
+import sys
 import time
 from pathlib import Path
+from llm import LLMClient
 
 sys.path.insert(0, str(Path(__file__).parent))
 
@@ -44,6 +46,9 @@ def main() -> None:
     if args.no_generate:
         logger.info("  (retrieval only, no LLM generation)")
 
+    LLMClient.reset()
+    _test_client = LLMClient()
+    print(f">>> ACTIVE BACKEND: {_test_client.backend}")
     outputs = []
     for item in eval_set:
         qid = item["id"]
@@ -52,6 +57,7 @@ def main() -> None:
 
         logger.info("\n%s\n[%s] %s\n%s", "=" * 60, qid, question, "=" * 60)
 
+        LLMClient.reset()
         t0 = time.time()
 
         if args.no_generate:
@@ -67,7 +73,7 @@ def main() -> None:
                     {
                         "chunk_id": f"{r['metadata']['ticker']}_{r['metadata']['accession_number']}_{r['metadata']['chunk_index']}",
                         "relevance": r["relevance"],
-                        "text_preview": r["text"][:200],
+                        "text_preview": r["text"],
                     }
                     for r in results
                 ],
@@ -83,7 +89,7 @@ def main() -> None:
                     {
                         "chunk_id": f"{r['metadata']['ticker']}_{r['metadata']['accession_number']}_{r['metadata']['chunk_index']}",
                         "relevance": r["relevance"],
-                        "text_preview": r["text"][:200],
+                        "text_preview": r["text"],
                     }
                     for r in result["sources"]
                 ],
