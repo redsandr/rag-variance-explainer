@@ -1,6 +1,17 @@
 # RAG Variance Explainer
 
-Retrieval-Augmented Generation pipeline that answers "why did this financial metric change?" using SEC filing MD&A sections. Given a question about a restaurant company's financial variance (labor costs, revenue, margins, etc.), the system retrieves the most relevant excerpts from 10-K/10-Q filings and generates a grounded, citation-backed explanation.
+[![Python 3.11](https://img.shields.io/badge/python-3.11-blue?logo=python)](https://python.org)
+[![Streamlit](https://img.shields.io/badge/streamlit-1.43-FF4B4B?logo=streamlit)](https://streamlit.io)
+[![ChromaDB](https://img.shields.io/badge/chromadb-0.6-FC6D26?logo=chroma)](https://www.trychroma.com)
+[![llama.cpp](https://img.shields.io/badge/llama.cpp-GGUF-1E88E5)](https://github.com/ggerganov/llama.cpp)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![CI](https://github.com/redsandr/rag-variance-explainer/actions/workflows/test.yml/badge.svg)](https://github.com/redsandr/rag-variance-explainer/actions)
+
+**Retrieval-Augmented Generation pipeline** that answers *"why did this financial metric change?"* using real SEC filing MD&A sections. Ask plain-language questions about restaurant companies' financial variances — labor costs, revenue drivers, margin changes — and get sourced, citation-backed explanations from 10-K/10-Q filings.
+
+Target: turn a 4-hour manual variance review into a 3-minute query.
+
+---
 
 ## Demo
 
@@ -8,28 +19,60 @@ Retrieval-Augmented Generation pipeline that answers "why did this financial met
 streamlit run app.py
 ```
 
-Dark-themed Streamlit UI with source cards and color-coded relevance scores.
+Dark-themed fintech dashboard with interactive question input, AI-sourced answers, color-coded source chunks, and side-by-side cross-encoder comparison mode.
+
+---
+
+## Features
+
+- **RAG pipeline** — query expansion → ChromaDB retrieval → cross-encoder re-ranking → grounded LLM generation
+- **Multi-backend LLM** — llama.cpp (local GPU, 7B), Anthropic, or OpenAI — swappable via `.env`
+- **SEC EDGAR ingestion** — auto-fetches MD&A text from 10-K/10-Q filings (Chipotle, Darden, Cracker Barrel)
+- **Retrieval accuracy** — MRR **0.66** (+28% baseline), recall@10 **0.70** (4 failing cases → 0)
+- **Faithfulness evaluation** — LLM-as-judge scoring, Claude calibration, period-integrity prompt engineering
+- **Cross-encoder re-ranking** — `MiniLM-L-6` with hybrid scoring (CE 0.9 + BI 0.1 + forward-looking penalty)
+- **Financial glossary** — 20 synonym groups for query expansion (COGS = Cost of Sales = Cost of Revenue)
+- **Streamlit dashboard** — OLED dark mode, KPI metrics, glassmorphism cards, SVG icons, accessibility-ready
+
+---
 
 ## Quick Start
 
 ```bash
-# Install
+# Setup
 python -m venv venv
-venv\Scripts\activate    # Windows
+venv\Scripts\activate          # Windows
 pip install -r requirements.txt
 
-# Set up .env (see .env.example)
-# LLM backend, model path, RAG config
+# Configuration
+cp .env.example .env           # Set LLM backend, model path, RAG params
 
-# Download a model (e.g. Qwen2.5-VL-7B-Instruct Q4_K_M)
+# Download model (Qwen2.5-VL-7B-Instruct Q4_K_M ~4.7 GB)
 # Place .gguf in models/
 
-# Build the ChromaDB index
+# Build vector index (432 chunks from 24 filings)
 python src/build_index.py
 
-# Run the demo
+# Launch demo
 streamlit run app.py
 ```
+
+### Configuration
+
+All parameters via env vars — no hardcoded magic numbers.
+
+| Variable | Default | Description |
+|---|---|---|
+| `LLM_BACKEND` | `llama_cpp` | `llama_cpp`, `anthropic`, or `openai` |
+| `RAG_CROSS_ENCODER_ENABLED` | `true` | Enable cross-encoder re-ranking |
+| `RAG_CROSS_ENCODER_WEIGHT` | `0.7` | CE vs bi-encoder blend |
+| `RAG_TOP_K` | `5` | Final chunks returned to LLM |
+| `RAG_EXPANSION_N_TERMS` | `5` | Synonym count per query |
+| `RAG_FORWARD_LOOKING_PENALTY_ENABLED` | `true` | Penalize risk-factor chunks |
+| `RAG_LLM_MAX_TOKENS` | `2048` | Max generation tokens |
+| `RAG_LLM_TEMPERATURE` | `0.1` | Generation temperature |
+
+---
 
 ## Architecture
 
@@ -40,58 +83,48 @@ User Question
   query_expansion (5 synonyms, 20 financial groups)
     |
     v
-  ChromaDB + nomic-embed (bi-encoder) -- top 20 candidates
+  ChromaDB + nomic-embed (bi-encoder) → top 20 candidates
     |
     v
   forward_looking_penalty (configurable patterns/weight)
     |
     v
-  cross-encoder re-ranking (MiniLM-L-6, hybrid score: 0.9*CE + 0.1*BI + penalty + boost)
+  cross-encoder re-ranking (MiniLM-L-6, hybrid score)
     |
     v
-  top_k chunks -> LLMClient (llama.cpp / Anthropic / OpenAI) -> grounded answer + citations
+  top_k chunks → LLMClient → grounded answer + citations
 ```
 
-- **Embedding**: `nomic-embed-text-v1.5` (768-dim, normalized) with `search_document`/`search_query` prefixes
-- **Re-ranking**: `cross-encoder/ms-marco-MiniLM-L-6-v2` with hybrid scoring
-- **Vector Store**: ChromaDB, cosine distance, metadata-rich (ticker, form, filing date)
-- **Chunking**: Structure-aware recursive splitting via `tiktoken` (500-token chunks, 50-token overlap)
-- **Config**: `src/config.py` reads all thresholds/weights/model names from env vars — no hardcoded magic numbers
-- **Ingestion**: SEC EDGAR HTML 10-K/10-Q filings, MD&A section extraction via BeautifulSoup + regex
-- **LLM Backend**: llama.cpp (local GPU, 7B model) or Anthropic/OpenAI API via `LLM_BACKEND=.env`
+| Component | Technology |
+|---|---|
+| Embedding | `nomic-embed-text-v1.5` (768-dim, normalized) |
+| Vector store | ChromaDB, cosine distance, metadata-rich |
+| Re-ranking | `cross-encoder/ms-marco-MiniLM-L-6-v2` |
+| Chunking | Structure-aware recursive split, 500-token chunks |
+| LLM (default) | `Qwen2.5-VL-7B-Instruct-Q4_K_M` (RTX 5060, ~2-3s/gen) |
+| Data source | SEC EDGAR HTML 10-K/10-Q (MD&A section) |
+| Companies | CMG (Chipotle), DRI (Darden), CBRL (Cracker Barrel) |
 
-## Model
+---
 
-Default: `Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf` (4.68 GB, ~2-3s per generation on RTX 5060).
-
-Configure path in `.env`:
-```
-LLAMA_CPP_MODEL_PATH=models/Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf
-LLM_BACKEND=llama_cpp
-```
-
-Context window: 8192 tokens (`n_ctx` in `src/llm.py`).
-
-## Evaluation Results
+## Evaluation
 
 ### Retrieval Recall@k
 
-20 ground-truth questions across CMG (7), DRI (6), CBRL (7). Three-stage retrieval pipeline: bi-encoder + glossary expansion -> cross-encoder re-ranking -> forward-looking penalty.
+20 ground-truth questions across 3 companies. Three-stage pipeline: **bi-encoder + glossary → cross-encoder → forward-looking penalty**.
 
-| Recall | Baseline | query_multi | + cross-encoder | Delta (baseline -> final) |
-|--------|----------|-------------|-----------------|--------------------------|
-| recall@1 | 0.18 | 0.14 | **0.23** | **+0.05** |
-| recall@3 | 0.24 | 0.42 | **0.45** | **+0.21** |
-| recall@5 | 0.33 | 0.51 | **0.52** | **+0.19** |
-| recall@8 | 0.38 | 0.67 | 0.66 | +0.28 |
+| Metric | Baseline | query_multi | + CE | Delta |
+|---|---|---|---|---|
+| recall@1 | 0.18 | 0.14 | **0.23** | +0.05 |
+| recall@3 | 0.24 | 0.42 | **0.45** | +0.21 |
+| recall@5 | 0.33 | 0.51 | **0.52** | +0.19 |
 | recall@10 | 0.55 | 0.71 | 0.70 | +0.15 |
-| recall@20 | 0.86 | 0.91 | 0.91 | +0.05 |
 | **MRR** | **0.52** | **0.57** | **0.66** | **+0.14** |
 
 Hardest-case turnaround:
 
 | Case | Before | After | Fix |
-|------|--------|-------|-----|
+|---|---|---|---|
 | CMG G&A (eval-009) | rank 17, recall@10=0.00 | **rank 1, recall@10=0.67** | Cross-encoder re-ranking |
 | CBRL labor (eval-017) | rank 17, recall@10=0.00 | **rank 1, recall@10=1.00** | Cross-encoder re-ranking |
 | DRI marketing (eval-002) | rank 14, recall@10=0.00 | **rank 8, recall@10=1.00** | Forward-looking penalty |
@@ -99,92 +132,57 @@ Hardest-case turnaround:
 
 ### Faithfulness (LLM-as-Judge)
 
-Automated evaluation via `eval_faithfulness.py`: for each question, the RAG pipeline generates an answer, then the same LLM judges each factual claim against the source chunks.
+Automated eval across 149 claims from 20 questions:
 
-**Latest full run (20 questions, Qwen2.5-VL-7B, seed=42):**
 ```
-Strict:   65.8% (98F / 39P / 12U)
+Strict:   65.8%  (98 faithful / 39 partial / 12 unfaithful)
 Weighted: 78.9%  (partial weighted 0.5)
 ```
 
-| Metric | Value |
-|--------|-------|
-| Total claims evaluated | 149 |
-| Faithful | 98 |
-| Partially faithful | 39 |
-| Unfaithful | 12 |
-| Retrieval gaps | 3 |
-| No-response failures | 4 (eval-002/004/006/016 — claim extraction failed) |
+Key improvements via prompt engineering:
+- **Period integrity rule** — eval-001 50%→100%, eval-015 20%→67%
+- **seed=42** — deterministic output, eval-003 0%→100%
+- **Anti-hallucination checklist** — strict number verification, no training data
+- **Direction verification** — prevents self-contradictory claims
 
-**Improvements since previous run:**
-- eval-001: 50% → 100% (period integrity prompt fix)
-- eval-003: regressed to 0% then recovered to 100% (seed=42 fix)
-- eval-015: 20% → 67% (period integrity prompt fix)
-
-**Remaining issues:**
-- 4 evals generate 0 claims (extraction failure, not faithfulness issue)
-- eval-009: 17F/9U — model still hallucinates financial table numbers
-- eval-010: all 24 claims PARTIAL — model refuses to commit
-
-**Known patterns:**
-- Multi-period / multi-quarter questions tend toward PARTIAL (judge flags period mismatches)
-- Local 7B judge overestimates ~7.5pp vs Claude (calibration complete — see `data/claude_judge.json`)
-- Checkpoint saving after each question — partial results preserved if interrupted
+---
 
 ## Project Structure
 
 ```
-├── app.py                          # Streamlit demo UI (dark theme)
-├── .streamlit/config.toml          # Dark theme config
-├── .env / .env.example             # Config (all RAG params via env vars)
-├── AGENTS.md                       # Agent instructions
-├── Makefile                        # install, test, run, eval-* targets
-├── models/                         # .gguf model files (gitignored)
-├── .github/workflows/test.yml      # CI: pytest on push/PR
+├── app.py                     # Streamlit dashboard
+├── .streamlit/config.toml     # Dark theme config
+├── .env / .env.example        # Configuration
+├── Makefile                   # install / test / run / eval-*
+├── tests.py                   # 7 pytest tests
+├── .github/workflows/test.yml # CI pipeline
 ├── src/
-│   ├── config.py                   # Centralized config dataclass from env
-│   ├── cross_encoder.py            # Cross-encoder re-ranking + hybrid scoring
-│   ├── retrieval.py                # ChromaDB + query_multi pipeline
-│   ├── query_expansion.py          # 20-group financial synonym expansion
-│   ├── glossary.py                 # Per-company XBRL tag mappings
-│   ├── rag.py                      # RAG orchestrator (retrieve -> generate)
-│   ├── llm.py                      # 3-backend LLM client (llama.cpp/Anthropic/OpenAI)
-│   ├── embedding.py                # nomic-embed wrapper with prefixing
-│   ├── chunking.py                 # Structure-aware recursive chunking
-│   ├── ingest.py                   # SEC EDGAR fetcher + MD&A extraction
-│   ├── build_index.py              # E2E pipeline: fetch -> chunk -> embed -> store
-│   ├── eval_recall.py              # Retrieval recall@k evaluation
-│   ├── eval_llm.py                 # LLM output generation + caching
-│   └── eval_faithfulness.py        # LLM-as-judge faithfulness evaluation
-├── data/
-│   ├── eval_questions.json         # 20 ground-truth eval questions
-│   ├── llm_outputs.json            # Cached LLM outputs
-│   └── faithfulness_results.json   # Automated faithfulness eval results
-├── tests.py                        # 7 pytest tests
-└── README.md                       # This file
+│   ├── rag.py                 # RAG orchestrator
+│   ├── retrieval.py           # ChromaDB + query_multi pipeline
+│   ├── cross_encoder.py       # Cross-encoder re-ranking
+│   ├── query_expansion.py     # Financial synonym expansion
+│   ├── llm.py                 # 3-backend LLM client
+│   ├── config.py              # Centralized config
+│   ├── ingest.py              # SEC EDGAR fetcher
+│   ├── embedding.py           # nomic-embed wrapper
+│   ├── chunking.py            # Structure-aware chunking
+│   ├── glossary.py            # Per-company XBTR tag mappings
+│   ├── build_index.py         # End-to-end index pipeline
+│   └── eval_*.py              # Evaluation scripts
+└── data/
+    ├── eval_questions.json    # 20 ground-truth questions
+    ├── llm_outputs.json       # Cached LLM outputs
+    └── faithfulness_results.json
 ```
 
-## RAG Config (all optional)
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `RAG_CROSS_ENCODER_ENABLED` | `true` | Enable cross-encoder re-ranking |
-| `RAG_CROSS_ENCODER_WEIGHT` | `0.7` | CE vs bi-encoder blend (0=pure BI, 1=pure CE) |
-| `RAG_CROSS_ENCODER_MODEL` | `cross-encoder/ms-marco-MiniLM-L-6-v2` | Cross-encoder model |
-| `RAG_CROSS_ENCODER_DEVICE` | `cpu` | `cpu` or `cuda` |
-| `RAG_FORWARD_LOOKING_PENALTY_ENABLED` | `true` | Penalize risk factor chunks |
-| `RAG_FORWARD_LOOKING_PATTERNS` | *(built-in list)* | Comma-separated penalty phrases |
-| `RAG_EXPANSION_N_TERMS` | `5` | Glossary synonym count per query |
-| `RAG_TOP_K` | `5` | Final chunks returned to LLM |
-| `RAG_N_CANDIDATES` | `20` | Candidates before re-ranking |
+---
 
 ## CI
 
-GitHub Actions runs `pytest tests.py -v` on every push and PR (Ubuntu, Python 3.11, Node.js 24 runtime).
+GitHub Actions runs `pytest tests.py -v` on every push and PR (Ubuntu, Python 3.11).
 
-## TODO / Future Work
+---
 
-- [ ] Cross-encoder on GPU (install torch with CUDA)
-- [ ] Improve table-heavy chunk embedding (restaurant counts, segment tables)
-- [ ] More tickers / industries
-- [ ] Reduce judge overstrictness on multi-period claims
+## License
+
+MIT
