@@ -7,11 +7,9 @@ Usage:
 
 import json
 import logging
-import sys
 from pathlib import Path
 from collections import defaultdict
 
-sys.path.insert(0, str(Path(__file__).parent))
 from retrieval import get_client, get_collection, query_multi
 
 logger = logging.getLogger(__name__)

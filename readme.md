@@ -150,6 +150,7 @@ Key improvements via prompt engineering:
 ## Project Structure
 
 ```
+├── pyproject.toml             # Package config (pip install -e .)
 ├── app.py                     # Streamlit dashboard
 ├── .streamlit/config.toml     # Dark theme config
 ├── .env / .env.example        # Configuration
@@ -163,6 +164,8 @@ Key improvements via prompt engineering:
 │   ├── query_expansion.py     # Financial synonym expansion
 │   ├── llm.py                 # 3-backend LLM client
 │   ├── config.py              # Centralized config
+│   ├── prompts.py             # Judge prompts (3 variants) + helpers
+│   ├── styles.css             # Dashboard stylesheet (imported by app.py)
 │   ├── ingest.py              # SEC EDGAR fetcher
 │   ├── embedding.py           # nomic-embed wrapper
 │   ├── chunking.py            # Structure-aware chunking
@@ -176,6 +179,14 @@ Key improvements via prompt engineering:
 ```
 
 ---
+
+## Refactoring (Jul 2026)
+
+- **`pyproject.toml`** — Proper package build (`pip install -e .`) removes fragile `sys.path.insert()` hacks from 5 files.
+- **`src/prompts.py`** — Extracted 3 judge prompt variants (`_FULL`, `_MEDIUM`, `_COMPACT`) + `build_judge_prompt()` helpers into a single module.
+- **`src/styles.css`** — 510 lines of inline CSS extracted from `app.py` into a standalone stylesheet.
+- **Dead code removed** — `build_multi_queries()` (query_expansion.py), `check_reported_tags()` / `list_all_taxonomies_and_matching_tags()` (ingest.py), all demo `__main__` blocks.
+- **Deferred imports** — `from retrieval import ...` and `from llm import LLMClient` lifted to top level in `rag.py`.
 
 ## CI
 

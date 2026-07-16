@@ -37,10 +37,4 @@ def expand_query(query: str, n_extra_terms: int = None) -> str:
     return query + " " + " ".join(extra[:n_extra_terms])
 
 
-def build_multi_queries(query: str, n_variants: int = 3) -> list[str]:
-    base = query
-    expanded = expand_query(base)
-    queries = [base]
-    if expanded != base:
-        queries.append(expanded)
-    return queries[:n_variants]
+

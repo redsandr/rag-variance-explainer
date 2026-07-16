@@ -31,31 +31,7 @@ CANDIDATE_TAGS = [
 ]
 
 
-### TAGS CHECKING ###
-def check_reported_tags(cik: str) -> dict:
-    """
-    For a given company, check which of CANDIDATE_TAGS it actually
-    reports (and under 'units' — usually USD). Returns a dict of
-    {tag: bool}.
-    """
-    facts = fetch_companyfacts(cik)
-    gaap = facts.get("facts", {}).get("us-gaap", {})
-    return {tag: tag in gaap for tag in CANDIDATE_TAGS}
 
-def list_all_taxonomies_and_matching_tags(cik: str, keyword: str) -> dict:
-    """
-    Search ALL taxonomies (not just us-gaap) for tag names containing
-    a keyword. Useful for finding company-specific custom extension
-    tags (e.g. 'cmg:MarketingExpense') that a us-gaap-only check
-    would miss entirely.
-    """
-    facts = fetch_companyfacts(cik)
-    results = {}
-    for taxonomy, tags in facts.get("facts", {}).items():
-        matches = [tag for tag in tags if keyword.lower() in tag.lower()]
-        if matches:
-            results[taxonomy] = matches
-    return results
 
 ### FETCHING ###
 
@@ -205,8 +181,3 @@ def filing_document_url(cik: str, accession_number: str, primary_document: str) 
     )
 
 
-if __name__ == "__main__":
-    for ticker in TICKERS:
-        print(f"\n=== {ticker}: tags containing 'Marketing' ===")
-        cik = get_cik(ticker)
-        print(list_all_taxonomies_and_matching_tags(cik, "Marketing"))

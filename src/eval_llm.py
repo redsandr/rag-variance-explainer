@@ -6,16 +6,12 @@ Runs the RAG pipeline on eval questions, saves Q&A for faithfulness review.
 import argparse
 import json
 import logging
-import sys
 import time
 from pathlib import Path
+
 from llm import LLMClient
-
-sys.path.insert(0, str(Path(__file__).parent))
-
-from rag import answer_question
+from rag import answer_question, build_context
 from retrieval import get_client, get_collection, query
-from rag import build_context
 
 logger = logging.getLogger(__name__)
 

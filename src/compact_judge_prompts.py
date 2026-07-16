@@ -6,19 +6,10 @@ No model needed — just reformats existing files.
 import re
 from pathlib import Path
 
+from prompts import JUDGE_SYSTEM_PROMPT_COMPACT_COMPACT
+
 DATA_DIR = Path(__file__).parent.parent / "data"
 OUT_DIR = DATA_DIR
-
-JUDGE_SYSTEM_PROMPT = """You are a strict but fair faithfulness evaluator for financial RAG systems.
-
-Rules:
-- FAITHFUL: Source supports claim verbatim or minor rephrasing. Numbers must match exactly.
-- PARTIALLY FAITHFUL: Source supports general direction but specific detail is wrong.
-- UNFAITHFUL: Source contradicts claim or does not contain the information.
-- Evaluate each claim independently against ALL sources.
-
-Return ONLY valid JSON:
-{"claims": [{"claim": "...", "verdict": "FAITHFUL|PARTIALLY FAITHFUL|UNFAITHFUL"}], "faithful_count": N, "partial_count": N, "unfaithful_count": N, "total_claims": N}"""
 
 
 def extract_question(text: str) -> str:
@@ -88,7 +79,7 @@ def main():
     outputs.sort(key=lambda x: x["id"])
 
     # Calculate sizes
-    sys_size = len(JUDGE_SYSTEM_PROMPT)
+    sys_size = len(JUDGE_SYSTEM_PROMPT_COMPACT)
     total_per_question = sum(o["size"] for o in outputs)
     total = sys_size + total_per_question
 
@@ -123,7 +114,7 @@ def main():
             f.write("=" * 60 + "\n")
             f.write("SYSTEM PROMPT — paste ONCE as first message:\n")
             f.write("=" * 60 + "\n")
-            f.write(JUDGE_SYSTEM_PROMPT)
+            f.write(JUDGE_SYSTEM_PROMPT_COMPACT)
             f.write("\n\n")
             f.write("=" * 60 + "\n")
             f.write(f"BATCH {i} of {len(batches)} — {len(batch)} questions\n")

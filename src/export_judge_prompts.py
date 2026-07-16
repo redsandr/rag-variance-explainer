@@ -14,31 +14,12 @@ import math
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
-
 from llm import LLMClient
 from rag import answer_question
+from prompts import JUDGE_SYSTEM_PROMPT_MEDIUM, build_judge_prompt_compact
 
 EVAL_FILE = Path(__file__).parent.parent / "data" / "eval_questions.json"
 OUT_DIR = Path(__file__).parent.parent / "data"
-
-JUDGE_SYSTEM_PROMPT = """You are a strict but fair faithfulness evaluator for financial RAG systems.
-
-Your job: extract each factual claim from the Answer text ONLY, then check if that claim is supported by the Source chunks.
-
-CRITICAL: Extract claims ONLY from the Answer. Do NOT extract claims from the Source chunks.
-
-Rules:
-- FAITHFUL: Source supports the claim verbatim or minor rephrasing. Numbers, percentages, dollar amounts must match exactly.
-- PARTIALLY FAITHFUL: Source supports general direction but specific detail is wrong (e.g. wrong number, wrong period).
-- UNFAITHFUL: Source contradicts the claim or does not contain the information.
-- Evaluate each claim independently against ALL sources. A claim about one period is FAITHFUL if its numbers match the source for that period.
-
-Return ONLY valid JSON:
-{"claims": [{"claim": "...", "verdict": "FAITHFUL|PARTIALLY FAITHFUL|UNFAITHFUL"}], "faithful_count": N, "partial_count": N, "unfaithful_count": N, "total_claims": N}"""
-
-
-def build_judge_prompt_compact(question: str, answer: str, sources: list[dict]) -> str:
     context_blocks = []
     for s in sources:
         meta = s.get("metadata", {})
@@ -94,7 +75,7 @@ def _write_batches(outputs: list[dict], split: int | None) -> None:
         f.write("=" * 60 + "\n\n")
         f.write("INSTRUCTION: Evaluate each question below. Return JSON for each.\n")
         f.write("System prompt:\n")
-        f.write(JUDGE_SYSTEM_PROMPT)
+        f.write(JUDGE_SYSTEM_PROMPT_MEDIUM)
         f.write("\n\n")
         for o in outputs:
             f.write("-" * 40 + "\n")
@@ -121,7 +102,7 @@ def _write_batches(outputs: list[dict], split: int | None) -> None:
                 f.write("=" * 60 + "\n")
                 f.write("SYSTEM PROMPT (paste ONCE as first message):\n")
                 f.write("=" * 60 + "\n")
-                f.write(JUDGE_SYSTEM_PROMPT)
+                f.write(JUDGE_SYSTEM_PROMPT_MEDIUM)
                 f.write("\n\n")
                 f.write("=" * 60 + "\n")
                 f.write(f"BATCH {i} of {len(batches)} — {len(batch)} questions\n")
