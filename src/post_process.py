@@ -155,3 +155,27 @@ class MetricVerifier:
                 })
 
         return mismatches
+
+
+def tag_chunk(chunk_text: str, base_metadata: dict) -> dict:
+    from query_expansion import FINANCIAL_SYNONYMS
+
+    text_lower = chunk_text.lower()
+    metric_scores = {}
+    for group_name, keywords in FINANCIAL_SYNONYMS.items():
+        score = sum(1 for kw in keywords if kw.lower() in text_lower)
+        if score >= 2:
+            metric_scores[group_name] = score
+
+    sorted_metrics = sorted(metric_scores.items(), key=lambda x: -x[1])
+    enriched = dict(base_metadata)
+    if sorted_metrics:
+        enriched["metric"] = sorted_metrics[0][0]
+        enriched["metric_keywords"] = ",".join(FINANCIAL_SYNONYMS[sorted_metrics[0][0]])
+        enriched["metric_confidence"] = sorted_metrics[0][1]
+    else:
+        enriched["metric"] = "general"
+        enriched["metric_keywords"] = ""
+        enriched["metric_confidence"] = 0
+
+    return enriched

@@ -12,6 +12,7 @@ from ingest import (
     get_mda_for_filing,
 )
 from chunking import chunk_document
+from post_process import tag_chunk
 from retrieval import get_client, get_collection, add_chunks
 from config import config
 
@@ -42,6 +43,18 @@ def build_index() -> None:
                 )
                 chunks = chunk_document(mda_text, chunk_size=500, chunk_overlap=50)
 
+                enriched_metadatas = []
+                for i, chunk in enumerate(chunks):
+                    base = {
+                        "ticker": ticker,
+                        "accession_number": accession,
+                        "form": form,
+                        "filing_date": filing_date,
+                        "chunk_index": i,
+                    }
+                    enriched = tag_chunk(chunk, base)
+                    enriched_metadatas.append(enriched)
+
                 add_chunks(
                     collection,
                     chunks=chunks,
@@ -49,6 +62,7 @@ def build_index() -> None:
                     accession_number=accession,
                     form=form,
                     filing_date=filing_date,
+                    metadatas=enriched_metadatas,
                 )
 
                 logger.info("  OK %s %s - %s chunks", form, filing_date, len(chunks))
