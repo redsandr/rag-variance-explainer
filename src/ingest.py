@@ -31,6 +31,8 @@ TICKERS = {
     "CMG": "Chipotle Mexican Grill",
     "DRI": "Darden Restaurants",
     "CBRL": "Cracker Barrel",
+    "WMT": "Walmart",
+    "TGT": "Target",
 }
 
 CANDIDATE_TAGS = [
