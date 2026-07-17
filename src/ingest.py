@@ -106,16 +106,25 @@ def _convert_tables_to_text(soup: BeautifulSoup) -> None:
             table.replace_with(new_div)
 
 
+def _parse_item_num(item_text: str) -> float:
+    m = re.match(r"^[ \t]*Item\s+(\d+)[A-Z]?\.", item_text, re.IGNORECASE)
+    return float(m.group(1)) if m else 0
+
+
 def extract_mda_section(html: str) -> str:
     soup = BeautifulSoup(html, "html.parser")
     _convert_tables_to_text(soup)
     text = soup.get_text(separator="\n")
 
     start_match = _find_mda_start(text)
+    mda_item_num = _parse_item_num(text[start_match.start():])
 
-    end_pattern = re.compile(r"^[ \t]*Item\s+\d+[A]?\.", re.IGNORECASE | re.MULTILINE)
-    end_match = end_pattern.search(text, pos=start_match.end())
-    end_pos = end_match.start() if end_match else len(text)
+    end_pattern = re.compile(r"^[ \t]*Item\s+\d+[A-Z]?\.", re.IGNORECASE | re.MULTILINE)
+    end_pos = len(text)
+    for m in end_pattern.finditer(text, pos=start_match.end()):
+        if _parse_item_num(m.group()) >= mda_item_num:
+            end_pos = m.start()
+            break
 
     def _clean_text(text: str) -> str:
         text = text.replace("\u200b", "")
