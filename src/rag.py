@@ -5,10 +5,15 @@ a grounded answer via the swappable LLMClient.
 
 from collections.abc import Callable
 
+import logging
+
 from config import config
 from llm import LLMClient
+from post_process import verify_answer
 from prompts import SYSTEM_PROMPT_RAG
 from retrieval import get_client, get_collection, query_multi
+
+logger = logging.getLogger(__name__)
 
 
 def build_context(results: list[dict]) -> str:
@@ -70,6 +75,14 @@ def answer_question(
     answer = llm.generate(prompt, system=SYSTEM_PROMPT_RAG, max_tokens=config.llm_max_tokens, temperature=config.llm_temperature)
     if on_progress:
         on_progress("done", "Done!")
+
+    issues = verify_answer(answer, results)
+    if issues["has_issues"]:
+        logger.warning("[NumberVerifier] %d issue(s) detected in answer", len(issues["issues"]))
+        warning_text = "\n\n\u26a0\ufe0f **Number Verification Note:** The following numbers in the answer may not match the source documents:"
+        for issue in issues["issues"]:
+            warning_text += f"\n- '{issue['value']}' — {issue.get('context', '')}"
+        answer += warning_text
 
     return {
         "question": question,
