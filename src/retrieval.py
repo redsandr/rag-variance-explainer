@@ -46,27 +46,31 @@ def add_chunks(
     accession_number: str,
     form: str,
     filing_date: str,
+    metadatas: list[dict] | None = None,
 ) -> None:
     """
     Embed and store a list of chunks from one filing, with metadata
     that lets us trace each chunk back to its source filing later
     (needed for citing "why did X happen" answers back to a real 10-Q/10-K).
+
+    If metadatas is provided, use it directly instead of building default.
     """
     if not chunks:
         return
 
     embeddings = embed_documents(chunks)
     ids = [f"{ticker}_{accession_number}_{i}" for i in range(len(chunks))]
-    metadatas = [
-        {
-            "ticker": ticker,
-            "accession_number": accession_number,
-            "form": form,
-            "filing_date": filing_date,
-            "chunk_index": i,
-        }
-        for i in range(len(chunks))
-    ]
+    if metadatas is None:
+        metadatas = [
+            {
+                "ticker": ticker,
+                "accession_number": accession_number,
+                "form": form,
+                "filing_date": filing_date,
+                "chunk_index": i,
+            }
+            for i in range(len(chunks))
+        ]
 
     collection.upsert(
         ids=ids,
@@ -212,6 +216,8 @@ def query_multi(
     else:
         candidates = dense
 
+    candidates = _filter_by_metric(candidates, query_text)
+
     if config.cross_encoder_enabled:
         return rerank(query_text, candidates, top_k=top_k)
 
@@ -223,6 +229,31 @@ def query_multi(
     candidates.sort(key=lambda x: x["_sort_score"], reverse=True)
 
     return candidates[:top_k]
+
+
+def _filter_by_metric(chunks: list[dict], query: str) -> list[dict]:
+    from post_process import _METRIC_TRIGGERS
+
+    query_metric_hints = []
+    for trigger in _METRIC_TRIGGERS:
+        if trigger.lower() in query.lower():
+            query_metric_hints.append(trigger)
+
+    if not query_metric_hints:
+        return chunks
+
+    filtered = []
+    for chunk in chunks:
+        chunk_metric = chunk.get("metadata", {}).get("metric", "")
+        if not chunk_metric or chunk_metric == "general":
+            filtered.append(chunk)
+            continue
+        for hint in query_metric_hints:
+            if hint.lower() in chunk_metric.lower():
+                filtered.append(chunk)
+                break
+
+    return filtered if filtered else chunks
 
 
 def _forward_looking_penalty(chunk_text: str) -> float:
