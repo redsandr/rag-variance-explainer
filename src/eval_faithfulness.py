@@ -52,6 +52,40 @@ def _strip_json_trailing(text: str) -> str:
     return "\n".join(result)
 
 
+def _try_parse_one(obj_str: str) -> dict | None:
+    for _ in range(3):
+        try:
+            return json.loads(obj_str)
+        except json.JSONDecodeError:
+            last_brace = obj_str.rfind("}")
+            penultimate_brace = obj_str.rfind("}", 0, last_brace) if last_brace > 0 else -1
+            if penultimate_brace != -1:
+                obj_str = obj_str[:penultimate_brace + 1]
+                continue
+            break
+    return None
+
+
+def _merge_judge_results(objects: list[dict]) -> dict:
+    claims = []
+    faithful = partial = unfaithful = 0
+    for obj in objects:
+        claims.extend(obj.get("claims", []))
+        faithful += obj.get("faithful_count", 0)
+        partial += obj.get("partial_count", 0)
+        unfaithful += obj.get("unfaithful_count", 0)
+    total = faithful + partial + unfaithful
+    score = faithful / total if total > 0 else 0.0
+    return {
+        "claims": claims,
+        "faithful_count": faithful,
+        "partial_count": partial,
+        "unfaithful_count": unfaithful,
+        "total_claims": total,
+        "faithfulness_score": round(score, 4),
+    }
+
+
 def parse_judge_response(response: str) -> dict | None:
     cleaned = response.strip()
     cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
@@ -59,16 +93,36 @@ def parse_judge_response(response: str) -> dict | None:
     cleaned = _strip_json_trailing(cleaned)
     if cleaned.endswith("},"):
         cleaned = cleaned[:-1]
-    for _ in range(3):
-        try:
-            return json.loads(cleaned)
-        except json.JSONDecodeError:
-            last_brace = cleaned.rfind("}")
-            penultimate_brace = cleaned.rfind("}", 0, last_brace) if last_brace > 0 else -1
-            if penultimate_brace != -1:
-                cleaned = cleaned[:penultimate_brace + 1]
-                continue
+    # Try direct parse first
+    parsed = _try_parse_one(cleaned)
+    if parsed is not None:
+        return parsed
+    # Handle multiple concatenated JSON objects (one per fiscal period)
+    import re as _re
+    objects = []
+    idx = 0
+    while idx < len(cleaned):
+        brace_start = cleaned.find("{", idx)
+        if brace_start == -1:
             break
+        depth = 0
+        for end_idx in range(brace_start, len(cleaned)):
+            ch = cleaned[end_idx]
+            if ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+                if depth == 0:
+                    candidate = cleaned[brace_start:end_idx + 1]
+                    obj = _try_parse_one(candidate)
+                    if obj is not None:
+                        objects.append(obj)
+                    idx = end_idx + 1
+                    break
+        else:
+            break
+    if objects:
+        return _merge_judge_results(objects)
     return None
 
 

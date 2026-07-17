@@ -45,7 +45,7 @@ Examples:
   Source: "Labor costs decreased 0.2%."
   → {"claim": "Labor costs decreased 0.2% due to wage inflation.", "verdict": "PARTIALLY FAITHFUL"}
 
-Return ONLY valid JSON — no comments, no explanations, no text outside the JSON object.
+Return EXACTLY ONE JSON object — combine ALL claims into a single "claims" array. Do NOT return separate JSON objects for different periods.
 {"claims": [{"claim": "...", "verdict": "FAITHFUL|PARTIALLY FAITHFUL|UNFAITHFUL"}], "faithful_count": N, "partial_count": N, "unfaithful_count": N, "total_claims": N}"""
 
 JUDGE_SYSTEM_PROMPT_MEDIUM = """You are a strict but fair faithfulness evaluator for financial RAG systems.
