@@ -216,7 +216,7 @@ def query_multi(
     else:
         candidates = dense
 
-    candidates = _filter_by_metric(candidates, query_text)
+    _add_metric_boost(candidates, query_text)
 
     if config.cross_encoder_enabled:
         return rerank(query_text, candidates, top_k=top_k)
@@ -224,14 +224,20 @@ def query_multi(
     for c in candidates:
         base = c.get("hybrid_score", c.get("relevance", 0))
         boost = c.get("keyword_boost", 0) * config.keyword_boost_weight if config.keyword_boost_enabled else 0
+        metric_boost = c.get("metric_boost", 0)
         penalty = c.get("forward_looking_penalty", 0) if config.forward_looking_penalty_enabled else 0
-        c["_sort_score"] = base + boost + penalty
+        c["_sort_score"] = base + boost + metric_boost + penalty
     candidates.sort(key=lambda x: x["_sort_score"], reverse=True)
 
     return candidates[:top_k]
 
 
-def _filter_by_metric(chunks: list[dict], query: str) -> list[dict]:
+METRIC_BOOST_CONFIG = {
+    "match_weight": 0.2,
+}
+
+
+def _add_metric_boost(chunks: list[dict], query: str) -> None:
     from post_process import _METRIC_TRIGGERS
 
     query_metric_hints = []
@@ -240,20 +246,18 @@ def _filter_by_metric(chunks: list[dict], query: str) -> list[dict]:
             query_metric_hints.append(trigger)
 
     if not query_metric_hints:
-        return chunks
+        return
 
-    filtered = []
     for chunk in chunks:
         chunk_metric = chunk.get("metadata", {}).get("metric", "")
         if not chunk_metric or chunk_metric == "general":
-            filtered.append(chunk)
+            chunk["metric_boost"] = 0.0
             continue
-        for hint in query_metric_hints:
-            if hint.lower() in chunk_metric.lower():
-                filtered.append(chunk)
-                break
-
-    return filtered if filtered else chunks
+        matched = any(
+            hint.lower() in chunk_metric.lower()
+            for hint in query_metric_hints
+        )
+        chunk["metric_boost"] = METRIC_BOOST_CONFIG["match_weight"] if matched else 0.0
 
 
 def _forward_looking_penalty(chunk_text: str) -> float:
