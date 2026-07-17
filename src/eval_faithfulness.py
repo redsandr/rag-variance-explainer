@@ -55,7 +55,7 @@ def _strip_json_trailing(text: str) -> str:
 def _try_parse_one(obj_str: str) -> dict | None:
     for _ in range(3):
         try:
-            return json.loads(obj_str)
+            return json.loads(obj_str, strict=False)
         except json.JSONDecodeError:
             last_brace = obj_str.rfind("}")
             penultimate_brace = obj_str.rfind("}", 0, last_brace) if last_brace > 0 else -1
