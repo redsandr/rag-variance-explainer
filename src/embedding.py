@@ -12,7 +12,7 @@ _model = None  # lazy-loaded singleton — avoid reloading the model on every ca
 def _get_model() -> SentenceTransformer:
     global _model
     if _model is None:
-        _model = SentenceTransformer(_MODEL_NAME, trust_remote_code=True)
+        _model = SentenceTransformer(_MODEL_NAME, trust_remote_code=True, device="cpu")
     return _model
 
 

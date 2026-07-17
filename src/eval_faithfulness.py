@@ -28,10 +28,35 @@ EVAL_FILE = Path(__file__).parent.parent / "data" / "eval_questions.json"
 RESULT_FILE = Path(__file__).parent.parent / "data" / "faithfulness_results.json"
 
 
+def _strip_json_trailing(text: str) -> str:
+    """Remove trailing comments (//) and parenthetical explanations after JSON values."""
+    lines = text.split("\n")
+    result = []
+    for line in lines:
+        stripped = line.strip()
+        in_string = False
+        for i, ch in enumerate(stripped):
+            if ch == '"' and (i == 0 or stripped[i-1] != '\\'):
+                in_string = not in_string
+            if not in_string:
+                if stripped[i:i+2] == "//":
+                    result.append(stripped[:i].rstrip())
+                    break
+                if ch == '"' and i > 0 and stripped[i-1] not in ('\\', ':'):
+                    rest = stripped[i+1:]
+                    if rest.startswith(")") or rest.startswith(" ("):
+                        result.append(stripped[:i+1])
+                        break
+        else:
+            result.append(line)
+    return "\n".join(result)
+
+
 def parse_judge_response(response: str) -> dict | None:
     cleaned = response.strip()
     cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
     cleaned = re.sub(r"\s*```$", "", cleaned)
+    cleaned = _strip_json_trailing(cleaned)
     if cleaned.endswith("},"):
         cleaned = cleaned[:-1]
     for _ in range(3):
