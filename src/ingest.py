@@ -123,6 +123,10 @@ def extract_mda_section(html: str) -> str:
     end_pos = len(text)
     for m in end_pattern.finditer(text, pos=start_match.end()):
         if _parse_item_num(m.group()) >= mda_item_num:
+            # Skip matches inside quotes (e.g. "see Item 5." references within narrative)
+            preceding = text[max(0, m.start()-30):m.start()].strip()
+            if preceding and preceding[-1] in ('"', '\u201c', '\u201d', '\u201e', '\u201f'):
+                continue
             end_pos = m.start()
             break
 
