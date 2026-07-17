@@ -105,3 +105,53 @@ def verify_answer(answer: str, sources: Sequence[dict | str]) -> dict:
         "issues": issues,
         "has_issues": len(issues) > 0,
     }
+
+
+class MetricVerifier:
+    def __init__(self, synonym_groups: dict[str, list[str]] = None):
+        from query_expansion import FINANCIAL_SYNONYMS
+        self.synonym_groups = synonym_groups or FINANCIAL_SYNONYMS
+        self._term_to_group = {}
+        for group_name, terms in self.synonym_groups.items():
+            for term in terms:
+                self._term_to_group[term.lower()] = group_name
+
+    def extract_metrics(self, text: str) -> list[str]:
+        found = []
+        for trigger in _METRIC_TRIGGERS:
+            if trigger.lower() in text.lower():
+                found.append(trigger)
+        return found
+
+    def resolve_group(self, metric_name: str) -> str | None:
+        return self._term_to_group.get(metric_name.lower())
+
+    def verify(self, answer: str, source_chunks: list[dict]) -> list[dict]:
+        answer_metrics = self.extract_metrics(answer)
+        source_metrics = set()
+        for chunk in source_chunks:
+            source_metrics.update(self.extract_metrics(chunk.get("text", "")))
+
+        answer_groups = set()
+        for m in answer_metrics:
+            g = self.resolve_group(m)
+            if g:
+                answer_groups.add(g)
+
+        source_groups = set()
+        for m in source_metrics:
+            g = self.resolve_group(m)
+            if g:
+                source_groups.add(g)
+
+        mismatches = []
+        for m in answer_metrics:
+            g = self.resolve_group(m)
+            if g and g not in source_groups:
+                mismatches.append({
+                    "metric": m,
+                    "group": g,
+                    "source_metrics": list(source_metrics),
+                })
+
+        return mismatches

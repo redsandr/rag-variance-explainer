@@ -9,7 +9,7 @@ import logging
 
 from config import config
 from llm import LLMClient
-from post_process import verify_answer
+from post_process import MetricVerifier, verify_answer
 from prompts import SYSTEM_PROMPT_RAG
 from retrieval import get_client, get_collection, query_multi
 
@@ -82,6 +82,15 @@ def answer_question(
         warning_text = "\n\n\u26a0\ufe0f **Number Verification Note:** The following numbers in the answer may not match the source documents:"
         for issue in issues["issues"]:
             warning_text += f"\n- '{issue['value']}' — {issue.get('context', '')}"
+        answer += warning_text
+
+    verifier = MetricVerifier()
+    metric_issues = verifier.verify(answer, results)
+    if metric_issues:
+        logger.warning("[MetricVerifier] %d metric mismatch(es) detected", len(metric_issues))
+        warning_text = "\n\n\u26a0\ufe0f **Metric Verification Note:** The following metric names in the answer may not match the source documents:"
+        for mi in metric_issues:
+            warning_text += f"\n- '{mi['metric']}' (group: {mi['group']})"
         answer += warning_text
 
     return {
