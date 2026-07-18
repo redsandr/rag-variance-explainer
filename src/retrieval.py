@@ -15,7 +15,7 @@ import chromadb
 from config import config
 from cross_encoder import rerank
 from embedding import embed_documents, embed_query
-from hybrid_search import build_bm25, bm25_scores, rrf_merge
+from hybrid_search import bm25_scores, build_bm25, rrf_merge
 from query_expansion import expand_query
 
 _COLLECTION_NAME = "mda_filings"
@@ -108,6 +108,7 @@ def query(
         results["documents"][0],
         results["metadatas"][0],
         results["distances"][0],
+        strict=True,
     ):
         relevance = 1 - distance
         if relevance >= min_relevance:
@@ -150,6 +151,7 @@ def _retrieve_dense(
         results["documents"][0],
         results["metadatas"][0],
         results["distances"][0],
+        strict=True,
     ):
         relevance = 1 - distance
         if relevance >= min_relevance:
@@ -175,7 +177,7 @@ def _retrieve_bm25(
     all_texts = all_docs["documents"]
     bm25 = build_bm25(all_texts)
     bm25_raw = bm25_scores(bm25, lookup, all_texts)
-    paired = sorted(zip(bm25_raw, all_texts, all_docs["metadatas"]), key=lambda x: -x[0])
+    paired = sorted(zip(bm25_raw, all_texts, all_docs["metadatas"], strict=True), key=lambda x: -x[0])
     candidates = []
     for score, text, meta in paired:
         candidates.append({"text": text, "metadata": meta, "relevance": score})

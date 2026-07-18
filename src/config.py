@@ -3,7 +3,12 @@ from dataclasses import dataclass, field
 
 from dotenv import load_dotenv
 
-load_dotenv()
+
+def init_config(env_file: str | None = None) -> None:
+    load_dotenv(env_file)
+
+
+init_config()
 
 
 @dataclass

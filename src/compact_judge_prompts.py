@@ -94,13 +94,13 @@ def main():
     logger.info("Grand total (with system): %s chars (~%s tokens)", total, total // 4)
 
     # Determine how many fit per batch for Claude free (~4000 tokens ≈ 16000 chars)
-    BUDGET_CHARS = 35000  # ~8700 tokens per batch (Claude free: ~10-15K limit)
+    budget_chars = 35000  # ~8700 tokens per batch (Claude free: ~10-15K limit)
     batches = []
     current_batch = []
     current_size = sys_size
 
     for o in outputs:
-        if current_size + o["size"] > BUDGET_CHARS and current_batch:
+        if current_size + o["size"] > budget_chars and current_batch:
             batches.append(current_batch)
             current_batch = []
             current_size = sys_size
@@ -120,7 +120,7 @@ def main():
             f.write("\n\n")
             f.write("=" * 60 + "\n")
             f.write(f"BATCH {i} of {len(batches)} — {len(batch)} questions\n")
-            f.write(f"Paste each question one at a time as a follow-up message.\n")
+            f.write("Paste each question one at a time as a follow-up message.\n")
             f.write("=" * 60 + "\n\n")
             for o in batch:
                 f.write("-" * 40 + "\n")

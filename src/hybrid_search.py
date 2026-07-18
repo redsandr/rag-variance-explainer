@@ -39,7 +39,6 @@ def bm25_scores(bm25: BM25Okapi | TfidfVectorizer, query: str, corpus: list[str]
     if HAS_BM25_LIB:
         return bm25.get_scores(tokens)
     from sklearn.metrics.pairwise import cosine_similarity
-    import numpy as np
     qv = bm25.transform([query])
     dv = bm25.transform(corpus)
     return cosine_similarity(qv, dv)[0].tolist()

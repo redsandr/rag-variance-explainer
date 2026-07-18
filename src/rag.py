@@ -3,9 +3,8 @@ End-to-end RAG pipeline: retrieve relevant MD&A chunks, then generate
 a grounded answer via the swappable LLMClient.
 """
 
-from collections.abc import Callable
-
 import logging
+from collections.abc import Callable
 
 from config import config
 from llm import LLMClient

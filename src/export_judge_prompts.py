@@ -16,8 +16,8 @@ import sys
 from pathlib import Path
 
 from llm import LLMClient
-from rag import answer_question
 from prompts import JUDGE_SYSTEM_PROMPT_MEDIUM, build_judge_prompt_compact
+from rag import answer_question
 
 logger = logging.getLogger(__name__)
 
@@ -141,7 +141,6 @@ def main():
         logger.error("  2. Use --from-cache to re-export from cached eval results")
         sys.exit(1)
     outputs = []
-    TOT_SYSTEM_PROMPT = "You are an AI assistant that helps export RAG evaluation data. Respond with 'OK' when you receive data."
 
     for item in eval_set:
         qid = item["id"]

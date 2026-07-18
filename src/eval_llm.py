@@ -10,7 +10,7 @@ import time
 from pathlib import Path
 
 from llm import LLMClient
-from rag import answer_question, build_context
+from rag import answer_question
 from retrieval import get_client, get_collection, query
 
 logger = logging.getLogger(__name__)
@@ -59,7 +59,6 @@ def main() -> None:
             client = get_client()
             collection = get_collection(client)
             results = query(collection, question, top_k=5, ticker_filter=ticker)
-            context = build_context(results)
             output = {
                 "question": question,
                 "ticker": ticker,

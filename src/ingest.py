@@ -6,10 +6,11 @@ requests without one get rejected). Replace the placeholder below with
 your actual name/email before running anything.
 """
 
-import requests
-import time
-from bs4 import BeautifulSoup
 import re
+import time
+
+import requests
+from bs4 import BeautifulSoup
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 

@@ -18,11 +18,11 @@ import sys
 import time
 from pathlib import Path
 
-logger = logging.getLogger(__name__)
-
 from llm import LLMClient
 from prompts import JUDGE_SYSTEM_PROMPT_FULL, build_judge_prompt
 from rag import answer_question
+
+logger = logging.getLogger(__name__)
 
 EVAL_FILE = Path(__file__).parent.parent / "data" / "eval_questions.json"
 RESULT_FILE = Path(__file__).parent.parent / "data" / "faithfulness_results.json"
@@ -98,7 +98,6 @@ def parse_judge_response(response: str) -> dict | None:
     if parsed is not None:
         return parsed
     # Handle multiple concatenated JSON objects (one per fiscal period)
-    import re as _re
     objects = []
     idx = 0
     while idx < len(cleaned):
@@ -308,9 +307,10 @@ def main() -> None:
     results = []
     times = []
 
+    LLMClient.reset()
+    llm = LLMClient()
+
     for i, item in enumerate(eval_set, 1):
-        LLMClient.reset()
-        llm = LLMClient()
         result = _process_question(item, llm, times, i, len(eval_set))
         results.append(result)
         _save_checkpoint(results)

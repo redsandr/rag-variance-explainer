@@ -10,15 +10,15 @@ Swapping backend never touches the RAG pipeline code (retrieval.py,
 build_index.py) — only this file and the .env config change.
 """
 
-import logging
 import os
 import threading
-
 
 
 class LLMClient:
     _instance = None
     _lock = threading.Lock()
+
+    _initialized: bool
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -89,10 +89,11 @@ class LLMClient:
     def generate(self, prompt: str, system: str = None, max_tokens: int = 500, temperature: float | None = None) -> str:
         if self.backend == "llama_cpp":
             return self._generate_llama_cpp(prompt, system, max_tokens, temperature)
-        elif self.backend == "anthropic":
+        if self.backend == "anthropic":
             return self._generate_anthropic(prompt, system, max_tokens)
-        elif self.backend == "openai":
+        if self.backend == "openai":
             return self._generate_openai(prompt, system, max_tokens, temperature)
+        raise ValueError(f"Unknown backend: {self.backend}")
 
     def _generate_llama_cpp(self, prompt: str, system: str, max_tokens: int, temperature: float | None = None) -> str:
         messages = []

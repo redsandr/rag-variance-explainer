@@ -4,17 +4,17 @@ End-to-end pipeline: fetch filings -> extract MD&A -> chunk -> embed & store.
 
 import logging
 
+from chunking import chunk_document
+from config import config
 from ingest import (
     TICKERS,
-    get_cik,
     fetch_submissions,
-    list_10k_10q_filings,
+    get_cik,
     get_mda_for_filing,
+    list_10k_10q_filings,
 )
-from chunking import chunk_document
 from post_process import tag_chunk
-from retrieval import get_client, get_collection, add_chunks
-from config import config
+from retrieval import add_chunks, get_client, get_collection
 
 logger = logging.getLogger(__name__)
 
