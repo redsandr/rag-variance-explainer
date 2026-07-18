@@ -1,38 +1,22 @@
 # RAG Variance Explainer
 
-[![Python 3.11](https://img.shields.io/badge/python-3.11-blue?logo=python)](https://python.org)
-[![Streamlit](https://img.shields.io/badge/streamlit-1.43-FF4B4B?logo=streamlit)](https://streamlit.io)
-[![ChromaDB](https://img.shields.io/badge/chromadb-0.6-FC6D26?logo=chroma)](https://www.trychroma.com)
-[![llama.cpp](https://img.shields.io/badge/llama.cpp-GGUF-1E88E5)](https://github.com/ggerganov/llama.cpp)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![CI](https://github.com/redsandr/rag-variance-explainer/actions/workflows/test.yml/badge.svg)](https://github.com/redsandr/rag-variance-explainer/actions)
+<p align="center">
+  <a href="https://python.org"><img src="https://img.shields.io/badge/python-3.11-blue?logo=python" alt="Python 3.11"></a>
+  <a href="https://streamlit.io"><img src="https://img.shields.io/badge/streamlit-1.43-FF4B4B?logo=streamlit" alt="Streamlit"></a>
+  <a href="https://www.trychroma.com"><img src="https://img.shields.io/badge/chromadb-0.6-FC6D26?logo=chroma" alt="ChromaDB"></a>
+  <a href="https://github.com/ggerganov/llama.cpp"><img src="https://img.shields.io/badge/llama.cpp-GGUF-1E88E5" alt="llama.cpp"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT"></a>
+  <a href="https://github.com/redsandr/rag-variance-explainer/actions"><img src="https://github.com/redsandr/rag-variance-explainer/actions/workflows/test.yml/badge.svg" alt="CI"></a>
+</p>
 
-**Retrieval-Augmented Generation pipeline** — ask *"why did this financial metric change?"* in plain language and get a sourced, citation-backed answer from real SEC filings. Covers **7 companies across 4 sectors**, runs locally, costs nothing per query.
+> **Turn a 4-hour manual variance review into a 3-minute query.** Ask *"why did this financial metric change?"* in plain language and get a sourced, citation-backed answer from real SEC filings — across **7 companies, 4 sectors**, locally, at zero cost per query.
 
-> **Target:** Turn a 4-hour manual variance review into a 3-minute query.
+Financial analysts read MD&A sections for hours every quarter. Most RAG demos work on one dataset in one domain — **generalization is the hard part.** This project proves a financial RAG pipeline can generalize across sectors without degrading retrieval quality.
 
----
-
-## The Problem
-
-Financial analysts spend hours reading MD&A sections every quarter — scanning tables, cross-referencing periods, searching for variance drivers. It's manual, inconsistent, and doesn't scale.
-
-Most RAG demos work on one dataset in one domain. **Generalization is the hard part.** This project proves a financial RAG pipeline can generalize across sectors without degrading retrieval quality.
-
----
-
-## Demo
-
-```bash
-streamlit run app.py
-```
-
-<!-- TODO: Add dashboard screenshot -->
+<!-- TODO: add dashboard screenshot or hero image -->
 <!-- ![Dashboard screenshot](docs/screenshots/dashboard.png) -->
 
-Dark-themed fintech dashboard with interactive question input, AI-sourced answers, color-coded source cards, and side-by-side cross-encoder comparison mode.
-
-> **📖 Full documentation:** [docs/](docs/) — problem validation, architecture decisions, evaluation iterations, technical notes, and roadmap.
+> **📖 Full documentation:** [docs/](docs/) — architecture decisions, evaluation iterations, technical notes, roadmap.
 
 ---
 
@@ -50,19 +34,26 @@ Dark-themed fintech dashboard with interactive question input, AI-sourced answer
 
 ## Features
 
-- **RAG pipeline** — query expansion (35 synonym groups) → ChromaDB retrieval → cross-encoder re-ranking → grounded LLM generation
-- **Multi-backend LLM** — llama.cpp (local GPU, 7B), Anthropic, or OpenAI — swappable via `.env`
-- **SEC EDGAR ingestion** — auto-fetches MD&A from 10-K/10-Q for Chipotle, Darden, Cracker Barrel, **Walmart, Target, Johnson & Johnson, Exxon Mobil**
-- **Cross-sector generalization** — recall@10 = **1.00** on retail; pipeline is domain-agnostic, not overfit to restaurant data
-- **Faithfulness evaluation** — strict **74.24%**, weighted **75.32%** — LLM-as-judge + human calibration
-- **Cross-encoder re-ranking** — `MiniLM-L-6` with hybrid scoring, configurable weight blend
-- **Financial glossary** — 35 synonym groups across restaurant, retail, healthcare, energy
-- **Multi-sector architecture** — 4 sectors (restaurant, retail, healthcare, energy) with sector-aware metadata tagging
-- **Prompt injection defense** — input sanitization, delimiters, rate limiting (1/10s), system-level instruction guard
-- **LLM resilience** — retry (3×, backoff), cross-encoder fallback, backend auto-fallback, GPU memory guard
-- **BM25 caching** — LRU cache per ticker, 30-50% query latency improvement
-- **Streamlit dashboard** — OLED dark mode, 2-view navigation (Q&A + System Analytics), glow interactions, WCAG-contrast colors
-- **32 pytest + ruff + mypy CI** — strict linting and type checking
+**Pipeline & Retrieval**
+- RAG pipeline: query expansion (35 synonym groups) → ChromaDB retrieval → cross-encoder re-ranking → grounded LLM generation
+- Cross-encoder re-ranking (`MiniLM-L-6-v2`) with hybrid scoring and configurable weight blend
+- BM25 LRU caching per ticker — 30-50% query latency improvement
+- Financial glossary: 35 synonym groups across restaurant, retail, healthcare, energy
+
+**LLM & Resilience**
+- Multi-backend: llama.cpp (local GPU, 7B), Anthropic, OpenAI — swappable via `.env`
+- Retry (3× exponential backoff), cross-encoder fallback, backend auto-fallback, GPU memory guard
+- Prompt injection defense: input sanitization, delimiters, rate limiting (1/10s), instruction guard
+
+**Data & Sectors**
+- SEC EDGAR ingestion: auto-fetches MD&A from 10-K/10-Q for 7 companies
+- Multi-sector: restaurant, retail, healthcare, energy — sector-aware metadata tagging
+- Cross-sector generalization: retail recall@10 = **1.00** — pipeline is domain-agnostic
+
+**Quality & UI**
+- Faithfulness evaluation: strict **74.24%**, weighted **75.32%** — LLM-as-judge + Claude cross-validation
+- 32 pytest + ruff + mypy CI — strict linting and type checking
+- Streamlit dashboard: OLED dark mode, 2 views (Q&A + System Analytics), WCAG contrast
 
 ---
 
@@ -259,6 +250,28 @@ Key prompt engineering wins:
 - **Evaluation** — 74.24% strict / 75.32% weighted faithfulness, retail recall@10 = 1.00
 
 > Full change history in [docs/](docs/).
+
+---
+
+## Roadmap
+
+- [ ] International filings (IFRS-based financials)
+- [ ] Multi-turn conversational memory
+- [ ] Docker deployment (single-command setup)
+- [ ] Fine-tuned embedding model on financial corpus
+- [ ] Public hosted demo
+
+---
+
+## Known Limitations
+
+- **Faithfulness ~74% strict** — occasional hallucination on ambiguous multi-period comparisons; cross-validation with Claude shows systematic overestimation addressed in v2
+- **Cross-encoder re-ranking** adds ~200ms latency per query
+- **SEC EDGAR ingestion** limited to 10-K/10-Q (no 8-K event-driven filings)
+- **Single-user** — no session management or multi-tenant support
+- **English only** — financial documents and queries in English
+
+---
 
 ## CI
 
