@@ -62,7 +62,7 @@ def answer_question(
     context = build_context(results)
     prompt = (
         f"Context from SEC filings:\n{context}\n\n"
-        f"Question: {question}\n\n"
+        f"=== USER QUESTION ===\n{question}\n=== END ===\n\n"
         f"Answer (bullet points, cite each claim, chronological by period):"
     )
 

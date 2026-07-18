@@ -6,6 +6,8 @@ requests without one get rejected). Replace the placeholder below with
 your actual name/email before running anything.
 """
 
+import logging
+import os
 import re
 import time
 
@@ -16,17 +18,40 @@ from urllib3.util.retry import Retry
 
 from config import config
 
+logger = logging.getLogger(__name__)
+
 HEADERS = {"User-Agent": config.sec_user_agent}
 
 _SESSION = requests.Session()
 _SESSION.headers.update(HEADERS)
 retry_strategy = Retry(
-    total=3,
-    backoff_factor=0.5,
+    total=5,
+    backoff_factor=1.0,
     status_forcelist=[429, 500, 502, 503, 504],
     allowed_methods=["GET"],
+    raise_on_status=False,
 )
 _SESSION.mount("https://", HTTPAdapter(max_retries=retry_strategy))
+
+SEC_REQUEST_DELAY = float(os.getenv("SEC_REQUEST_DELAY", "0.2"))
+_LAST_REQUEST_TIME = 0.0
+
+
+def _rate_limited_get(url: str) -> requests.Response:
+    global _LAST_REQUEST_TIME
+    elapsed = time.time() - _LAST_REQUEST_TIME
+    if elapsed < SEC_REQUEST_DELAY:
+        time.sleep(SEC_REQUEST_DELAY - elapsed)
+    response = _SESSION.get(url)
+    _LAST_REQUEST_TIME = time.time()
+    if response.status_code == 429:
+        wait = int(response.headers.get("Retry-After", "10"))
+        logger.warning("SEC rate limited (429). Waiting %ds...", wait)
+        time.sleep(wait)
+        response = _SESSION.get(url)
+        _LAST_REQUEST_TIME = time.time()
+    response.raise_for_status()
+    return response
 
 TICKERS = {
     "CMG": "Chipotle Mexican Grill",
@@ -34,6 +59,8 @@ TICKERS = {
     "CBRL": "Cracker Barrel",
     "WMT": "Walmart",
     "TGT": "Target",
+    "JNJ": "Johnson & Johnson",
+    "XOM": "Exxon Mobil",
 }
 
 CANDIDATE_TAGS = [
@@ -53,10 +80,8 @@ CANDIDATE_TAGS = [
 ### FETCHING ###
 
 def fetch_filing_html(url: str) -> str:
-    """Fetch raw HTML of a filing document with retry on transient failures."""
-    response = _SESSION.get(url)
-    response.raise_for_status()
-    time.sleep(0.15)
+    """Fetch raw HTML of a filing document with rate limiting and retry."""
+    response = _rate_limited_get(url)
     return response.text
 
 
@@ -149,8 +174,7 @@ def get_mda_for_filing(cik: str, accession_number: str, primary_document: str) -
 
 
 def get_cik(ticker: str) -> str:
-    response = _SESSION.get("https://www.sec.gov/files/company_tickers.json")
-    response.raise_for_status()
+    response = _rate_limited_get("https://www.sec.gov/files/company_tickers.json")
     data = response.json()
 
     ticker_upper = ticker.upper()
@@ -163,18 +187,14 @@ def get_cik(ticker: str) -> str:
 def fetch_companyfacts(cik: str) -> dict:
     """Fetch all XBRL-tagged facts for a company."""
     url = f"https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json"
-    response = _SESSION.get(url)
-    response.raise_for_status()
-    time.sleep(0.15)
+    response = _rate_limited_get(url)
     return response.json()
 
 
 def fetch_submissions(cik: str) -> dict:
     """Fetch filing history/metadata (accession numbers, forms, dates)."""
     url = f"https://data.sec.gov/submissions/CIK{cik}.json"
-    response = _SESSION.get(url)
-    response.raise_for_status()
-    time.sleep(0.15)
+    response = _rate_limited_get(url)
     return response.json()
 
 

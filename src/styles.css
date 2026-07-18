@@ -56,7 +56,7 @@
         margin: 1px 0 0 0;
     }
     .top-header .brand-text .breadcrumb,
-    .top-header .brand-text .breadcrumb span { color: #6B7280; }
+    .top-header .brand-text .breadcrumb span { color: #9CA3AF; }
     .top-header .brand-text .breadcrumb .active { color: #9CA3AF; }
 
     .dashboard-grid {
@@ -81,7 +81,7 @@
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.06em;
-        color: #6B7280;
+        color: #9CA3AF;
         margin-bottom: 12px;
         display: flex;
         align-items: center;
@@ -95,7 +95,7 @@
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.06em;
-        color: #6B7280;
+        color: #9CA3AF;
         margin-bottom: 12px;
     }
     .kpi-stack { display: flex; flex-direction: column; gap: 10px; }
@@ -104,16 +104,17 @@
         border: 1px solid #2D2D2D;
         border-radius: 12px;
         padding: 14px 16px;
-        transition: border-color 0.2s ease;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
     }
     .kpi-stack-card:hover {
         border-color: #8B5CF6;
-        box-shadow: 0 0 24px rgba(139, 92, 246, 0.08);
+        box-shadow: 0 0 24px rgba(139, 92, 246, 0.12), 0 0 48px rgba(139, 92, 246, 0.06);
+        transform: translateY(-1px);
     }
     .kpi-stack-card .kpi-row-label {
         font-size: 0.7rem;
         font-weight: 500;
-        color: #6B7280;
+        color: #9CA3AF;
         text-transform: uppercase;
         letter-spacing: 0.04em;
         margin-bottom: 4px;
@@ -126,7 +127,7 @@
     }
     .kpi-stack-card .kpi-row-sub {
         font-size: 0.7rem;
-        color: #6B7280;
+        color: #9CA3AF;
         margin-top: 2px;
     }
     .kpi-stack-card .kpi-row-value .purple { color: #A78BFA; }
@@ -143,12 +144,12 @@
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.06em;
-        color: #6B7280;
+        color: #9CA3AF;
         margin-bottom: 8px;
     }
     .about-card .about-text {
         font-size: 0.78rem;
-        color: #6B7280;
+        color: #9CA3AF;
         line-height: 1.6;
     }
 
@@ -161,7 +162,7 @@
     }
     .example-row .hint {
         font-size: 0.75rem;
-        color: #6B7280;
+        color: #9CA3AF;
         font-weight: 500;
     }
 
@@ -226,7 +227,7 @@
     .sources-panel .sources-head .count-badge {
         font-size: 0.65rem;
         background: #242424;
-        color: #6B7280;
+        color: #9CA3AF;
         padding: 2px 10px;
         border-radius: 20px;
         border: 1px solid #2D2D2D;
@@ -261,6 +262,47 @@
         border-radius: 4px;
         border: 1px solid rgba(139, 92, 246, 0.15);
     }
+    .source-card .sector-tag {
+        font-size: 0.6rem;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 4px;
+        letter-spacing: 0.03em;
+    }
+    .source-card .sector-tag.restaurant {
+        background: rgba(245, 158, 11, 0.12);
+        color: #F59E0B;
+        border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+    .source-card .sector-tag.retail {
+        background: rgba(59, 130, 246, 0.12);
+        color: #60A5FA;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+    .source-card .sector-tag.healthcare {
+        background: rgba(239, 68, 68, 0.12);
+        color: #F87171;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+    .source-card .sector-tag.energy {
+        background: rgba(251, 191, 36, 0.12);
+        color: #FBBF24;
+        border: 1px solid rgba(251, 191, 36, 0.2);
+    }
+
+    .sector-badge {
+        display: inline-block;
+        font-size: 0.6rem;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 4px;
+        letter-spacing: 0.03em;
+        margin: 2px 2px;
+    }
+    .sector-badge.restaurant { background: rgba(245, 158, 11, 0.15); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.25); }
+    .sector-badge.retail { background: rgba(59, 130, 246, 0.15); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.25); }
+    .sector-badge.healthcare { background: rgba(239, 68, 68, 0.15); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.25); }
+    .sector-badge.energy { background: rgba(251, 191, 36, 0.15); color: #FBBF24; border: 1px solid rgba(251, 191, 36, 0.25); }
     .source-card .form-tag {
         font-size: 0.65rem;
         font-weight: 500;
@@ -269,7 +311,7 @@
         padding: 2px 8px;
         border-radius: 4px;
     }
-    .source-card .date-tag { font-size: 0.65rem; color: #6B7280; }
+    .source-card .date-tag { font-size: 0.65rem; color: #9CA3AF; }
     .source-card .score-tag {
         font-size: 0.65rem;
         font-weight: 600;
@@ -309,7 +351,7 @@
     }
     .empty-state .empty-desc {
         font-size: 0.82rem;
-        color: #6B7280;
+        color: #9CA3AF;
         max-width: 400px;
         margin: 0 auto;
         line-height: 1.6;
@@ -324,7 +366,7 @@
     .compare-vs .vs-badge {
         font-size: 0.65rem;
         font-weight: 700;
-        color: #6B7280;
+        color: #9CA3AF;
         background: #242424;
         padding: 4px 12px;
         border-radius: 20px;
@@ -339,7 +381,7 @@
     .compare-label {
         font-size: 0.75rem;
         font-weight: 500;
-        color: #6B7280;
+        color: #9CA3AF;
         margin-bottom: 6px;
     }
 
@@ -360,6 +402,12 @@
     .stButton button[kind="primary"]:focus-visible {
         outline: 2px solid #A78BFA;
         outline-offset: 2px;
+    }
+    .stButton button[kind="primary"]:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        box-shadow: none;
+        background: #4B5563;
     }
     .stButton button[kind="secondary"] {
         border: 1px solid #2D2D2D;
@@ -385,52 +433,30 @@
     div[data-testid="stSidebar"] {
         background: #0A0A0A !important;
         border-right: 1px solid #2D2D2D !important;
-        min-width: 64px !important;
-        width: 64px !important;
+        min-width: 220px !important;
+        padding: 16px 12px;
     }
-    div[data-testid="stSidebar"] .sidebar-content { display: none; }
-    div[data-testid="stSidebarCollapsedButton"] { display: none; }
-
-    .sidebar-nav {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding-top: 20px;
-        gap: 6px;
+    div[data-testid="stSidebar"] .stRadio div[role="radiogroup"] {
+        gap: 2px;
     }
-    .sidebar-nav .nav-item {
-        width: 44px;
-        height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 10px;
-        cursor: pointer;
+    div[data-testid="stSidebar"] .stRadio label {
+        color: #9CA3AF !important;
+        font-size: 0.85rem !important;
+        padding: 8px 12px;
+        border-radius: 8px;
         transition: background 0.15s ease, color 0.15s ease;
-        color: #4B5563;
-        position: relative;
-        border: none;
-        background: transparent;
-        padding: 0;
     }
-    .sidebar-nav .nav-item:hover {
-        background: rgba(139, 92, 246, 0.1);
-        color: #A78BFA;
+    div[data-testid="stSidebar"] .stRadio label:hover {
+        background: rgba(139, 92, 246, 0.08);
+        color: #D1D5DB !important;
     }
-    .sidebar-nav .nav-item:focus-visible {
-        outline: 2px solid #A78BFA;
-        outline-offset: 2px;
-    }
-    .sidebar-nav .nav-item.active {
+    div[data-testid="stSidebar"] .stRadio label[data-checked="true"] {
         background: rgba(139, 92, 246, 0.15);
-        color: #A78BFA;
+        color: #A78BFA !important;
+        font-weight: 600;
     }
-    .sidebar-nav .nav-item svg { display: block; }
-    .sidebar-nav .nav-divider {
-        width: 24px;
-        height: 1px;
-        background: #2D2D2D;
-        margin: 6px 0;
+    div[data-testid="stSidebar"] .stLinkButton button {
+        font-size: 0.8rem;
     }
 
     .stTextInput input {
@@ -448,7 +474,7 @@
         border-color: #8B5CF6 !important;
         box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15) !important;
     }
-    .stTextInput input::placeholder { color: #4B5563 !important; }
+    .stTextInput input::placeholder { color: #6B7280 !important; }
 
     .stSelectbox div[data-baseweb="select"] > div {
         background: #242424 !important;
@@ -460,6 +486,10 @@
     .stSelectbox div[data-baseweb="select"] > div:hover {
         border-color: #8B5CF6 !important;
     }
+    .stSelectbox div[data-baseweb="select"] > div:focus-within {
+        border-color: #8B5CF6 !important;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15) !important;
+    }
 
     div.stSlider [data-baseweb="slider"] div { background: #2D2D2D !important; }
     div.stSlider [data-baseweb="slider"] div[role="slider"] { background: #8B5CF6 !important; }
@@ -470,6 +500,11 @@
 
     .stCheckbox label { color: #9CA3AF !important; font-size: 0.82rem !important; }
     .stCheckbox label:hover { color: #D1D5DB !important; }
+    .stCheckbox label:focus-within {
+        outline: 2px solid #A78BFA;
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
 
     hr { border-color: #2D2D2D !important; margin: 12px 0 !important; }
 
@@ -511,5 +546,28 @@
     div.stExpander > details > summary:focus-visible {
         outline: 2px solid #A78BFA;
         outline-offset: 2px;
+    }
+
+    @keyframes shimmer {
+        0% { background-position: -400px 0; }
+        100% { background-position: 400px 0; }
+    }
+    .skeleton-block {
+        height: 16px;
+        border-radius: 6px;
+        background: linear-gradient(90deg, #1E1E1E 25%, #2A2A2A 50%, #1E1E1E 75%);
+        background-size: 800px 100%;
+        animation: shimmer 1.4s ease-in-out infinite;
+        margin-bottom: 10px;
+    }
+    .skeleton-block.wide { width: 80%; }
+    .skeleton-block.medium { width: 55%; }
+    .skeleton-block.narrow { width: 35%; }
+    .skeleton-card {
+        background: #141414;
+        border: 1px solid #2D2D2D;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
     }
 </style>

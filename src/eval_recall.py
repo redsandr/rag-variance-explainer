@@ -9,6 +9,7 @@ import json
 import logging
 from collections import defaultdict
 from pathlib import Path
+from typing import Any
 
 from retrieval import get_client, get_collection, query_multi
 
@@ -38,9 +39,9 @@ def evaluate() -> None:
     lines.append(_format_row(header_parts))
     lines.append("-" * 100)
 
-    all_recalls = {k: [] for k in K_VALUES}
-    reciprocal_ranks = []
-    by_ticker = defaultdict(lambda: {"recalls": {k: [] for k in K_VALUES}, "rrs": []})
+    all_recalls: dict[int, list[float]] = {k: [] for k in K_VALUES}
+    reciprocal_ranks: list[float] = []
+    by_ticker: dict[str, dict[str, Any]] = defaultdict(lambda: {"recalls": {k: [] for k in K_VALUES}, "rrs": []})
 
     for item in eval_set:
         qid = item["id"]

@@ -10,8 +10,34 @@ Swapping backend never touches the RAG pipeline code (retrieval.py,
 build_index.py) — only this file and the .env config change.
 """
 
+import logging
 import os
 import threading
+import time
+
+logger = logging.getLogger(__name__)
+
+
+def _retry(max_attempts: int = 3, base_delay: float = 2.0):
+    """Decorator: retry with exponential backoff on transient failure."""
+    def decorator(fn):
+        def wrapper(*args, **kwargs):
+            last_exc = None
+            for attempt in range(1, max_attempts + 1):
+                try:
+                    return fn(*args, **kwargs)
+                except Exception as e:
+                    last_exc = e
+                    if attempt < max_attempts:
+                        delay = base_delay * (2 ** (attempt - 1))
+                        logger.warning(
+                            "LLM call failed (attempt %d/%d): %s. Retrying in %.1fs...",
+                            attempt, max_attempts, e, delay,
+                        )
+                        time.sleep(delay)
+            raise last_exc
+        return wrapper
+    return decorator
 
 
 class LLMClient:
@@ -37,24 +63,41 @@ class LLMClient:
         if self._initialized:
             return
 
-        self.backend = backend or os.getenv("LLM_BACKEND", "llama_cpp")
+        preferred = backend or os.getenv("LLM_BACKEND", "llama_cpp")
+        backends = [preferred]
+        if preferred != "llama_cpp":
+            backends.append("llama_cpp")
 
-        try:
-            if self.backend == "llama_cpp":
-                self._init_llama_cpp()
-            elif self.backend == "anthropic":
-                self._init_anthropic()
-            elif self.backend == "openai":
-                self._init_openai()
-            else:
-                raise ValueError(f"Unknown backend: {self.backend}")
-        except Exception:
-            cls = type(self)
-            cls._instance = None
-            self._initialized = False
-            raise
+        last_error = None
+        for candidate in backends:
+            self.backend = candidate
+            try:
+                if candidate == "llama_cpp":
+                    self._init_llama_cpp()
+                elif candidate == "anthropic":
+                    self._init_anthropic()
+                elif candidate == "openai":
+                    self._init_openai()
+                else:
+                    raise ValueError(f"Unknown backend: {candidate}")
+                self._initialized = True
+                if candidate != preferred:
+                    logger.warning(
+                        "Preferred backend '%s' unavailable, fell back to '%s'.",
+                        preferred, candidate,
+                    )
+                return
+            except Exception as e:
+                last_error = e
+                logger.warning("Backend '%s' failed: %s", candidate, e)
+                continue
 
-        self._initialized = True
+        cls = type(self)
+        cls._instance = None
+        self._initialized = False
+        raise RuntimeError(
+            f"All LLM backends failed. Last error: {last_error}"
+        ) from last_error
 
     def _init_llama_cpp(self):
         from llama_cpp import Llama
@@ -66,7 +109,16 @@ class LLMClient:
                 "downloaded .gguf file, e.g. models/llama-3-8b-instruct.Q4_K_M.gguf"
             )
         model_path = os.path.expandvars(model_path)
-        self._llm = Llama(model_path=model_path, n_ctx=8192, n_gpu_layers=-1, seed=42, verbose=False)
+        n_gpu_layers = int(os.getenv("LLAMA_CPP_N_GPU_LAYERS", "-1"))
+        try:
+            self._llm = Llama(model_path=model_path, n_ctx=8192, n_gpu_layers=n_gpu_layers, seed=42, verbose=False)
+        except Exception as e:
+            if "CUDA" in str(e) or "cuda" in str(e) or "memory" in str(e).lower():
+                raise RuntimeError(
+                    f"GPU memory error loading model. Try setting LLAMA_CPP_N_GPU_LAYERS=0 in .env "
+                    f"to use CPU only, or reduce n_ctx. Original error: {e}"
+                ) from e
+            raise
 
     def _init_anthropic(self):
         import anthropic
@@ -86,6 +138,7 @@ class LLMClient:
         self._client = OpenAI(api_key=api_key)
         self._model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
+    @_retry(max_attempts=3, base_delay=2.0)
     def generate(self, prompt: str, system: str = None, max_tokens: int = 500, temperature: float | None = None) -> str:
         if self.backend == "llama_cpp":
             return self._generate_llama_cpp(prompt, system, max_tokens, temperature)
@@ -124,6 +177,3 @@ class LLMClient:
             kwargs["temperature"] = temperature
         response = self._client.chat.completions.create(**kwargs)
         return response.choices[0].message.content.strip()
-
-
-

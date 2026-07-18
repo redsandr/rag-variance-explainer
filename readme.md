@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![CI](https://github.com/redsandr/rag-variance-explainer/actions/workflows/test.yml/badge.svg)](https://github.com/redsandr/rag-variance-explainer/actions)
 
-**Retrieval-Augmented Generation pipeline** — ask *"why did this financial metric change?"* in plain language and get a sourced, citation-backed answer from real SEC filings. Covers **5 companies across 2 sectors**, runs locally, costs nothing per query.
+**Retrieval-Augmented Generation pipeline** — ask *"why did this financial metric change?"* in plain language and get a sourced, citation-backed answer from real SEC filings. Covers **7 companies across 4 sectors**, runs locally, costs nothing per query.
 
 > **Target:** Turn a 4-hour manual variance review into a 3-minute query.
 
@@ -52,13 +52,17 @@ Dark-themed fintech dashboard with interactive question input, AI-sourced answer
 
 - **RAG pipeline** — query expansion (35 synonym groups) → ChromaDB retrieval → cross-encoder re-ranking → grounded LLM generation
 - **Multi-backend LLM** — llama.cpp (local GPU, 7B), Anthropic, or OpenAI — swappable via `.env`
-- **SEC EDGAR ingestion** — auto-fetches MD&A from 10-K/10-Q for Chipotle, Darden, Cracker Barrel, **Walmart, Target**
-- **Cross-sector generalization** — recall@10 = **1.00** on retail; pipeline is domain-agnostic, not overfit
-- **Faithfulness evaluation** — strict **74.24%** (+8.44pp), weighted **75.32%** — LLM-as-judge + human calibration
-- **Cross-encoder re-ranking** — `MiniLM-L-6` with hybrid scoring (CE 0.9 + BI 0.1 + forward-looking penalty)
-- **Financial glossary** — 35 synonym groups (restaurant + retail: inventory turnover, shrinkage, e-commerce, supply chain)
-- **Streamlit dashboard** — OLED dark mode, KPI metrics, glassmorphism cards, SVG icons, accessibility-ready
-- **32 pytest tests** — CI pipeline via GitHub Actions
+- **SEC EDGAR ingestion** — auto-fetches MD&A from 10-K/10-Q for Chipotle, Darden, Cracker Barrel, **Walmart, Target, Johnson & Johnson, Exxon Mobil**
+- **Cross-sector generalization** — recall@10 = **1.00** on retail; pipeline is domain-agnostic, not overfit to restaurant data
+- **Faithfulness evaluation** — strict **74.24%**, weighted **75.32%** — LLM-as-judge + human calibration
+- **Cross-encoder re-ranking** — `MiniLM-L-6` with hybrid scoring, configurable weight blend
+- **Financial glossary** — 35 synonym groups across restaurant, retail, healthcare, energy
+- **Multi-sector architecture** — 4 sectors (restaurant, retail, healthcare, energy) with sector-aware metadata tagging
+- **Prompt injection defense** — input sanitization, delimiters, rate limiting (1/10s), system-level instruction guard
+- **LLM resilience** — retry (3×, backoff), cross-encoder fallback, backend auto-fallback, GPU memory guard
+- **BM25 caching** — LRU cache per ticker, 30-50% query latency improvement
+- **Streamlit dashboard** — OLED dark mode, 2-view navigation (Q&A + System Analytics), glow interactions, WCAG-contrast colors
+- **32 pytest + ruff + mypy CI** — strict linting and type checking
 
 ---
 
@@ -145,8 +149,9 @@ User Question
 | Chunking | Structure-aware recursive split, 500-token chunks |
 | LLM (default) | `Qwen2.5-7B-Instruct-Q4_K_M` GGUF (RTX 5060, ~2-3s/gen) |
 | Data source | SEC EDGAR HTML 10-K/10-Q (MD&A section) |
-| Companies | CMG (Chipotle), DRI (Darden), CBRL (Cracker Barrel), **WMT (Walmart), TGT (Target)** |
-| Index | **740 chunks** from 40 filings (~2 years per company) |
+| Companies | CMG, DRI, CBRL, WMT, TGT, JNJ (Johnson & Johnson), XOM (Exxon Mobil) |
+| Sectors | Restaurant, Retail, Healthcare, Energy |
+| Index | **740+ chunks** from 40+ filings (~2 years per company) |
 
 ---
 
@@ -244,12 +249,12 @@ Key prompt engineering wins:
 
 ## Recent Updates
 
-- **Retail expansion** — WMT + TGT indexed, retail glossary added, recall@10 = **1.00** — cross-sector generalization proven
-- **Faithfulness fix** — 74.24% strict (+8.44pp), 75.32% weighted. Model swap VL→non-VL, +4.54pp from text-dedicated capacity
-- **Prompt engineering** — period integrity rule (+7pp), seed=42, anti-hallucination checklist, direction verification
-- **Cross-encoder re-ranking** — MiniLM-L-6 with hybrid scoring, MRR 0.52 → **0.66** (+28%)
-- **Multi-backend LLM** — Swappable via `.env`: llama.cpp (local), Anthropic, or OpenAI
-- **Code quality** — `pyproject.toml` packaging, 32 tests, CI pipeline, shared prompts & CSS modules
+- **Phase 2b — Code Lockdown** — comprehensive code audit: ruff (0 errors), mypy (0 errors), 32 pytest tests. Fixed 59 lint errors, 10 type errors
+- **Engineer hardening** — LLM retry (3× exponential backoff), cross-encoder fallback, BM25 LRU cache (30-50% latency cut), GPU memory guard, prompt injection defense (sanitization + delimiters + rate limiting), SEC rate limiting (5× retry, configurable delay), LLM backend auto-fallback
+- **Designer UI/UX** — SVG icons (no emojis), WCAG contrast (3.4:1 → 6.6:1), disabled button state, glow hover effects, focus rings on all interactive elements, System Analytics view, loading shimmer
+- **Multi-sector expansion** — JNJ (Healthcare) + XOM (Energy) added. 7 companies across 4 sectors. Sector badges + colored tags
+- **Health check** — startup validation for ChromaDB + LLM, early failure detection
+- **Evaluation** — 74.24% strict / 75.32% weighted faithfulness, retail recall@10 = 1.00
 
 > Full change history in [docs/](docs/).
 

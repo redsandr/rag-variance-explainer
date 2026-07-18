@@ -7,7 +7,7 @@ the prefixing behavior (search_document/search_query) that nomic-embed
 requires.
 """
 
-import re
+import logging
 from typing import Any
 
 import chromadb
@@ -15,18 +15,20 @@ import chromadb
 from config import config
 from cross_encoder import rerank
 from embedding import embed_documents, embed_query
-from hybrid_search import bm25_scores, build_bm25, rrf_merge
+from hybrid_search import _tokenize, bm25_scores, build_bm25, rrf_merge
 from query_expansion import expand_query
+
+logger = logging.getLogger(__name__)
 
 _COLLECTION_NAME = "mda_filings"
 
 
-def get_client() -> chromadb.PersistentClient:
+def get_client() -> Any:
     """Persistent local ChromaDB client — data survives between runs."""
     return chromadb.PersistentClient(path=config.db_path)
 
 
-def get_collection(client: chromadb.PersistentClient) -> Any:
+def get_collection(client: Any) -> Any:
     """
     Get or create the MD&A collection. Explicitly configured for cosine
     distance since our embeddings are normalized (embedding.py uses
@@ -122,8 +124,7 @@ def query(
 
 
 def _keyword_boost(query_text: str, chunk_text: str) -> float:
-    query_lower = query_text.lower()
-    words = re.findall(r'\w+', query_lower)
+    words = _tokenize(query_text)
     stopwords = {"the", "a", "an", "is", "are", "was", "were", "how", "why",
                  "what", "did", "do", "does", "in", "of", "to", "at", "for",
                  "and", "or", "change", "changes", "affect"}
@@ -165,19 +166,40 @@ def _retrieve_dense(
     return candidates
 
 
+def _bm25_cache_key(ticker_filter: str | None) -> str:
+    return ticker_filter or "__ALL__"
+
+
+_BM25_CACHE: dict[str, tuple] = {}
+_BM25_MAX_CACHE = 8
+
+
+def _get_bm25_index(cache_key: str, collection: Any) -> tuple:
+    if cache_key in _BM25_CACHE:
+        return _BM25_CACHE[cache_key]
+    if len(_BM25_CACHE) >= _BM25_MAX_CACHE:
+        _BM25_CACHE.pop(next(iter(_BM25_CACHE)))
+    get_kw = {}
+    if cache_key != "__ALL__":
+        get_kw["where"] = {"ticker": cache_key}
+    all_docs = collection.get(**get_kw)
+    texts = all_docs["documents"]
+    metas = all_docs["metadatas"]
+    bm25 = build_bm25(texts)
+    entry = (bm25, texts, metas)
+    _BM25_CACHE[cache_key] = entry
+    return entry
+
+
 def _retrieve_bm25(
     collection: Any,
     lookup: str,
     ticker_filter: str | None,
 ) -> list[dict]:
-    get_kw = {}
-    if ticker_filter:
-        get_kw["where"] = {"ticker": ticker_filter}
-    all_docs = collection.get(**get_kw)
-    all_texts = all_docs["documents"]
-    bm25 = build_bm25(all_texts)
+    cache_key = _bm25_cache_key(ticker_filter)
+    bm25, all_texts, all_metas = _get_bm25_index(cache_key, collection)
     bm25_raw = bm25_scores(bm25, lookup, all_texts)
-    paired = sorted(zip(bm25_raw, all_texts, all_docs["metadatas"], strict=True), key=lambda x: -x[0])
+    paired = sorted(zip(bm25_raw, all_texts, all_metas, strict=True), key=lambda x: -x[0])
     candidates = []
     for score, text, meta in paired:
         candidates.append({"text": text, "metadata": meta, "relevance": score})
@@ -221,7 +243,10 @@ def query_multi(
     _add_metric_boost(candidates, query_text)
 
     if config.cross_encoder_enabled:
-        return rerank(query_text, candidates, top_k=top_k)
+        try:
+            return rerank(query_text, candidates, top_k=top_k)
+        except Exception as e:
+            logger.warning("Cross-encoder failed, falling back to dense-only: %s", e)
 
     for c in candidates:
         base = c.get("hybrid_score", c.get("relevance", 0))

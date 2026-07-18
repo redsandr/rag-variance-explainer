@@ -29,7 +29,7 @@ def extract_sources(text: str) -> list[dict]:
     lines = text.split("\n")
     sources = []
     current_label = None
-    current_text = []
+    current_text: list[str] = []
     in_sources = False
     for line in lines:
         if line.startswith("Source chunks:"):

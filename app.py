@@ -1,3 +1,5 @@
+import re
+import time
 from pathlib import Path
 
 import streamlit as st
@@ -18,13 +20,29 @@ st.markdown(css_path.read_text(encoding="utf-8"), unsafe_allow_html=True)
 
 
 @st.cache_resource
+def _startup_check():
+    try:
+        client = get_client()
+        collection = get_collection(client)
+        collection.count()
+    except Exception as e:
+        st.warning(f"ChromaDB connection issue: {e}. Some features may be unavailable.")
+    try:
+        get_llm()
+    except Exception as e:
+        st.warning(f"LLM initialization issue: {e}. Answer generation will fail.")
+
+_startup_check()
+
+
+@st.cache_resource
 def _get_db_stats():
     client = get_client()
     collection = get_collection(client)
-    count = collection.count()
     all_meta = collection.get(include=["metadatas"])
+    chunk_count = len(all_meta["metadatas"])
     filings = set(m["accession_number"] for m in all_meta["metadatas"] if "accession_number" in m)
-    return count, len(filings)
+    return chunk_count, len(filings)
 
 
 LOGO_SVG = (
@@ -33,6 +51,30 @@ LOGO_SVG = (
     '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>'
     '<line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/>'
     '<line x1="15" y1="21" x2="15" y2="9"/>'
+    '</svg>'
+)
+
+ANALYTICS_SVG = (
+    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+    '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>'
+    '<line x1="6" y1="20" x2="6" y2="14"/>'
+    '</svg>'
+)
+
+TARGET_SVG = (
+    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+    '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/>'
+    '<circle cx="12" cy="12" r="2"/>'
+    '</svg>'
+)
+
+FLASK_SVG = (
+    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+    '<path d="M9 3h6v5l4 11H5l4-11V3"/>'
+    '<line x1="9" y1="3" x2="15" y2="3"/>'
     '</svg>'
 )
 
@@ -55,82 +97,135 @@ def get_llm():
     return LLMClient()
 
 
-SIDEBAR_ICONS = {
-    "dashboard": (
-        "dashboard",
-        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
-        'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
-        '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>'
-        '<rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>'
-        '</svg>'
-    ),
-    "analytics": (
-        "analytics",
-        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
-        'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
-        '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>'
-        '<line x1="6" y1="20" x2="6" y2="14"/>'
-        '</svg>'
-    ),
-    "ai": (
-        "ai",
-        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
-        'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
-        '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 '
-        '7 14.14 2 9.27 8.91 8.26 12 2"/>'
-        '</svg>'
-    ),
-    "docs": (
-        "docs",
-        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
-        'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
-        '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>'
-        '<polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/>'
-        '<line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>'
-        '</svg>'
-    ),
-    "settings": (
-        "settings",
-        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
-        'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
-        '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 '
-        '2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 '
-        '2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 '
-        '2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 '
-        '2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 '
-        '2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 '
-        '2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 '
-        '2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 '
-        '2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>'
-        '</svg>'
-    ),
+SECTOR_MAP = {
+    "CMG": "Restaurant",
+    "DRI": "Restaurant",
+    "CBRL": "Restaurant",
+    "WMT": "Retail",
+    "TGT": "Retail",
+    "JNJ": "Healthcare",
+    "XOM": "Energy",
 }
 
+MAX_QUESTION_LENGTH = 256
+_RATE_LIMIT_SECONDS = 10
+
+
+def _sanitize_question(raw: str) -> str:
+    cleaned = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', raw)
+    return cleaned[:MAX_QUESTION_LENGTH]
+
+
+def _rate_limited() -> str | None:
+    last = st.session_state.get("last_ask_time", 0.0)
+    elapsed = time.time() - last
+    if elapsed < _RATE_LIMIT_SECONDS:
+        remaining = int(_RATE_LIMIT_SECONDS - elapsed)
+        st.warning(f"Please wait {remaining}s before asking another question.")
+        return None
+    return "ok"
+
+
 with st.sidebar:
-    sidebar_html = '<div class="sidebar-nav" role="navigation" aria-label="Main navigation">'
-    sidebar_html += (
-        f'<button class="nav-item active" title="Dashboard" aria-label="Dashboard">'
-        f'{SIDEBAR_ICONS["dashboard"][1]}</button>'
+    view = st.radio(
+        "Navigation",
+        ["Ask a Question", "System Analytics"],
+        index=0,
+        label_visibility="collapsed",
     )
-    sidebar_html += (
-        f'<button class="nav-item" title="Analytics" aria-label="Analytics">'
-        f'{SIDEBAR_ICONS["analytics"][1]}</button>'
+
+with st.sidebar:
+    st.divider()
+    st.link_button(
+        "Documentation \u2197",
+        "https://github.com/redsandr/rag-variance-explainer",
+        use_container_width=True,
     )
-    sidebar_html += (
-        f'<button class="nav-item" title="AI Analysis" aria-label="AI Analysis">'
-        f'{SIDEBAR_ICONS["ai"][1]}</button>'
+
+if view == "System Analytics":
+    st.markdown('<div class="dashboard-grid">', unsafe_allow_html=True)
+    st.markdown('<div class="main-col">', unsafe_allow_html=True)
+
+    chunk_count, filing_count = _get_db_stats()
+    st.markdown(
+        f'<div class="hero-card">'
+        f'<div class="hero-label">{ANALYTICS_SVG} System Analytics</div>'
+        f'<div class="kpi-stack">'
+        '<div class="kpi-stack-card">'
+        '<div class="kpi-row-label">Companies</div>'
+        '<div class="kpi-row-value">7</div>'
+        '<div class="kpi-row-sub">CMG &middot; DRI &middot; CBRL &middot; WMT &middot; TGT &middot; JNJ &middot; XOM</div>'
+        '</div>'
+        '<div class="kpi-stack-card">'
+        '<div class="kpi-row-label">Sectors</div>'
+        '<div class="kpi-row-value">4</div>'
+        '<div class="kpi-row-sub">'
+        '<span class="sector-badge restaurant">Restaurant</span> '
+        '<span class="sector-badge retail">Retail</span> '
+        '<span class="sector-badge healthcare">Healthcare</span> '
+        '<span class="sector-badge energy">Energy</span>'
+        '</div></div>'
+        '<div class="kpi-stack-card">'
+        '<div class="kpi-row-label">Filings Indexed</div>'
+        f'<div class="kpi-row-value">{filing_count}</div>'
+        '<div class="kpi-row-sub">10-K &amp; 10-Q combined</div></div>'
+        '<div class="kpi-stack-card">'
+        '<div class="kpi-row-label">Knowledge Base</div>'
+        f'<div class="kpi-row-value">{chunk_count}</div>'
+        '<div class="kpi-row-sub">MD&A text chunks</div></div>'
+        f'</div></div>',
+        unsafe_allow_html=True,
     )
-    sidebar_html += '<div class="nav-divider" role="separator"></div>'
-    sidebar_html += (
-        f'<button class="nav-item" title="Documents" aria-label="Documents">'
-        f'{SIDEBAR_ICONS["docs"][1]}</button>'
+
+    st.markdown('<div class="hero-card">', unsafe_allow_html=True)
+    st.markdown(f'<div class="hero-label">{TARGET_SVG} Retrieval Performance</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="kpi-stack">'
+        '<div class="kpi-stack-card">'
+        '<div class="kpi-row-label">Restaurant MRR</div>'
+        '<div class="kpi-row-value"><span class="purple">0.66</span></div>'
+        '<div class="kpi-row-sub">+28% from baseline</div></div>'
+        '<div class="kpi-stack-card">'
+        '<div class="kpi-row-label">Retail recall@10</div>'
+        '<div class="kpi-row-value"><span class="green">1.00</span></div>'
+        '<div class="kpi-row-sub">WMT &middot; TGT — zero degradation</div></div>'
+        '</div>',
+        unsafe_allow_html=True,
     )
-    sidebar_html += (
-        f'<button class="nav-item" title="Settings" aria-label="Settings">'
-        f'{SIDEBAR_ICONS["settings"][1]}</button>'
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown('<div class="hero-card">', unsafe_allow_html=True)
+    st.markdown(f'<div class="hero-label">{FLASK_SVG} Faithfulness</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="kpi-stack">'
+        '<div class="kpi-stack-card">'
+        '<div class="kpi-row-label">Restaurant (strict)</div>'
+        '<div class="kpi-row-value"><span class="green">74.2%</span></div>'
+        '<div class="kpi-row-sub">weighted 75.3%</div></div>'
+        '<div class="kpi-stack-card">'
+        '<div class="kpi-row-label">Retail (strict)</div>'
+        '<div class="kpi-row-value"><span class="green">69.7%</span></div>'
+        '<div class="kpi-row-sub">weighted 80.3%</div></div>'
+        '</div>',
+        unsafe_allow_html=True,
     )
-    sidebar_html += '</div>'
-    st.markdown(sidebar_html, unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('<div class="right-col">', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="about-card">'
+        '<div class="about-title">About</div>'
+        '<div class="about-text">'
+        'Retrieves MD&A sections from SEC EDGAR filings and generates '
+        'sourced answers about financial variance drivers using a RAG pipeline '
+        'with cross-encoder re-ranking and configurable retrieval settings.'
+        '</div></div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.stop()
 
 st.markdown('<div class="dashboard-grid">', unsafe_allow_html=True)
 st.markdown('<div class="main-col">', unsafe_allow_html=True)
@@ -158,7 +253,13 @@ with col_q:
         key="question_input",
     )
 with col_btn:
-    ask = st.button("Analyze", type="primary", use_container_width=True)
+    processing = st.session_state.get("processing", False)
+    ask = st.button(
+        "Analyze" if not processing else "Analyzing...",
+        type="primary",
+        use_container_width=True,
+        disabled=processing,
+    )
 
 EXAMPLE_QUESTIONS = [
     "Why did Chipotle's labor costs change?",
@@ -167,6 +268,8 @@ EXAMPLE_QUESTIONS = [
     "Why did CBRL's operating costs change?",
     "How did Walmart's e-commerce sales change?",
     "What drove Target's comparable sales?",
+    "How did Johnson & Johnson's pharmaceutical revenue perform?",
+    "What drove Exxon's upstream earnings changes?",
 ]
 
 st.markdown('<div class="example-row">', unsafe_allow_html=True)
@@ -185,13 +288,18 @@ ticker_map = {
     "CBRL (Cracker Barrel)": "CBRL",
     "WMT (Walmart)": "WMT",
     "TGT (Target)": "TGT",
+    "JNJ (Johnson & Johnson)": "JNJ",
+    "XOM (Exxon Mobil)": "XOM",
 }
 
 filter_col, topk_col = st.columns(2)
 with filter_col:
     ticker_filter = st.selectbox(
         "Company",
-        options=["All", "CMG (Chipotle)", "DRI (Darden)", "CBRL (Cracker Barrel)", "WMT (Walmart)", "TGT (Target)"],
+        options=[
+            "All", "CMG (Chipotle)", "DRI (Darden)", "CBRL (Cracker Barrel)",
+            "WMT (Walmart)", "TGT (Target)", "JNJ (Johnson & Johnson)", "XOM (Exxon Mobil)",
+        ],
         index=0,
         help="Filter sources by company ticker",
     )
@@ -211,53 +319,64 @@ compare = st.checkbox(
 if "pending_question" in st.session_state:
     st.session_state.question_input = st.session_state.pop("pending_question")
 
-if ask and question.strip():
-    ticker = ticker_map[ticker_filter]
+if ask and question.strip() and not st.session_state.get("processing", False):
+    question = _sanitize_question(question)
+    if not question:
+        st.warning("Question is empty after sanitization.")
+    elif _rate_limited() is None:
+        pass
+    else:
+        st.session_state.processing = True
+        st.session_state.last_ask_time = time.time()
+        ticker = ticker_map[ticker_filter]
 
-    def run_with_progress(fn, label):
-        status = st.status(label, expanded=True)
-        def on_progress(_phase, msg):
-            status.update(label=msg, state="running")
+        def run_with_progress(fn, label):
+            status = st.status(label, expanded=True)
+            def on_progress(_phase, msg):
+                status.update(label=msg, state="running")
+            try:
+                result = fn(on_progress=on_progress)
+                status.update(label="Complete", state="complete")
+                return result
+            except Exception as e:
+                status.update(label=f"Error: {e}", state="error")
+                raise
+
         try:
-            result = fn(on_progress=on_progress)
-            status.update(label="Complete", state="complete")
-            return result
+            if compare:
+                with_ce = config.cross_encoder_enabled
+                config.cross_encoder_enabled = False
+                try:
+                    before = run_with_progress(
+                        lambda on_progress: answer_question(
+                            question, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
+                            on_progress=on_progress),
+                        "Without cross-encoder",
+                    )
+                finally:
+                    config.cross_encoder_enabled = True
+                after = run_with_progress(
+                    lambda on_progress: answer_question(
+                        question, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
+                        on_progress=on_progress),
+                    "With cross-encoder",
+                )
+                config.cross_encoder_enabled = with_ce
+                st.session_state.last_result = {"compare": True, "before": before, "after": after}
+            else:
+                result = run_with_progress(
+                    lambda on_progress: answer_question(
+                        question, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
+                        on_progress=on_progress),
+                    "Analyzing filings",
+                )
+                st.session_state.last_result = {"compare": False, **result}
         except Exception as e:
-            status.update(label=f"Error: {e}", state="error")
-            raise
-
-    try:
-        if compare:
-            orig = config.cross_encoder_enabled
-            config.cross_encoder_enabled = False
-            before = run_with_progress(
-                lambda on_progress: answer_question(
-                    question, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
-                    on_progress=on_progress),
-                "Without cross-encoder",
-            )
-            config.cross_encoder_enabled = True
-            after = run_with_progress(
-                lambda on_progress: answer_question(
-                    question, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
-                    on_progress=on_progress),
-                "With cross-encoder",
-            )
-            config.cross_encoder_enabled = orig
-            st.session_state.last_result = {"compare": True, "before": before, "after": after}
-        else:
-            result = run_with_progress(
-                lambda on_progress: answer_question(
-                    question, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
-                    on_progress=on_progress),
-                "Analyzing filings",
-            )
-            st.session_state.last_result = {"compare": False, **result}
-    except Exception as e:
-        st.error(f"Something went wrong: {e}")
-        st.session_state.pop("last_result", None)
-
-    st.rerun()
+            st.error(f"Something went wrong: {e}")
+            st.session_state.pop("last_result", None)
+        finally:
+            st.session_state.processing = False
+            st.rerun()
 
 elif ask and not question.strip():
     st.warning("Please enter a question.")
@@ -275,6 +394,11 @@ def _score_icon(score: float) -> str:
     elif score >= 0.4:
         return "\u25C6"
     return "\u25BC"
+
+def _sector_tag(ticker: str) -> str:
+    sector = SECTOR_MAP.get(ticker, "")
+    css_class = sector.lower() if sector else ""
+    return f'<span class="sector-tag {css_class}">{sector}</span>'
 
 def _render_sources(sources):
     if not sources:
@@ -297,6 +421,7 @@ def _render_sources(sources):
             f'<div class="source-card">'
             f'<div class="meta-row">'
             f'<span class="ticker-tag">{meta["ticker"]}</span>'
+            f'{_sector_tag(meta["ticker"])}'
             f'<span class="form-tag">{meta["form"]}</span>'
             f'<span class="date-tag">{meta["filing_date"]}</span>'
             f'<span class="score-tag {score_cls}">{_score_icon(score)} {score:.2f}</span>'
@@ -347,7 +472,7 @@ if "last_result" in st.session_state:
 else:
     if not (ask and question.strip()):
         EMPTY_SVG = (
-            '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#4B5563" '
+            '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6B7280" '
             'stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'
             '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>'
             '</svg>'
@@ -362,6 +487,8 @@ else:
             f'</div></div>',
             unsafe_allow_html=True,
         )
+    else:
+        pass
 
 st.markdown('</div>', unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
@@ -372,6 +499,11 @@ try:
     chunk_count, filing_count = _get_db_stats()
 except Exception:
     chunk_count, filing_count = 0, 0
+
+refresh = st.button("Refresh Stats", key="refresh_kpi", use_container_width=True)
+if refresh:
+    st.cache_resource.clear()
+    st.rerun()
 
 st.markdown(
     f'<div class="kpi-panel">'
@@ -389,15 +521,39 @@ st.markdown(
     f'<div class="kpi-row-label">Knowledge Base</div>'
     f'<div class="kpi-row-value">{chunk_count}</div>'
     f'<div class="kpi-row-sub">MD&A text chunks</div></div>'
-    f'<div class="kpi-stack-card">'
-    f'<div class="kpi-row-label">Retrieval MRR</div>'
-    f'<div class="kpi-row-value"><span class="purple">0.66</span></div>'
-    f'<div class="kpi-row-sub">+28% from baseline</div></div>'
-    f'<div class="kpi-stack-card">'
-    f'<div class="kpi-row-label">Faithfulness</div>'
-f'<div class="kpi-row-value"><span class="green">74.2%</span></div>'
-     f'<div class="kpi-row-sub">strict · 75.3% weighted</div></div>'
     f'</div></div>',
+    unsafe_allow_html=True,
+)
+
+st.markdown(
+    '<div class="kpi-panel">'
+    '<div class="panel-title">Retrieval</div>'
+    '<div class="kpi-stack">'
+    '<div class="kpi-stack-card">'
+    '<div class="kpi-row-label">Restaurant MRR</div>'
+    '<div class="kpi-row-value"><span class="purple">0.66</span></div>'
+    '<div class="kpi-row-sub">+28% from baseline</div></div>'
+    '<div class="kpi-stack-card">'
+    '<div class="kpi-row-label">Retail recall@10</div>'
+    '<div class="kpi-row-value"><span class="green">1.00</span></div>'
+    '<div class="kpi-row-sub">WMT &middot; TGT</div></div>'
+    '</div></div>',
+    unsafe_allow_html=True,
+)
+
+st.markdown(
+    '<div class="kpi-panel">'
+    '<div class="panel-title">Faithfulness</div>'
+    '<div class="kpi-stack">'
+    '<div class="kpi-stack-card">'
+    '<div class="kpi-row-label">Restaurant</div>'
+    '<div class="kpi-row-value"><span class="green">74.2%</span> <span class="kpi-row-sub">strict</span></div>'
+    '<div class="kpi-row-sub">weighted 75.3%</div></div>'
+    '<div class="kpi-stack-card">'
+    '<div class="kpi-row-label">Retail</div>'
+    '<div class="kpi-row-value"><span class="green">69.7%</span> <span class="kpi-row-sub">strict</span></div>'
+    '<div class="kpi-row-sub">weighted 80.3%</div></div>'
+    '</div></div>',
     unsafe_allow_html=True,
 )
 

@@ -305,7 +305,7 @@ def main() -> None:
     logger.info("(each question = 2 LLM calls: 1 generate + 1 judge)\n")
 
     results = []
-    times = []
+    times: list[float] = []
 
     LLMClient.reset()
     llm = LLMClient()

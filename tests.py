@@ -1,9 +1,10 @@
 import pytest
+
 from src.chunking import chunk_document, count_tokens
-from src.rag import build_context
-from src.query_expansion import expand_query
-from src.retrieval import _keyword_boost, _forward_looking_penalty
 from src.prompts import build_judge_prompt, build_judge_prompt_compact
+from src.query_expansion import expand_query
+from src.rag import build_context
+from src.retrieval import _forward_looking_penalty, _keyword_boost
 
 
 def test_chunk_respects_token_size_not_character_size() -> None:
