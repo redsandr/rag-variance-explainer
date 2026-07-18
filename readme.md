@@ -7,9 +7,17 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![CI](https://github.com/redsandr/rag-variance-explainer/actions/workflows/test.yml/badge.svg)](https://github.com/redsandr/rag-variance-explainer/actions)
 
-**Retrieval-Augmented Generation pipeline** that answers *"why did this financial metric change?"* using real SEC filing MD&A sections. Ask plain-language questions about restaurants **and** retail — labor costs, revenue drivers, margin changes, inventory, e-commerce — and get sourced, citation-backed explanations from 10-K/10-Q filings across **5 companies, 2 sectors**.
+**Retrieval-Augmented Generation pipeline** — ask *"why did this financial metric change?"* in plain language and get a sourced, citation-backed answer from real SEC filings. Covers **5 companies across 2 sectors**, runs locally, costs nothing per query.
 
-Target: turn a 4-hour manual variance review into a 3-minute query.
+> **Target:** Turn a 4-hour manual variance review into a 3-minute query.
+
+---
+
+## The Problem
+
+Financial analysts spend hours reading MD&A sections every quarter — scanning tables, cross-referencing periods, searching for variance drivers. It's manual, inconsistent, and doesn't scale.
+
+Most RAG demos work on one dataset in one domain. **Generalization is the hard part.** This project proves a financial RAG pipeline can generalize across sectors without degrading retrieval quality.
 
 ---
 
@@ -19,23 +27,38 @@ Target: turn a 4-hour manual variance review into a 3-minute query.
 streamlit run app.py
 ```
 
-Dark-themed fintech dashboard with interactive question input, AI-sourced answers, color-coded source chunks, and side-by-side cross-encoder comparison mode.
+<!-- TODO: Add dashboard screenshot -->
+<!-- ![Dashboard screenshot](docs/screenshots/dashboard.png) -->
+
+Dark-themed fintech dashboard with interactive question input, AI-sourced answers, color-coded source cards, and side-by-side cross-encoder comparison mode.
 
 > **📖 Full documentation:** [docs/](docs/) — problem validation, architecture decisions, evaluation iterations, technical notes, and roadmap.
 
 ---
 
+## Use Cases
+
+| Question | Answer includes | Source |
+|----------|----------------|--------|
+| *"Why did Chipotle's labor costs change?"* | Wage inflation, CA minimum wage, sales leverage | CMG 10-K/10-Q |
+| *"What drove Walmart's e-commerce growth?"* | Omnichannel penetration, store-fulfilled pickup/delivery | WMT 10-K/10-Q |
+| *"How did Target's gross margin rate change?"* | Merchandise mix, promotions, shrink impact | TGT 10-K/10-Q |
+| *"How did Darden's acquisition of Chuy's impact revenue?"* | Purchase price, sales contribution, segment profit | DRI 10-K/10-Q |
+| *"How do WMT and TGT compare on inventory turnover?"* | Cross-retail inventory trends, shrink reduction | WMT + TGT 10-K/10-Q |
+
+---
+
 ## Features
 
-- **RAG pipeline** — query expansion → ChromaDB retrieval → cross-encoder re-ranking → grounded LLM generation
+- **RAG pipeline** — query expansion (35 synonym groups) → ChromaDB retrieval → cross-encoder re-ranking → grounded LLM generation
 - **Multi-backend LLM** — llama.cpp (local GPU, 7B), Anthropic, or OpenAI — swappable via `.env`
-- **SEC EDGAR ingestion** — auto-fetches MD&A text from 10-K/10-Q filings (Chipotle, Darden, Cracker Barrel, **Walmart, Target**)
-- **Retrieval accuracy** — MRR **0.66** (+28% baseline), recall@10 **0.70** (restaurant); **recall@10 = 1.00** (retail)
-- **Cross-sector generalization** — pipeline scaled from 3 restaurant to **5 companies across 2 sectors** with **zero recall degradation** (retail recall@10 = 1.00)
-- **Faithfulness evaluation** — strict **74.24%** (+8.44pp from baseline), weighted **75.32%** — LLM-as-judge with Claude calibration
+- **SEC EDGAR ingestion** — auto-fetches MD&A from 10-K/10-Q for Chipotle, Darden, Cracker Barrel, **Walmart, Target**
+- **Cross-sector generalization** — recall@10 = **1.00** on retail; pipeline is domain-agnostic, not overfit
+- **Faithfulness evaluation** — strict **74.24%** (+8.44pp), weighted **75.32%** — LLM-as-judge + human calibration
 - **Cross-encoder re-ranking** — `MiniLM-L-6` with hybrid scoring (CE 0.9 + BI 0.1 + forward-looking penalty)
-- **Financial glossary** — 35 synonym groups for query expansion (COGS = Cost of Sales = Cost of Revenue, plus retail: inventory turnover, shrinkage, e-commerce)
+- **Financial glossary** — 35 synonym groups (restaurant + retail: inventory turnover, shrinkage, e-commerce, supply chain)
 - **Streamlit dashboard** — OLED dark mode, KPI metrics, glassmorphism cards, SVG icons, accessibility-ready
+- **32 pytest tests** — CI pipeline via GitHub Actions
 
 ---
 
@@ -50,7 +73,8 @@ python -m venv venv && source venv/bin/activate
 
 pip install -r requirements.txt
 cp .env.example .env
-# Download Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf → models/
+# Download Qwen2.5-7B-Instruct-Q4_K_M.gguf → models/
+# https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF
 python src/build_index.py
 streamlit run app.py
 ```
@@ -98,7 +122,7 @@ All parameters via env vars — no hardcoded magic numbers.
 User Question
     |
     v
-  query_expansion (5 synonyms, 20 financial groups)
+  query_expansion (35 synonym groups across 2 sectors)
     |
     v
   ChromaDB + nomic-embed (bi-encoder) → top 20 candidates
@@ -122,6 +146,7 @@ User Question
 | LLM (default) | `Qwen2.5-7B-Instruct-Q4_K_M` GGUF (RTX 5060, ~2-3s/gen) |
 | Data source | SEC EDGAR HTML 10-K/10-Q (MD&A section) |
 | Companies | CMG (Chipotle), DRI (Darden), CBRL (Cracker Barrel), **WMT (Walmart), TGT (Target)** |
+| Index | **740 chunks** from 40 filings (~2 years per company) |
 
 ---
 
@@ -156,17 +181,19 @@ Hardest-case turnaround:
 |--------|----------|----------|----------|-----------|-----|
 | **WMT** (Walmart) | 0.36 | **0.86** | **1.00** | **1.00** | **0.64** |
 | **TGT** (Target) | **0.43** | **0.86** | **1.00** | **1.00** | **0.65** |
-| **Cross-retail** | 0.33 | 0.75 | **1.00** | **1.00** | **0.65** |
+| **Cross-retail** (no ticker filter) | 0.33 | 0.75 | **1.00** | **1.00** | **0.65** |
 
 Pipeline generalizes to retail with **zero degradation** — retail recall@10 outperforms restaurant baseline. Cross-sector validation confirms architecture is domain-agnostic, not overfit to restaurant terminology.
 
 ### Faithfulness (LLM-as-Judge)
 
-| Phase | Model | Strict | Weighted | Delta |
-|-------|-------|--------|----------|-------|
+| Phase | Model | Strict | Weighted | Δ Strict |
+|-------|-------|--------|----------|----------|
 | Baseline | Qwen2.5-VL-7B | 65.8% | 78.9% | — |
-| Phase 7e (3 fixes + model swap) | Qwen2.5-7B-Instruct | **74.24%** | **75%** | **+8.44pp** |
-| Phase 7f (prompt + parser fix) | Qwen2.5-7B-Instruct | — | **75.32%** | +0.32pp |
+| Phase 7e (3 fixes + model swap) | Qwen2.5-7B-Instruct | **74.24%** | 75.0% | **+8.44pp** |
+| Phase 7f (prompt + parser fix) | Qwen2.5-7B-Instruct | — | **75.32%** | — |
+
+> Weighted baseline (78.9%) and post-fix (75.32%) are not directly comparable — the judge evaluation methodology was refined between iterations (stricter parsing, reduced overestimation). The **strict metric is the reliable indicator**: **65.8% → 74.24%** (+8.44pp).
 
 Three targeted fixes drove the improvement:
 1. **Number transposition** — `verify_answer()` integration catches decimal shifts & year mismatches
@@ -196,7 +223,7 @@ Key prompt engineering wins:
 │   ├── retrieval.py           # ChromaDB + multi-strategy retrieval
 │   ├── cross_encoder.py       # Cross-encoder re-ranking
 │   ├── hybrid_search.py       # BM25 + RRF merge
-│   ├── query_expansion.py     # Financial synonym expansion
+│   ├── query_expansion.py     # Financial synonym expansion (35 groups)
 │   ├── llm.py                 # 3-backend LLM client
 │   ├── config.py              # Centralized config (22 params from env vars)
 │   ├── prompts.py             # RAG system prompt + judge prompts (3 variants) + helpers
@@ -217,7 +244,7 @@ Key prompt engineering wins:
 
 ## Recent Updates
 
-- **Retail expansion** — WMT (Walmart) + TGT (Target) indexed, retail glossary added, recall@10 = **1.00** — cross-sector generalization proven
+- **Retail expansion** — WMT + TGT indexed, retail glossary added, recall@10 = **1.00** — cross-sector generalization proven
 - **Faithfulness fix** — 74.24% strict (+8.44pp), 75.32% weighted. Model swap VL→non-VL, +4.54pp from text-dedicated capacity
 - **Prompt engineering** — period integrity rule (+7pp), seed=42, anti-hallucination checklist, direction verification
 - **Cross-encoder re-ranking** — MiniLM-L-6 with hybrid scoring, MRR 0.52 → **0.66** (+28%)
