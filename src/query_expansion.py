@@ -20,6 +20,21 @@ FINANCIAL_SYNONYMS = {
     "cost of goods": ["cost of goods", "cogs", "food cost", "cost of sales", "cost of revenue"],
     "segment": ["segment", "division", "brand", "concept", "chain", "segment sales", "segment profit", "segment margin"],
     "quarter": ["quarter", "quarterly", "Q1", "Q2", "Q3", "Q4", "fiscal", "period", "three months"],
+    "inventory": ["inventory", "inventory turnover", "inventory management", "inventory levels", "days in inventory", "inventory position"],
+    "shrinkage": ["shrinkage", "shrink", "inventory shrink", "lost inventory", "inventory loss"],
+    "merchandise": ["merchandise", "merchandising", "product cost", "merchandise cost", "cost of merchandise", "procurement"],
+    "ecommerce": ["e-commerce", "ecommerce", "digital", "online", "online sales", "omnichannel", "digital sales", "direct-to-consumer"],
+    "supply_chain": ["supply chain", "logistics", "distribution", "warehouse", "fulfillment", "transportation", "freight"],
+    "segment_retail": ["segment", "walmart us", "walmart international", "sam's club", "target segment", "retail segment"],
+    "store": ["store", "stores", "retail store", "supercenter", "discount store", "location", "retail location"],
+    "traffic": ["traffic", "customer traffic", "foot traffic", "customer visits", "transactions", "store traffic"],
+    "ticket": ["ticket", "average ticket", "basket size", "average transaction", "units per transaction"],
+    "private_label": ["private label", "private brand", "own brand", "exclusive brand", "owned brand"],
+    "membership": ["membership", "membership income", "membership fee", "subscription", "sam's club membership"],
+    "cannibalization": ["cannibalization", "cannibalize", "store overlap", "market saturation", "sales transfer"],
+    "inflation_retail": ["inflation", "price inflation", "cost inflation", "input cost", "commodity cost"],
+    "capital_expenditure": ["capex", "capital expenditure", "capital spend", "store remodel", "renovation", "investment"],
+    "promotion": ["promotion", "promotional", "markdown", "discount", "price investment", "everyday low price"],
 }
 
 

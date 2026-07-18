@@ -74,7 +74,7 @@ def evaluate() -> None:
         best_str = str(best_rank) if best_rank else "-"
         parts = [f"{label:<50} {len(golden):<6} {best_str:<9}"]
 
-        ticker = item.get("ticker_filter", "?")
+        ticker = item.get("ticker_filter") or "ALL"
         for k in K_VALUES:
             retrieved_at_k = set(retrieved_ids[:k])
             hits = len(golden & retrieved_at_k)
