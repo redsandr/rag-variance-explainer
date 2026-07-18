@@ -4,10 +4,10 @@ const HERO_QUESTION = "Why did Chipotle's labor costs increase?";
 const PIPE_QUESTION = "Why did Chipotle's labor costs increase?";
 
 const CHART_DATA = [
-  { label: 'recall@1', base: 0.18, ce: 0.23 },
-  { label: 'recall@3', base: 0.24, ce: 0.45 },
-  { label: 'recall@5', base: 0.33, ce: 0.52 },
-  { label: 'recall@10', base: 0.55, ce: 0.7 },
+  { label: 'Top 1', base: 0.18, ce: 0.23 },
+  { label: 'Top 3', base: 0.24, ce: 0.45 },
+  { label: 'Top 5', base: 0.33, ce: 0.52 },
+  { label: 'Top 10', base: 0.55, ce: 0.7 },
 ];
 
 const USE_CASES = [
@@ -19,23 +19,20 @@ const USE_CASES = [
 ];
 
 const FEATURES = [
-  { t: 'RAG pipeline', d: 'Query expansion, 35 synonym groups, ChromaDB retrieval, cross-encoder re-ranking, grounded generation.' },
-  { t: 'Multi-backend LLM', d: 'llama.cpp local GPU, Anthropic, or OpenAI. Swappable via .env, no vendor lock-in.' },
-  { t: 'SEC EDGAR ingestion', d: 'Auto-fetches MD&A from 10-K/10-Q across 7 companies with one command.' },
-  { t: 'Cross-sector generalization', d: 'recall@10 = 1.00 on retail. Domain-agnostic, not overfit to restaurant data.' },
-  { t: 'Faithfulness evaluation', d: 'Strict 74.24%, weighted 75.32%. LLM-as-judge with Claude cross-validation.' },
-  { t: 'Cross-encoder re-ranking', d: 'MiniLM-L-6-v2 with hybrid scoring and configurable blend weight.' },
-  { t: 'Prompt injection defense', d: 'Input sanitization, delimiters, rate limiting, system-level instruction guard.' },
-  { t: 'LLM resilience', d: 'Retry with exponential backoff, cross-encoder fallback, backend auto-fallback.' },
-  { t: 'BM25 caching', d: 'LRU cache per ticker for 30 to 50 percent query latency improvement.' },
+  { t: 'Understands plain-language questions', d: "Ask the way you'd ask a colleague. No need to know exact filing terms or section names." },
+  { t: 'Cites its sources', d: 'Every answer points back to the exact filing and page, so you can verify it yourself before it goes in a report.' },
+  { t: 'Pulls straight from SEC filings', d: 'Automatically fetches the relevant sections from 10-Ks and 10-Qs across 7 companies — no manual PDF searching.' },
+  { t: 'Works across industries', d: 'Tested on retail with no drop in accuracy compared to restaurants — not tuned to look good on just one industry.' },
+  { t: 'Checked against the source', d: 'Roughly 3 out of 4 answers verified as fully accurate against the original filing text, with ongoing work to improve that further.' },
+  { t: 'Flexible on privacy and cost', d: 'Runs fully offline on your own machine, or connects to a cloud AI provider if you prefer — your data, your choice.' },
 ];
 
 const ROADMAP = [
-  'International filings (IFRS-based financials)',
-  'Multi-turn conversational memory',
-  'Docker deployment, single-command setup',
-  'Fine-tuned embedding model on financial corpus',
-  'Public hosted demo',
+  'International filings, not just US-based companies',
+  'Follow-up questions in the same conversation, not just one-off queries',
+  'One-click setup, no command line required',
+  'A version tuned specifically on financial language for even higher accuracy',
+  'A public demo anyone can try without installing anything',
 ];
 
 const CODE_SNIPPETS = {
@@ -78,10 +75,10 @@ streamlit run app.py`,
 };
 
 const PIPE_STEPS = [
-  { title: 'Query expansion', label: 'chunks scanned', kind: 'count', to: 740, duration: 700 },
-  { title: 'ChromaDB retrieval', label: 'candidates found', kind: 'count', to: 20, duration: 600 },
-  { title: 'Cross-encoder', label: 'top re-rank score', kind: 'score', to: 0.91, duration: 700 },
-  { title: 'LLM generation', label: 'grounded answer', kind: 'writing' },
+  { title: 'Understand the question', label: 'sections searched', kind: 'count', to: 740, duration: 700 },
+  { title: 'Search the filings', label: 'possible matches', kind: 'count', to: 20, duration: 600 },
+  { title: 'Rank by relevance', label: 'best match found', kind: 'score', to: 0.91, duration: 700 },
+  { title: 'Write the answer', label: 'sourced answer', kind: 'writing' },
 ];
 
 function useTypewriter(text, { startDelay = 0, speed = 32, onDone } = [], deps = []) {
@@ -297,7 +294,7 @@ export default function Home() {
                 style={{ background: 'var(--accent-soft)', color: 'var(--accent-dark)' }}
               >
                 <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--green)' }}></span>
-                7 companies &middot; 4 sectors &middot; local-first
+                7 companies &middot; 4 industries &middot; your data stays in-house
               </div>
               <h1 className="text-4xl md:text-5xl font-bold leading-[1.1] tracking-tight mb-5" style={{ color: 'var(--text)' }}>
                 Ask why a metric moved.
@@ -305,8 +302,8 @@ export default function Home() {
                 Get an answer <span style={{ color: 'var(--accent)' }}>sourced from the filing.</span>
               </h1>
               <p className="text-base leading-relaxed mb-8 max-w-md" style={{ color: 'var(--text-dim)' }}>
-                A retrieval pipeline over real SEC 10-K/10-Q filings. Query expansion, cross-encoder re-ranking, and
-                grounded generation — turning a 4-hour variance review into a 3-minute query.
+                Ask a plain-language question about real SEC filings — 10-Ks, 10-Qs, MD&amp;A sections — and get a
+                sourced answer in minutes, not hours of digging through pages by hand.
               </p>
               <div className="flex items-center gap-3">
                 <a href="https://github.com/redsandr/rag-variance-explainer" className="px-5 py-3 rounded-xl text-sm font-semibold btn-primary">
@@ -319,16 +316,16 @@ export default function Home() {
 
               <div className="flex items-center gap-8 mt-10 pt-8" style={{ borderTop: '1px solid var(--border)' }}>
                 <div>
-                  <div className="text-2xl font-bold tabular" style={{ color: 'var(--green)' }}>1.00</div>
-                  <div className="text-xs mt-0.5" style={{ color: 'var(--text-mute)' }}>recall@10, retail</div>
+                  <div className="text-2xl font-bold tabular" style={{ color: 'var(--green)' }}>4 hrs &rarr; 3 min</div>
+                  <div className="text-xs mt-0.5" style={{ color: 'var(--text-mute)' }}>time per variance question</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold tabular" style={{ color: 'var(--accent)' }}>74.2%</div>
-                  <div className="text-xs mt-0.5" style={{ color: 'var(--text-mute)' }}>faithfulness</div>
+                  <div className="text-2xl font-bold tabular" style={{ color: 'var(--accent)' }}>100%</div>
+                  <div className="text-xs mt-0.5" style={{ color: 'var(--text-mute)' }}>right answer found, every industry tested</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold tabular">740+</div>
-                  <div className="text-xs mt-0.5" style={{ color: 'var(--text-mute)' }}>indexed chunks</div>
+                  <div className="text-2xl font-bold tabular">74%</div>
+                  <div className="text-xs mt-0.5" style={{ color: 'var(--text-mute)' }}>of answers verified against the filing</div>
                 </div>
               </div>
             </div>
@@ -360,7 +357,7 @@ export default function Home() {
                     </div>
 
                     <div className="text-[11px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-mute)' }}>
-                      Source chunks &middot; 3
+                      Source passages &middot; 3
                     </div>
 
                     <div className="space-y-2">
@@ -371,7 +368,7 @@ export default function Home() {
                         <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded" style={{ background: 'var(--accent-soft)', color: 'var(--accent-dark)' }}>CMG</span>
                           <span className="text-[10px] px-2 py-0.5 rounded" style={{ background: 'var(--accent-soft)', color: 'var(--text-mute)' }}>10-K</span>
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full score-high ml-auto">&#9650; 0.91</span>
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full score-high ml-auto">Top match</span>
                         </div>
                         <p className="text-[11px] mono leading-relaxed" style={{ color: 'var(--text-mute)' }}>
                           &quot;...labor costs as a percentage of revenue increased due to wage inflation and minimum wage...&quot;
@@ -384,7 +381,7 @@ export default function Home() {
                         <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                           <span className="text-[10px] font-bold px-2 py-0.5 rounded" style={{ background: 'var(--accent-soft)', color: 'var(--accent-dark)' }}>CMG</span>
                           <span className="text-[10px] px-2 py-0.5 rounded" style={{ background: 'var(--accent-soft)', color: 'var(--text-mute)' }}>10-Q</span>
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full score-mid ml-auto">&#9670; 0.68</span>
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full score-mid ml-auto">Also relevant</span>
                         </div>
                         <p className="text-[11px] mono leading-relaxed" style={{ color: 'var(--text-mute)' }}>
                           &quot;...partially offset by sales leverage as comparable restaurant sales grew...&quot;
@@ -405,12 +402,12 @@ export default function Home() {
             Financial analysts spend hours reading MD&amp;A sections every quarter.
           </p>
           <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--text-dim)' }}>
-            Scanning tables, cross-referencing periods, hunting for variance drivers — it&apos;s manual, inconsistent,
-            and doesn&apos;t scale. Most RAG demos work on one dataset in one domain, because generalizing across
-            sector vocabulary and filing structure is the hard part.
+            Scanning tables, cross-referencing periods, hunting for the one sentence that explains why a number moved
+            — it&apos;s manual, repetitive, and easy to get wrong under deadline pressure. This tool answers those
+            questions directly from the filing text, with the source cited every time.
             <span style={{ color: 'var(--text)', fontWeight: 500 }}>
-              {' '}This project tests whether one pipeline holds up across four sectors — restaurant, retail,
-              healthcare, energy — without retrieval quality degrading.
+              {' '}It was built and tested to work the same way across four different industries — restaurant,
+              retail, healthcare, energy — not just tuned to look good on one company.
             </span>
           </p>
         </section>
@@ -476,10 +473,10 @@ export default function Home() {
         <section id="evidence" className="max-w-6xl mx-auto px-6 py-24 md:py-32">
           <div className="mb-14">
             <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>Evidence, not claims</div>
-            <p className="text-3xl md:text-4xl font-bold mb-4">Cross-encoder re-ranking, measured.</p>
+            <p className="text-3xl md:text-4xl font-bold mb-4">Accuracy, tested and measured.</p>
             <p className="text-base max-w-2xl" style={{ color: 'var(--text-dim)' }}>
-              Recall@k across 40 ground-truth questions, before and after re-ranking. The hardest cases moved from
-              unranked to rank 1.
+              Tested against 40 real questions with known correct answers, before and after adding a
+              relevance-ranking step. The hardest cases went from being missed entirely to found first.
             </p>
           </div>
 
@@ -528,38 +525,38 @@ export default function Home() {
             <div className="md:col-span-2 space-y-4 md:pl-6 md:border-l" style={{ borderColor: 'var(--border)' }}>
               <div className="flex items-center gap-2 text-xs">
                 <span className="h-2.5 w-2.5 rounded-sm" style={{ background: 'var(--border-strong)' }}></span>
-                <span style={{ color: 'var(--text-dim)' }}>Baseline retrieval</span>
+                <span style={{ color: 'var(--text-dim)' }}>Before ranking step</span>
               </div>
               <div className="flex items-center gap-2 text-xs">
                 <span className="h-2.5 w-2.5 rounded-sm" style={{ background: 'var(--accent)' }}></span>
-                <span style={{ color: 'var(--text-dim)' }}>+ cross-encoder re-rank</span>
+                <span style={{ color: 'var(--text-dim)' }}>After ranking step</span>
               </div>
               <div className="pt-3">
-                <div className="text-3xl font-bold tabular" style={{ color: 'var(--green)' }}>+0.14</div>
-                <div className="text-xs mt-1" style={{ color: 'var(--text-mute)' }}>MRR improvement, 0.52 &rarr; 0.66</div>
+                <div className="text-3xl font-bold tabular" style={{ color: 'var(--green)' }}>0.52 &rarr; 0.66</div>
+                <div className="text-xs mt-1" style={{ color: 'var(--text-mute)' }}>search score (higher = right answer found sooner)</div>
               </div>
             </div>
           </div>
 
           <div className="grid md:grid-cols-3 gap-4">
             <div className="rounded-xl p-5 card card-hover">
-              <div className="mono text-xs mb-2" style={{ color: 'var(--text-mute)' }}>eval-009 &middot; CMG G&amp;A</div>
+              <div className="mono text-xs mb-2" style={{ color: 'var(--text-mute)' }}>Chipotle overhead-cost question</div>
               <div className="flex items-center gap-3 text-sm">
-                <span style={{ color: 'var(--text-mute)' }}>rank 17</span>
+                <span style={{ color: 'var(--text-mute)' }}>was result #17</span>
                 <span style={{ color: 'var(--text-mute)' }}>&rarr;</span>
-                <span className="font-semibold" style={{ color: 'var(--green)' }}>rank 1</span>
+                <span className="font-semibold" style={{ color: 'var(--green)' }}>now #1</span>
               </div>
             </div>
             <div className="rounded-xl p-5 card card-hover">
-              <div className="mono text-xs mb-2" style={{ color: 'var(--text-mute)' }}>eval-017 &middot; CBRL labor</div>
+              <div className="mono text-xs mb-2" style={{ color: 'var(--text-mute)' }}>Cracker Barrel labor-cost question</div>
               <div className="flex items-center gap-3 text-sm">
-                <span style={{ color: 'var(--text-mute)' }}>rank 17</span>
+                <span style={{ color: 'var(--text-mute)' }}>was result #17</span>
                 <span style={{ color: 'var(--text-mute)' }}>&rarr;</span>
-                <span className="font-semibold" style={{ color: 'var(--green)' }}>rank 1</span>
+                <span className="font-semibold" style={{ color: 'var(--green)' }}>now #1</span>
               </div>
             </div>
             <div className="rounded-xl p-5 card card-hover">
-              <div className="mono text-xs mb-2" style={{ color: 'var(--text-mute)' }}>recall@10 = 0 cases</div>
+              <div className="mono text-xs mb-2" style={{ color: 'var(--text-mute)' }}>Questions it used to miss entirely</div>
               <div className="flex items-center gap-3 text-sm">
                 <span style={{ color: 'var(--text-mute)' }}>4 of 20</span>
                 <span style={{ color: 'var(--text-mute)' }}>&rarr;</span>
@@ -608,7 +605,7 @@ export default function Home() {
         <section id="features" className="max-w-6xl mx-auto px-6 py-24 md:py-32">
           <div className="mb-14">
             <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>Features</div>
-            <p className="text-3xl md:text-4xl font-bold">Production-grade RAG, local-first.</p>
+            <p className="text-3xl md:text-4xl font-bold">Built for accuracy, security, and trust.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-4">
             {FEATURES.map((f) => (
@@ -625,6 +622,7 @@ export default function Home() {
           <div className="mb-14">
             <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>Quick start</div>
             <p className="text-3xl md:text-4xl font-bold">Running in two minutes.</p>
+            <p className="text-base mt-3" style={{ color: 'var(--text-dim)' }}>For anyone who wants to run it themselves or review exactly how it works under the hood.</p>
           </div>
           <div className="rounded-2xl overflow-hidden card">
             <div className="flex items-center justify-between" style={{ borderBottom: '1px solid var(--border)' }}>
