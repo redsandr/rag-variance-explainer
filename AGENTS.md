@@ -206,6 +206,8 @@ Project ini pake gstack workflow. Beberapa hal yang perlu diingat:
 - `.streamlit/secrets.toml` added to `.gitignore` — deployment safety
 
 #### Session 5 — Streamlit Bug Hunt & UX Fixes
+- **CI Fix**: `ruff` dan `mypy` gak diinstall di workflow — cuma `bandit pytest-cov`. Ditambahin ke `pip install` di `.github/workflows/test.yml`.
+- **Programmer**: 6 bugs fixed — `get_llm` NameError ordering, `st.session_state.question_input` widget conflict, `pending_question` Streamlit DOM isolation, example chips auto-submit, stale processing recovery, NameError compare undefined
 - **Programmer**: 6 bugs fixed — `get_llm` NameError ordering, `st.session_state.question_input` widget conflict, `pending_question` Streamlit DOM isolation, example chips auto-submit, stale processing recovery, NameError compare undefined
 - **Engineer**: `st.fragment` wrapping analyze logic (race condition), `st.form()` for submit isolation, `disabled=processing` on all widgets during model run, `@st.cache_resource` get_llm ordering before `_startup_check()`
 - **Designer**: Restructured layout — stripped broken HTML grid (`dashboard-grid`/`main-col`/`right-col`), replaced with native `st.columns([3,1])`, example chips as `st.columns(4)` rows, removed orphaned CSS
