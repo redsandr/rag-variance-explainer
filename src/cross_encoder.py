@@ -23,6 +23,13 @@ def _get_model() -> CrossEncoder:
 
 
 def rerank(query: str, candidates: list[dict], top_k: int = 5) -> list[dict]:
+    """Re-rank candidates using cross-encoder scores blended with bi-encoder.
+
+    Normalises both cross-encoder and bi-encoder scores to [0,1], blends
+    them with *cross_encoder_weight*, adds keyword boost and forward-looking
+    penalty, then returns the top *top_k* candidates sorted by hybrid score.
+    Falls back silently to input order if cross-encoder loading fails.
+    """
     if not candidates:
         return []
 

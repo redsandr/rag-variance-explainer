@@ -87,6 +87,13 @@ def _merge_judge_results(objects: list[dict]) -> dict:
 
 
 def parse_judge_response(response: str) -> dict | None:
+    """Recover structured judge output from LLM text, handling common failures.
+
+    Strips code fences, trailing commas, and broken JSON; attempts direct
+    parse first, then falls back to multi-object merge for LLMs that return
+    one JSON object per fiscal period. Returns None if nothing could be
+    recovered — the caller treats this as a failed judgement.
+    """
     cleaned = response.strip()
     cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
     cleaned = re.sub(r"\s*```$", "", cleaned)

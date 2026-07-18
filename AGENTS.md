@@ -160,19 +160,32 @@ Project ini pake gstack workflow. Beberapa hal yang perlu diingat:
 ## Session Context — 18 Juli 2026
 
 ### Apa yang dikerjakan
-- **Phase 2b Code Lockdown complete** — 5-role audit (Programmer → Designer → Engineer → Business → CEO)
+#### Session 1 — Phase 2b Code Lockdown
 - **Programmer**: 5 UI fixes (sidebar nav, KPI refresh, sector badges, retail stats, loading shimmer)
 - **Designer**: 6 UX fixes (emoji→SVG, WCAG contrast, button disabled, glow hover, focus rings, remove skeleton duplicate)
 - **Engineer**: 14 fixes — P1 (LLM retry+timeout+CE fallback), P2 (BM25 cache), P3 (prompt injection+rate limit+input validation), SEC rate limiting, LLM backend fallback, GPU guard, health check, tokenization DRY, double call optimization
 - **Business**: JNJ+XOM added (7 companies, 4 sectors), SEC rate limiting retry, LLM fallback mechanism
 - **CEO**: Go signal for Phase 3 (benchmarking, blog, deploy)
 
+#### Session 2 — 6 Concern Fixes + Docstrings + Code Quality
+- **Docstrings**: P0 functions (14% → ~27% with WHY) — `answer_question`, `query_multi`, `chunk_document`, `build_index`, `parse_judge_response`, `rerank`, `extract_mda_section`, `LLMClient.__init__`, `LLMClient.generate`
+- **Concern 1** (Idempotency): ✅ Comment clarifying `collection.upsert()` deterministik — `src/retrieval.py:47`
+- **Concern 2** (Mocking): ✅ `conftest.py` — auto-patch semua `_init_*` methods. Test yang keciidola init LLM asli bakal fail cepat & jelas
+- **Concern 3** (Config validation): ✅ `__post_init__` — validasi range 11 parameter (weight 0-1, int >=1), error jelas di startup
+- **Concern 4** (LLM-as-judge disclosure): ✅ README updated — Claude cross-validation pada 20 questions × 66 claims, no manual annotation
+- **Concern 5** (SEC retry): ✅ `_rate_limited_get` → 5× retry + exponential backoff + connection timeout handling
+- **Concern 6** (Auto-generate script): ✅ `scripts/update_readme_stats.py` — query ChromaDB, update README Index line (`--check` untuk dry-run)
+- **CI**: 35 tests (↑3), ruff 0 errors, mypy 19 pre-existing only
+- **build_index.py**: CIK/fetch/parse wrapped in try/except — 1 ticker gagal gak ngerusak sisanya
+- **Peringatan baru**: `conftest.py` auto-patch LLM init — jangan hapus tanpa bikin mock alternatif
+
 ### State akhir session
 | Commit | Message | Files |
 |--------|---------|-------|
 | `a0301bf` | Phase 2b complete: code lockdown + designer + engineer + business fixes | 14 files |
+| *(next)* | fix: docstrings, config validation, SEC retry, LLM test fixture, idempotency, README disclosure, auto-stats script | 14 files + 2 new |
 
-### Next yang direncanakan (Phase 3)
+### Next yang direncanakan
 1. **Deploy live demo** — Streamlit Cloud (30 min)
 2. **Blog post** — "Building a Multi-Sector RAG Pipeline with 74% Faithfulness"
 3. **Benchmark GPT-4o** — requires API key
@@ -182,3 +195,5 @@ Project ini pake gstack workflow. Beberapa hal yang perlu diingat:
 - `src/ingest.py` TICKERS includes JNJ + XOM but data not yet indexed — run `python -m src.build_index` to fetch
 - LLM model path must be set in `.env` — see `.env.example`
 - Obsidian vault docs not synced this session — `docs/` in repo may be stale
+- `conftest.py` patches `LLMClient._init_*` — prevents accidental real LLM calls in CI. Don't remove without mock alternative.
+- `scripts/update_readme_stats.py` requires ChromaDB collection with data — run after `build_index`

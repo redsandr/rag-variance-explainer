@@ -40,6 +40,12 @@ def answer_question(
     llm: LLMClient = None,
     on_progress: Callable | None = None,
 ) -> dict:
+    """End-to-end RAG pipeline: retrieve, generate, verify.
+
+    Pulls relevant MD&A chunks from ChromaDB, builds a grounded prompt,
+    calls the LLM, then runs number + metric verification on the answer.
+    Returns structured dict with 'question', 'answer', and 'sources'.
+    """
     if top_k is None:
         top_k = config.retrieval_top_k
     if min_relevance is None:

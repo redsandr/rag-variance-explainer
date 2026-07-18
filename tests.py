@@ -216,3 +216,32 @@ def test_expand_query_unknown_terms_adds_no_synonyms() -> None:
 def test_keyword_boost_stopwords_ignored() -> None:
     from src.retrieval import _keyword_boost
     assert _keyword_boost("the a an in of to", "any text here") == 0.0
+
+
+# --- LLM backend tests ---
+
+
+def test_llm_unknown_backend_fallback_raises_runtime_error() -> None:
+    from src.llm import LLMClient
+    LLMClient.reset()
+    with pytest.raises(RuntimeError, match="All LLM backends failed"):
+        LLMClient(backend="nonexistent_backend")
+    LLMClient.reset()
+
+
+def test_llm_singleton_returns_same_instance() -> None:
+    from src.llm import LLMClient
+    LLMClient.reset()
+    a = LLMClient.__new__(LLMClient)
+    b = LLMClient.__new__(LLMClient)
+    assert a is b
+    LLMClient.reset()
+
+
+def test_llm_reset_creates_new_instance() -> None:
+    from src.llm import LLMClient
+    LLMClient.reset()
+    a = LLMClient.__new__(LLMClient)
+    LLMClient.reset()
+    b = LLMClient.__new__(LLMClient)
+    assert a is not b

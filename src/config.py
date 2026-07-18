@@ -1,7 +1,10 @@
+import logging
 import os
 from dataclasses import dataclass, field
 
 from dotenv import load_dotenv
+
+logger = logging.getLogger(__name__)
 
 
 def init_config(env_file: str | None = None) -> None:
@@ -9,6 +12,23 @@ def init_config(env_file: str | None = None) -> None:
 
 
 init_config()
+
+
+def _validate_float_range(key: str, value: float, lo: float, hi: float) -> float:
+    if not lo <= value <= hi:
+        raise ValueError(
+            f"{key}={value} is outside valid range [{lo}, {hi}]. "
+            f"Check your .env file."
+        )
+    return value
+
+
+def _validate_positive_int(key: str, value: int) -> int:
+    if value < 1:
+        raise ValueError(
+            f"{key}={value} must be >= 1. Check your .env file."
+        )
+    return value
 
 
 @dataclass
@@ -47,6 +67,19 @@ class RAGConfig:
     sec_user_agent: str = os.getenv("SEC_USER_AGENT", "RAG-Variance-Explainer (sebas@portfolio.dev)")
     llm_max_tokens: int = int(os.getenv("RAG_LLM_MAX_TOKENS", "2048"))
     llm_temperature: float = float(os.getenv("RAG_LLM_TEMPERATURE", "0.1"))
+
+    def __post_init__(self) -> None:
+        _validate_positive_int("RAG_TOP_K", self.retrieval_top_k)
+        _validate_float_range("RAG_MIN_RELEVANCE", self.retrieval_min_relevance, 0.0, 1.0)
+        _validate_positive_int("RAG_N_CANDIDATES", self.retrieval_n_candidates)
+        _validate_positive_int("RAG_EXPANSION_N_TERMS", self.expansion_n_terms)
+        _validate_float_range("RAG_KEYWORD_BOOST_WEIGHT", self.keyword_boost_weight, -1.0, 1.0)
+        _validate_float_range("RAG_FORWARD_LOOKING_PENALTY_WEIGHT", self.forward_looking_penalty_weight, -1.0, 1.0)
+        _validate_float_range("RAG_CROSS_ENCODER_WEIGHT", self.cross_encoder_weight, 0.0, 1.0)
+        _validate_positive_int("RAG_CROSS_ENCODER_BATCH_SIZE", self.cross_encoder_batch_size)
+        _validate_positive_int("RAG_FILINGS_PER_COMPANY", self.build_filings_per_company)
+        _validate_positive_int("RAG_LLM_MAX_TOKENS", self.llm_max_tokens)
+        _validate_float_range("RAG_LLM_TEMPERATURE", self.llm_temperature, 0.0, 2.0)
 
 
 config = RAGConfig()

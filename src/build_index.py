@@ -28,9 +28,17 @@ def build_index() -> None:
 
     for ticker in TICKERS:
         logger.info("=== %s ===", ticker)
-        cik = get_cik(ticker)
-        submissions = fetch_submissions(cik)
-        filings = list_10k_10q_filings(submissions)[:config.build_filings_per_company]
+
+        try:
+            cik = get_cik(ticker)
+            submissions = fetch_submissions(cik)
+            filings = list_10k_10q_filings(submissions)[
+                : config.build_filings_per_company
+            ]
+        except Exception as e:
+            logger.error("  SKIP %s — pre-processing failed: %s", ticker, e)
+            failures.append((ticker, "N/A", "N/A", "N/A", str(e)))
+            continue
 
         for filing in filings:
             accession = filing["accessionNumber"]

@@ -200,6 +200,8 @@ Pipeline generalizes to retail with **zero degradation** — retail recall@10 ou
 
 > Weighted baseline (78.9%) and post-fix (75.32%) are not directly comparable — the judge evaluation methodology was refined between iterations (stricter parsing, reduced overestimation). The **strict metric is the reliable indicator**: **65.8% → 74.24%** (+8.44pp).
 
+**Methodology note:** Qwen2.5-7B-Instruct acts as the judge, evaluating each claim against source chunks. The judge prompt was iterated 11 times to minimise overestimation. Early iterations (iterasi 3) were cross-validated against Claude (Anthropic) as a secondary judge on the full eval set — the Qwen score was ~7.5pp higher, confirming systematic overestimation that was later addressed through stricter prompt engineering and parser fixes. No manual human annotation was performed; the calibration anchor is the Claude cross-validation on 20 questions × 66 claims.
+
 Three targeted fixes drove the improvement:
 1. **Number transposition** — `verify_answer()` integration catches decimal shifts & year mismatches
 2. **Metric conflation** — `MetricVerifier` cross-checks metric labels against source chunk metadata

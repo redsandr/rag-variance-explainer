@@ -74,6 +74,13 @@ def chunk_document(
         chunk_size: int = 500,
         chunk_overlap: int = 50,
 ) -> list[str]:
+    """Structure-aware recursive text chunking.
+
+    Splits by paragraph → line → token boundaries to avoid cutting
+    through tables, sentences, or financial figures. Adds overlap by
+    prepending the tail of the previous chunk so downstream retrieval
+    doesn't lose context at boundaries.
+    """
     if chunk_overlap >= chunk_size:
         raise ValueError("chunk_overlap must be smaller than chunk_size")
 

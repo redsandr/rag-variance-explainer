@@ -55,6 +55,10 @@ def add_chunks(
     that lets us trace each chunk back to its source filing later
     (needed for citing "why did X happen" answers back to a real 10-Q/10-K).
 
+    Uses *upsert* with deterministic IDs (ticker + accession + index), so
+    running build_index twice simply overwrites existing chunks instead of
+    duplicating them — idempotent by design.
+
     If metadatas is provided, use it directly instead of building default.
     """
     if not chunks:
@@ -222,6 +226,13 @@ def query_multi(
     min_relevance: float = None,
     ticker_filter: str | None = None,
 ) -> list[dict]:
+    """Multi-stage retrieval: dense → optional BM25 hybrid → cross-encoder rerank.
+
+    Dense retrieval (nomic-embed) is the primary pass. If
+    *hybrid_search_enabled*, BM25 scores supplement dense via RRF merge.
+    If *cross_encoder_enabled*, final reranking refines the ranking.
+    Falls back gracefully if cross-encoder is unavailable.
+    """
     if top_k is None:
         top_k = config.retrieval_top_k
     if min_relevance is None:

@@ -20,5 +20,6 @@ Extended documentation for the project, covering problem validation, architectur
 ## Quick Links
 
 - **README** (root): project overview, setup, architecture
-- **Tests**: `tests.py` — 32 tests across 9 modules
+- **Tests**: `tests.py` + `conftest.py` — 35 tests across 9 modules (LLM backend, singleton, reset) + auto-mock fixture
+- **Scripts**: `scripts/update_readme_stats.py` — auto-generate corpus stats from ChromaDB
 - **CI**: `.github/workflows/test.yml` — pytest on push/PR

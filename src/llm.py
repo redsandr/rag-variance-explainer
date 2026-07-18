@@ -60,6 +60,13 @@ class LLMClient:
             cls._instance = None
 
     def __init__(self, backend: str | None = None):
+        """Initialize the LLM client with a swappable backend.
+
+        Tries the preferred backend first; falls back to llama_cpp if that
+        fails. Raises RuntimeError if every backend in the chain fails.
+        Singleton — subsequent calls return the same instance without
+        re-initializing.
+        """
         if self._initialized:
             return
 
@@ -140,6 +147,12 @@ class LLMClient:
 
     @_retry(max_attempts=3, base_delay=2.0)
     def generate(self, prompt: str, system: str = None, max_tokens: int = 500, temperature: float | None = None) -> str:
+        """Generate a completion for *prompt*, routed to the active backend.
+
+        Automatically retries on transient failures (network timeout, API
+        503) with exponential backoff. The caller never needs to know which
+        backend is actually serving the request.
+        """
         if self.backend == "llama_cpp":
             return self._generate_llama_cpp(prompt, system, max_tokens, temperature)
         if self.backend == "anthropic":

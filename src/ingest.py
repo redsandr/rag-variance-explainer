@@ -37,21 +37,45 @@ SEC_REQUEST_DELAY = float(os.getenv("SEC_REQUEST_DELAY", "0.2"))
 _LAST_REQUEST_TIME = 0.0
 
 
-def _rate_limited_get(url: str) -> requests.Response:
+def _rate_limited_get(url: str, max_retries: int = 5, base_delay: float = 5.0) -> requests.Response:
+    """Fetch *url* with rate limiting, retry on 429 and transient errors.
+
+    - Enforces minimum *SEC_REQUEST_DELAY* between requests (SEC mandate).
+    - Retries on 429 (respecting Retry-After header) and connection errors
+      (timeout, DNS, reset) with exponential backoff, up to *max_retries*.
+    """
     global _LAST_REQUEST_TIME
-    elapsed = time.time() - _LAST_REQUEST_TIME
-    if elapsed < SEC_REQUEST_DELAY:
-        time.sleep(SEC_REQUEST_DELAY - elapsed)
-    response = _SESSION.get(url)
-    _LAST_REQUEST_TIME = time.time()
-    if response.status_code == 429:
-        wait = int(response.headers.get("Retry-After", "10"))
-        logger.warning("SEC rate limited (429). Waiting %ds...", wait)
-        time.sleep(wait)
-        response = _SESSION.get(url)
-        _LAST_REQUEST_TIME = time.time()
-    response.raise_for_status()
-    return response
+    last_exception = None
+    for attempt in range(1, max_retries + 1):
+        try:
+            elapsed = time.time() - _LAST_REQUEST_TIME
+            if elapsed < SEC_REQUEST_DELAY:
+                time.sleep(SEC_REQUEST_DELAY - elapsed)
+            response = _SESSION.get(url, timeout=30)
+            _LAST_REQUEST_TIME = time.time()
+            if response.status_code == 429:
+                wait = int(response.headers.get("Retry-After", str(base_delay)))
+                logger.warning(
+                    "SEC rate limited (429). Attempt %d/%d. Waiting %ds...",
+                    attempt, max_retries, wait,
+                )
+                time.sleep(wait)
+                continue
+            response.raise_for_status()
+            return response
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
+            last_exception = e
+            if attempt < max_retries:
+                delay = base_delay * (2 ** (attempt - 1))
+                logger.warning(
+                    "SEC request failed (attempt %d/%d): %s. Retrying in %.1fs...",
+                    attempt, max_retries, e, delay,
+                )
+                time.sleep(delay)
+            continue
+    raise RuntimeError(
+        f"SEC request failed after {max_retries} attempts. Last error: {last_exception}"
+    ) from last_exception
 
 TICKERS = {
     "CMG": "Chipotle Mexican Grill",
@@ -138,6 +162,12 @@ def _parse_item_num(item_text: str) -> float:
 
 
 def extract_mda_section(html: str) -> str:
+    """Extract the Management's Discussion & Analysis section from SEC HTML.
+
+    Parses the SEC filing HTML, converts tables to readable text, then
+    locates the MD&A heading and extracts all text up to the next Item
+    heading. Returns clean, minimally-formatted text ready for chunking.
+    """
     soup = BeautifulSoup(html, "html.parser")
     _convert_tables_to_text(soup)
     text = soup.get_text(separator="\n")
