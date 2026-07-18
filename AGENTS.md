@@ -205,6 +205,13 @@ Project ini pake gstack workflow. Beberapa hal yang perlu diingat:
 - **Profile recomm.** : run 5-10 queries → check `[timing]` logs → serang bottleneck terbesar (kemungkinan LLM generation ~80%)
 - `.streamlit/secrets.toml` added to `.gitignore` — deployment safety
 
+#### Session 5 — Streamlit Bug Hunt & UX Fixes
+- **Programmer**: 6 bugs fixed — `get_llm` NameError ordering, `st.session_state.question_input` widget conflict, `pending_question` Streamlit DOM isolation, example chips auto-submit, stale processing recovery, NameError compare undefined
+- **Engineer**: `st.fragment` wrapping analyze logic (race condition), `st.form()` for submit isolation, `disabled=processing` on all widgets during model run, `@st.cache_resource` get_llm ordering before `_startup_check()`
+- **Designer**: Restructured layout — stripped broken HTML grid (`dashboard-grid`/`main-col`/`right-col`), replaced with native `st.columns([3,1])`, example chips as `st.columns(4)` rows, removed orphaned CSS
+- **Streamlit Skills**: Installed `developing-with-streamlit` skill
+- **Root cause discovery**: Streamlit DOM isolation — HTML tags across multiple `st.markdown()` calls never nest properly. All widget-interactive sections must use pure Streamlit layout
+
 ### State akhir session
 | Commit | Message | Files |
 |--------|---------|-------|
@@ -212,20 +219,27 @@ Project ini pake gstack workflow. Beberapa hal yang perlu diingat:
 | `4bb006e` | fix: docstrings, config validation, SEC retry, LLM test fixture, idempotency, README disclosure, auto-stats script | 16 files |
 | `1c7b9b7` | fix: mypy debt, rerank/build_index tests, pre-commit, CI coverage+bandit | 15 files |
 | `9967ea2` | fix: app.py bridge audit — sanitize_input moved to src/, sidebar KPI 5->7, .gitignore secrets | 4 files |
-| *(next)* | feat: timeout, graceful degradation (embedding), monitoring (log_timer), concurrent semaphore, app.py bridge fixes | 8 files |
+| `08f32a1` | feat: timeout, graceful degradation, monitoring, concurrent semaphore | 8 files |
+| *(next)* | Streamlit bug hunt — fragment, form, chip auto-submit, processing freeze | 3 files |
+
+### Temuan Penting
+- **Streamlit DOM isolation**: Jangan buka `<div>` di satu `st.markdown()` dan tutup di `st.markdown()` lain — Streamlit render tiap `st.*` di container terpisah, nesting HTML gak pernah valid.
+- **`st.form()`**: Satu-satunya cara prevent widget change trigger rerun. Changes di dalam form gak trigger rerun — cuma `st.form_submit_button()` yang trigger.
+- **`st.fragment`**: Isolation execution yang kebal dari widget change rerun. Cocok buat long-running operations (LLM call).
+- **`disabled=processing`**: Widget harus render dengan `disabled=True` selama processing — tapi `st.session_state.processing` harus di-set SEBELUM widget render, bukan sesudahnya (pakai two-pass: set processing → rerun → render disabled).
 
 ### Next yang direncanakan
-1. **Profile bottleneck** — `python src/rag.py` or via Streamlit, check `[timing]` logs, optimize biggest stage
-2. **Deploy live demo** — Streamlit Cloud (30 min)
-3. **Blog post** — "Building a Multi-Sector RAG Pipeline with 74% Faithfulness"
-4. **Benchmark GPT-4o** — requires API key
-5. **Run `build_index`** — for JNJ + XOM data (currently code-ready, no data)
+1. **System Analytics test** — test the KPI grid, About card, refresh button
+2. **Error handling test** — empty states, sanitization edge cases, rate limiting
+3. **Deploy live demo** — Streamlit Cloud (30 min)
+4. **Blog post** — "Building a Multi-Sector RAG Pipeline with 74% Faithfulness"
+5. **Run `build_index`** — for JNJ + XOM data
 
 ### Peringatan
 - `src/ingest.py` TICKERS includes JNJ + XOM but data not yet indexed — run `python -m src.build_index` to fetch
 - LLM model path must be set in `.env` — see `.env.example`
-- Obsidian vault docs not synced this session — `docs/` in repo may be stale
 - `conftest.py` patches `LLMClient._init_*` — prevents accidental real LLM calls in CI. Don't remove without mock alternative.
 - `scripts/update_readme_stats.py` requires ChromaDB collection with data — run after `build_index`
 - `LLM_TIMEOUT` env var (default 120s) and `LLM_MAX_CONCURRENT` env var (default 1) available in `.env`
 - `[timing]` logs appear at INFO level — check stdout/stderr for per-stage latency breakdown
+- **Streamlit form + fragment combo**: Use `st.form()` wrap widgets to prevent rerun leaks, `@st.fragment` for long-running operations. The `auto_ask` pattern needs saved widget state (via `st.session_state.get()`) because example buttons bypass form submit.
