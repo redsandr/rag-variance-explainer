@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt bandit pytest-cov
+          pip install -r requirements.txt ruff mypy bandit pytest-cov
 
       - name: Lint (ruff)
         run: ruff check src/ conftest.py
