@@ -21,6 +21,9 @@ run:
 eval-recall:
 	python src/eval_recall.py
 
+eval-ablation:
+	python src/eval_ablation.py
+
 eval-llm:
 	python src/eval_llm.py
 
