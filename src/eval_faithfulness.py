@@ -322,7 +322,7 @@ def main() -> None:
         results.append(result)
         _save_checkpoint(results)
 
-    full = _aggregate_results(results, times)
+    full = _aggregate_results([r for r in results if r is not None], times)
 
     with open(RESULT_FILE, "w") as f:
         json.dump(full, f, indent=2)

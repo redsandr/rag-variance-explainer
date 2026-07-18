@@ -33,7 +33,7 @@ where = ["src"]
 [tool.ruff]
 target-version = "py311"
 line-length = 160
-include = ["src/*.py", "app.py", "tests.py"]
+include = ["src/*.py", "app.py", "tests.py", "conftest.py", "scripts/*.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "SIM"]
@@ -42,6 +42,9 @@ select = ["E", "F", "W", "I", "N", "UP", "B", "SIM"]
 "tests.py" = ["SIM"]
 "src/prompts.py" = ["E501"]
 "src/compact_judge_prompts.py" = ["E501"]
+
+[tool.bandit]
+targets = ["src/"]
 
 [tool.mypy]
 python_version = "3.11"

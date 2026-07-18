@@ -38,7 +38,7 @@ FINANCIAL_SYNONYMS = {
 }
 
 
-def expand_query(query: str, n_extra_terms: int = None) -> str:
+def expand_query(query: str, n_extra_terms: int | None = None) -> str:
     if n_extra_terms is None:
         n_extra_terms = config.expansion_n_terms
 

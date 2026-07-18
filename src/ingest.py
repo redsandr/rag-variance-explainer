@@ -10,6 +10,7 @@ import logging
 import os
 import re
 import time
+from typing import cast
 
 import requests
 from bs4 import BeautifulSoup
@@ -109,7 +110,7 @@ def fetch_filing_html(url: str) -> str:
     return response.text
 
 
-def _find_mda_start(text: str) -> re.Match | None:
+def _find_mda_start(text: str) -> re.Match[str]:
     heading_pattern = re.compile(
         r"Item\s+\d+[A]?\.\s*Management.{0,3}s\s+Discussion\s+and\s+Analysis",
         re.IGNORECASE,
@@ -128,7 +129,7 @@ def _find_mda_start(text: str) -> re.Match | None:
             best_gap = gap
             best_match = m
 
-    return best_match
+    return cast("re.Match[str]", best_match)
 
 
 def _convert_tables_to_text(soup: BeautifulSoup) -> None:

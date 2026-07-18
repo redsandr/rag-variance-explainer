@@ -89,8 +89,8 @@ def add_chunks(
 def query(
     collection: Any,
     query_text: str,
-    top_k: int = None,
-    min_relevance: float = None,
+    top_k: int | None = None,
+    min_relevance: float | None = None,
     ticker_filter: str | None = None,
     expand: bool = False,
 ) -> list[dict]:
@@ -222,8 +222,8 @@ def _fill_missing_fields(candidates: list[dict], query_text: str) -> None:
 def query_multi(
     collection: Any,
     query_text: str,
-    top_k: int = None,
-    min_relevance: float = None,
+    top_k: int | None = None,
+    min_relevance: float | None = None,
     ticker_filter: str | None = None,
 ) -> list[dict]:
     """Multi-stage retrieval: dense → optional BM25 hybrid → cross-encoder rerank.

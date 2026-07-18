@@ -175,15 +175,24 @@ Project ini pake gstack workflow. Beberapa hal yang perlu diingat:
 - **Concern 4** (LLM-as-judge disclosure): ✅ README updated — Claude cross-validation pada 20 questions × 66 claims, no manual annotation
 - **Concern 5** (SEC retry): ✅ `_rate_limited_get` → 5× retry + exponential backoff + connection timeout handling
 - **Concern 6** (Auto-generate script): ✅ `scripts/update_readme_stats.py` — query ChromaDB, update README Index line (`--check` untuk dry-run)
-- **CI**: 35 tests (↑3), ruff 0 errors, mypy 19 pre-existing only
+- **CI**: 38 tests (↑6), mypy 0 errors, ruff 0 errors, bandit 0 issues
 - **build_index.py**: CIK/fetch/parse wrapped in try/except — 1 ticker gagal gak ngerusak sisanya
+- **Pre-commit**: `.pre-commit-config.yaml` — ruff + mypy auto-run on `git commit`
+
+#### Session 3 — mypy Debt + Test Coverage + CI Gate
+- **mypy 19→0**: Fixed all implicit `Optional` errors across core files (`llm.py`, `rag.py`, `retrieval.py`, `hybrid_search.py`, `query_expansion.py`, `post_process.py`, `ingest.py`, `eval_faithfulness.py`) + `ingest.py` return type narrowing
+- **rerank test**: 2 tests — empty candidates, single candidate with mocked cross-encoder
+- **build_index test**: 1 test — empty TICKERS dict, mocking client/collection
+- **CI upgrade**: `pytest --cov-fail-under=65`, `mypy src/`, `ruff check`, `bandit -r src/` all run on every push
 - **Peringatan baru**: `conftest.py` auto-patch LLM init — jangan hapus tanpa bikin mock alternatif
+- **Peringatan**: `scripts/update_readme_stats.py` requires ChromaDB data — jalanin setelah `build_index`
 
 ### State akhir session
 | Commit | Message | Files |
 |--------|---------|-------|
-| `a0301bf` | Phase 2b complete: code lockdown + designer + engineer + business fixes | 14 files |
-| *(next)* | fix: docstrings, config validation, SEC retry, LLM test fixture, idempotency, README disclosure, auto-stats script | 14 files + 2 new |
+| `a0301bf` | Phase 2b complete | 14 files |
+| `4bb006e` | fix: docstrings, config validation, SEC retry, LLM test fixture, idempotency, README disclosure, auto-stats script | 16 files |
+| *(next)* | fix: mypy debt, rerank/build_index tests, pre-commit, CI coverage+bandit gate | 9 files |
 
 ### Next yang direncanakan
 1. **Deploy live demo** — Streamlit Cloud (30 min)

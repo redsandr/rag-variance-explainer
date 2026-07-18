@@ -108,7 +108,7 @@ def verify_answer(answer: str, sources: Sequence[dict | str]) -> dict:
 
 
 class MetricVerifier:
-    def __init__(self, synonym_groups: dict[str, list[str]] = None):
+    def __init__(self, synonym_groups: dict[str, list[str]] | None = None):
         from query_expansion import FINANCIAL_SYNONYMS
         self.synonym_groups = synonym_groups or FINANCIAL_SYNONYMS
         self._term_to_group = {}

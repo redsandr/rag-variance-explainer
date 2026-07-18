@@ -146,7 +146,7 @@ class LLMClient:
         self._model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
     @_retry(max_attempts=3, base_delay=2.0)
-    def generate(self, prompt: str, system: str = None, max_tokens: int = 500, temperature: float | None = None) -> str:
+    def generate(self, prompt: str, system: str | None = None, max_tokens: int = 500, temperature: float | None = None) -> str:
         """Generate a completion for *prompt*, routed to the active backend.
 
         Automatically retries on transient failures (network timeout, API
@@ -161,7 +161,7 @@ class LLMClient:
             return self._generate_openai(prompt, system, max_tokens, temperature)
         raise ValueError(f"Unknown backend: {self.backend}")
 
-    def _generate_llama_cpp(self, prompt: str, system: str, max_tokens: int, temperature: float | None = None) -> str:
+    def _generate_llama_cpp(self, prompt: str, system: str | None, max_tokens: int, temperature: float | None = None) -> str:
         messages = []
         if system:
             messages.append({"role": "system", "content": system})
@@ -172,7 +172,7 @@ class LLMClient:
         output = self._llm.create_chat_completion(**kwargs)
         return output["choices"][0]["message"]["content"].strip()
 
-    def _generate_anthropic(self, prompt: str, system: str, max_tokens: int) -> str:
+    def _generate_anthropic(self, prompt: str, system: str | None, max_tokens: int) -> str:
         kwargs = {"model": self._model, "max_tokens": max_tokens,
                 "messages": [{"role": "user", "content": prompt}]}
         if system:
@@ -180,7 +180,7 @@ class LLMClient:
         response = self._client.messages.create(**kwargs)
         return response.content[0].text.strip()
 
-    def _generate_openai(self, prompt: str, system: str, max_tokens: int, temperature: float | None = None) -> str:
+    def _generate_openai(self, prompt: str, system: str | None, max_tokens: int, temperature: float | None = None) -> str:
         messages = []
         if system:
             messages.append({"role": "system", "content": system})

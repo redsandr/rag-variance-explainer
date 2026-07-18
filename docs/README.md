@@ -20,6 +20,8 @@ Extended documentation for the project, covering problem validation, architectur
 ## Quick Links
 
 - **README** (root): project overview, setup, architecture
-- **Tests**: `tests.py` + `conftest.py` — 35 tests across 9 modules (LLM backend, singleton, reset) + auto-mock fixture
+- **Tests**: `tests.py` + `conftest.py` — **38 tests** (LLM backend, singleton, reset, rerank, build_index, chunking, retrieval helpers, prompt builders, RRF merge) + auto-mock fixture prevents real LLM calls
 - **Scripts**: `scripts/update_readme_stats.py` — auto-generate corpus stats from ChromaDB
+- **Pre-commit**: `.pre-commit-config.yaml` — ruff + mypy auto-run on commit
+- **CI**: pytest + coverage (`--cov-fail-under=65`), mypy (0 errors), ruff (0 errors), bandit (0 issues)
 - **CI**: `.github/workflows/test.yml` — pytest on push/PR

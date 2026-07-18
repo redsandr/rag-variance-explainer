@@ -34,10 +34,10 @@ def build_context(results: list[dict]) -> str:
 
 def answer_question(
     question: str,
-    ticker_filter: str = None,
-    top_k: int = None,
-    min_relevance: float = None,
-    llm: LLMClient = None,
+    ticker_filter: str | None = None,
+    top_k: int | None = None,
+    min_relevance: float | None = None,
+    llm: LLMClient | None = None,
     on_progress: Callable | None = None,
 ) -> dict:
     """End-to-end RAG pipeline: retrieve, generate, verify.

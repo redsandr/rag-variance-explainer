@@ -48,7 +48,7 @@ def rrf_merge(
     dense_list: list[dict],
     bm25_list: list[dict],
     k: int = 60,
-    top_k: int = None,
+    top_k: int | None = None,
 ) -> list[dict]:
     scores: dict[str, float] = {}
     items: dict[str, dict] = {}

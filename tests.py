@@ -245,3 +245,41 @@ def test_llm_reset_creates_new_instance() -> None:
     LLMClient.reset()
     b = LLMClient.__new__(LLMClient)
     assert a is not b
+
+
+# --- Cross-encoder rerank tests ---
+
+
+def test_rerank_empty_candidates_returns_empty() -> None:
+    from src.cross_encoder import rerank
+    assert rerank("test query", [], top_k=5) == []
+
+
+def test_rerank_single_candidate_preserves_it() -> None:
+    from unittest.mock import patch
+    from src.cross_encoder import rerank
+
+    candidate = {"text": "Revenue increased 10%", "metadata": {"ticker": "CMG"}, "relevance": 0.9}
+    with patch("src.cross_encoder._get_model") as mock_get_model:
+        mock_model = mock_get_model.return_value
+        mock_model.predict.return_value = [0.95]
+        result = rerank("revenue", [candidate], top_k=5)
+    assert len(result) == 1
+    assert result[0]["text"] == "Revenue increased 10%"
+    assert "cross_encoder_score" in result[0]
+
+
+# --- build_index tests ---
+
+
+def test_build_index_empty_db_handles_gracefully() -> None:
+    from unittest.mock import patch
+    import src.build_index as bi
+
+    with (
+        patch("src.build_index.get_client") as mock_client,
+        patch("src.build_index.get_collection") as mock_collection,
+        patch("src.build_index.TICKERS", {}),
+    ):
+        mock_collection.return_value.count.return_value = 0
+        bi.build_index()
