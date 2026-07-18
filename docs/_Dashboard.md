@@ -33,8 +33,10 @@ status: active
 | Retrieval MRR (retail) | **0.65** |
 | recall@10 (restaurant) | **0.70** |
 | recall@10 (retail) | **1.00** ✅ |
-| Faithfulness (strict) | **74.24%** (+8.44pp from baseline) |
-| Faithfulness (weighted) | **75.32%** ✅ (above target) |
+| Faithfulness (strict, restaurant) | **74.24%** (+8.44pp from baseline) |
+| Faithfulness (strict, retail) | **69.70%** ✅ |
+| Faithfulness (weighted, restaurant) | **75.32%** ✅ (above target) |
+| Faithfulness (weighted, retail) | **80.30%** ✅ |
 | Judge parse errors | **0** ✅ |
 | Phase 1 | ✅ Complete (merged to master) |
 | Phase 2 — Retail Expansion | ✅ Complete (WMT + TGT indexed, recall@10=1.00) |
