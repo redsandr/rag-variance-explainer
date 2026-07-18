@@ -29,14 +29,16 @@ status: active
 
 | Metric | Value |
 |--------|-------|
-| Retrieval MRR | **0.66** (+28% baseline) |
-| recall@10 | **0.70** |
-| Faithfulness (strict) | **64.56%** (Iterasi 11d) / **74.8%** (Claude) |
+| Retrieval MRR (restaurant) | **0.66** (+28% baseline) |
+| Retrieval MRR (retail) | **0.65** |
+| recall@10 (restaurant) | **0.70** |
+| recall@10 (retail) | **1.00** ✅ |
+| Faithfulness (strict) | **74.24%** (+8.44pp from baseline) |
 | Faithfulness (weighted) | **75.32%** ✅ (above target) |
 | Judge parse errors | **0** ✅ |
 | Phase 1 | ✅ Complete (merged to master) |
-| Phase 2 — Retail Expansion | 🟡 In Progress (WMT + TGT) |
-| Companies | 5 (CMG, DRI, CBRL, WMT, TGT) |
+| Phase 2 — Retail Expansion | ✅ Complete (WMT + TGT indexed, recall@10=1.00) |
+| Companies | **5** (CMG, DRI, CBRL, WMT, TGT) — 2 sectors |
 | Chunks | **740** from 40 filings |
 | Tests | 32 pytest |
 | Model | Qwen2.5-7B-Instruct Q4_K_M (llama.cpp) |

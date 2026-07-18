@@ -8,7 +8,7 @@ Extended documentation for the project, covering problem validation, architectur
 |------|-------------|
 | `00. RAG Project Plan.md` | Project scope, problem statement validated against real job listings |
 | `01. RAG Roadmap.md` | Development phases and milestones |
-| `02. Progress & Technical Documentation.md` | Comprehensive docs: architecture, eval results, refactoring history (Phase 1–6) |
+| `02. Progress & Technical Documentation.md` | Comprehensive docs: architecture, eval results, refactoring history (Phase 1–7, retail expansion) |
 | `03. Faithfulness Eval — Iterasi 3.md` | Faithfulness evaluation methodology and results |
 | `04. Prompt Engineering & Evaluation Fixes.md` | Prompt engineering iterations and calibration |
 | `05. Turn Weaknesses Into Strengths.md` | Action plan: scaling, deployment, community outreach, user testing (superseded by 07) |

@@ -43,8 +43,8 @@ def main() -> None:
         logger.info("  (retrieval only, no LLM generation)")
 
     LLMClient.reset()
-    _test_client = LLMClient()
-    logger.info("Active backend: %s", _test_client.backend)
+    llm = LLMClient()
+    logger.info("Active backend: %s, model loaded once, reused across all questions", llm.backend)
     outputs = []
     for item in eval_set:
         qid = item["id"]
@@ -53,7 +53,6 @@ def main() -> None:
 
         logger.info("\n%s\n[%s] %s\n%s", "=" * 60, qid, question, "=" * 60)
 
-        LLMClient.reset()
         t0 = time.time()
 
         if args.no_generate:
@@ -76,7 +75,7 @@ def main() -> None:
                 "retrieval_time_s": round(time.time() - t0, 1),
             }
         else:
-            result = answer_question(question, ticker_filter=ticker, top_k=5)
+            result = answer_question(question, ticker_filter=ticker, top_k=5, llm=llm)
             output = {
                 "question": question,
                 "ticker": ticker,
