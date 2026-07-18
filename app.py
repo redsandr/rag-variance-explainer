@@ -1,10 +1,11 @@
-import streamlit as st
 from pathlib import Path
+
+import streamlit as st
+
 from config import config
 from llm import LLMClient
 from rag import answer_question
 from retrieval import get_client, get_collection
-
 
 st.set_page_config(
     page_title="RAG Variance Explainer",
@@ -164,6 +165,8 @@ EXAMPLE_QUESTIONS = [
     "What drove Darden's revenue changes?",
     "How did wage inflation affect Chipotle?",
     "Why did CBRL's operating costs change?",
+    "How did Walmart's e-commerce sales change?",
+    "What drove Target's comparable sales?",
 ]
 
 st.markdown('<div class="example-row">', unsafe_allow_html=True)
@@ -180,13 +183,15 @@ ticker_map = {
     "CMG (Chipotle)": "CMG",
     "DRI (Darden)": "DRI",
     "CBRL (Cracker Barrel)": "CBRL",
+    "WMT (Walmart)": "WMT",
+    "TGT (Target)": "TGT",
 }
 
 filter_col, topk_col = st.columns(2)
 with filter_col:
     ticker_filter = st.selectbox(
         "Company",
-        options=["All", "CMG (Chipotle)", "DRI (Darden)", "CBRL (Cracker Barrel)"],
+        options=["All", "CMG (Chipotle)", "DRI (Darden)", "CBRL (Cracker Barrel)", "WMT (Walmart)", "TGT (Target)"],
         index=0,
         help="Filter sources by company ticker",
     )
@@ -352,8 +357,8 @@ else:
             f'<div class="empty-icon" aria-hidden="true">{EMPTY_SVG}</div>'
             f'<div class="empty-title">Ask a question to get started</div>'
             f'<div class="empty-desc">'
-            f'Query financial variance drivers from SEC EDGAR MD&A sections '
-            f'across Chipotle, Darden Restaurants, and Cracker Barrel.'
+             f'Query financial variance drivers from SEC EDGAR MD&A sections '
+             f'across Chipotle, Darden, Cracker Barrel, Walmart, and Target.'
             f'</div></div>',
             unsafe_allow_html=True,
         )
@@ -374,8 +379,8 @@ st.markdown(
     f'<div class="kpi-stack">'
     f'<div class="kpi-stack-card">'
     f'<div class="kpi-row-label">Companies</div>'
-    f'<div class="kpi-row-value">3</div>'
-    f'<div class="kpi-row-sub">CMG &middot; DRI &middot; CBRL</div></div>'
+     f'<div class="kpi-row-value">5</div>'
+     f'<div class="kpi-row-sub">CMG &middot; DRI &middot; CBRL &middot; WMT &middot; TGT</div></div>'
     f'<div class="kpi-stack-card">'
     f'<div class="kpi-row-label">Filings Indexed</div>'
     f'<div class="kpi-row-value">{filing_count}</div>'
@@ -390,8 +395,8 @@ st.markdown(
     f'<div class="kpi-row-sub">+28% from baseline</div></div>'
     f'<div class="kpi-stack-card">'
     f'<div class="kpi-row-label">Faithfulness</div>'
-f'<div class="kpi-row-value"><span class="green">65.8%</span></div>'
-     f'<div class="kpi-row-sub">strict score</div></div>'
+f'<div class="kpi-row-value"><span class="green">74.2%</span></div>'
+     f'<div class="kpi-row-sub">strict · 75.3% weighted</div></div>'
     f'</div></div>',
     unsafe_allow_html=True,
 )
