@@ -2,6 +2,7 @@
 
 <p align="center">
   <a href="https://python.org"><img src="https://img.shields.io/badge/python-3.11-blue?logo=python" alt="Python 3.11"></a>
+  <a href="https://img.shields.io/badge/version-1.0.0-violet"><img src="https://img.shields.io/badge/version-1.0.0-8B5CF6" alt="v1.0.0"></a>
   <a href="https://streamlit.io"><img src="https://img.shields.io/badge/streamlit-1.43-FF4B4B?logo=streamlit" alt="Streamlit"></a>
   <a href="https://www.trychroma.com"><img src="https://img.shields.io/badge/chromadb-0.6-FC6D26?logo=chroma" alt="ChromaDB"></a>
   <a href="https://github.com/ggerganov/llama.cpp"><img src="https://img.shields.io/badge/llama.cpp-GGUF-1E88E5" alt="llama.cpp"></a>
@@ -17,6 +18,7 @@ Financial analysts read MD&A sections for hours every quarter. Most RAG demos wo
 <!-- ![Dashboard screenshot](docs/screenshots/dashboard.png) -->
 
 > **📖 Full documentation:** [docs/](docs/) — architecture decisions, evaluation iterations, technical notes, roadmap.
+> **🌐 Landing page:** [rag-variance-explainer.vercel.app](https://rag-variance-explainer.vercel.app) — project showcase (Next.js + Tailwind)
 
 ---
 
@@ -248,6 +250,8 @@ Key prompt engineering wins:
 - **Multi-sector expansion** — JNJ (Healthcare) + XOM (Energy) added. 7 companies across 4 sectors. Sector badges + colored tags
 - **Health check** — startup validation for ChromaDB + LLM, early failure detection
 - **Evaluation** — 74.24% strict / 75.32% weighted faithfulness, retail recall@10 = 1.00
+- **Portfolio polish** — README restructured (hero, features grid, roadmap, known limitations). Added CODE_OF_CONDUCT.md, SECURITY.md, ISSUE_TEMPLATEs. v1.0.0 tagged.
+- **Landing page** — [rag-variance-explainer.vercel.app](https://rag-variance-explainer.vercel.app). Next.js 14 + Tailwind, dark theme, deployed to Vercel.
 
 > Full change history in [docs/](docs/).
 
