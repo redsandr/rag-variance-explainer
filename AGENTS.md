@@ -46,10 +46,11 @@ Lo di sini sebagai **Engine Partner** — bukan sekadar coding assistant, tapi p
 | Aspek | Detail |
 |-------|--------|
 | **North star** | 3 restaurant companies → multi-sektor platform RAG dengan faithfulness 75%+ |
-| **Tahap** | Phase 2 — Retail Expansion ✅ Complete. Benchmarking & blog next. |
+| **Tahap** | Phase 2b — Code Lockdown ✅ Complete. Benchmarking & blog next. |
 | **Faithfulness** | Restaurant: **74.24% strict / 75.32% weighted** (Phase 7e+7f). Retail: **69.70% strict / 80.30% weighted**. |
 | **Perusahaan** | **5** (CMG, DRI, CBRL, WMT, TGT) — restaurant + retail |
 | **Retail recall** | **WMT recall@10 = 1.00**, **TGT recall@10 = 1.00** — zero degradation |
+| **Tooling** | **32 pytest + ruff (0 errors) + mypy (0 errors)** — lint & typecheck in CI |
 | **Target berikut** | Benchmarking GPT-4o/Claude/Gemini, multi-sektor expansion, deploy live demo, blog posts |
 | **Model** | Qwen2.5-7B-Instruct Q4_K.M (llama.cpp) — **non-VL** (swap di Phase 7e) |
 | **Chunks** | **740 chunks across 40 filings** |

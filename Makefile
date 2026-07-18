@@ -1,10 +1,19 @@
-.PHONY: install test run eval-recall eval-llm eval-faithfulness clean
+.PHONY: install test lint typecheck run eval-recall eval-llm eval-faithfulness clean
 
 install:
 	pip install -r requirements.txt
+	pip install ruff mypy
 
 test:
 	pytest tests.py -v
+
+lint:
+	ruff check src/ app.py
+
+typecheck:
+	mypy src/config.py src/chunking.py src/post_process.py src/rag.py src/llm.py src/embedding.py --no-strict-optional --ignore-missing-imports
+
+check: test lint typecheck
 
 run:
 	streamlit run app.py
