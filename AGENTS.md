@@ -154,3 +154,31 @@ Project ini pake gstack workflow. Beberapa hal yang perlu diingat:
 - [ ] Risk udah dipertimbangkan?
 - [ ] Portfolio value: ini nambah value gak?
 - [ ] Kalo ada decision: udah dilihat dari 5 role?
+
+---
+
+## Session Context — 18 Juli 2026
+
+### Apa yang dikerjakan
+- **Phase 2b Code Lockdown complete** — 5-role audit (Programmer → Designer → Engineer → Business → CEO)
+- **Programmer**: 5 UI fixes (sidebar nav, KPI refresh, sector badges, retail stats, loading shimmer)
+- **Designer**: 6 UX fixes (emoji→SVG, WCAG contrast, button disabled, glow hover, focus rings, remove skeleton duplicate)
+- **Engineer**: 14 fixes — P1 (LLM retry+timeout+CE fallback), P2 (BM25 cache), P3 (prompt injection+rate limit+input validation), SEC rate limiting, LLM backend fallback, GPU guard, health check, tokenization DRY, double call optimization
+- **Business**: JNJ+XOM added (7 companies, 4 sectors), SEC rate limiting retry, LLM fallback mechanism
+- **CEO**: Go signal for Phase 3 (benchmarking, blog, deploy)
+
+### State akhir session
+| Commit | Message | Files |
+|--------|---------|-------|
+| `a0301bf` | Phase 2b complete: code lockdown + designer + engineer + business fixes | 14 files |
+
+### Next yang direncanakan (Phase 3)
+1. **Deploy live demo** — Streamlit Cloud (30 min)
+2. **Blog post** — "Building a Multi-Sector RAG Pipeline with 74% Faithfulness"
+3. **Benchmark GPT-4o** — requires API key
+4. **Run `build_index`** — for JNJ + XOM data (currently code-ready, no data)
+
+### Peringatan
+- `src/ingest.py` TICKERS includes JNJ + XOM but data not yet indexed — run `python -m src.build_index` to fetch
+- LLM model path must be set in `.env` — see `.env.example`
+- Obsidian vault docs not synced this session — `docs/` in repo may be stale
