@@ -14,8 +14,15 @@ import logging
 import os
 import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FuturesTimeout
 
 logger = logging.getLogger(__name__)
+
+_LLM_TIMEOUT = int(os.getenv("LLM_TIMEOUT", "120"))
+_MAX_CONCURRENT = int(os.getenv("LLM_MAX_CONCURRENT", "1"))
+_llm_semaphore = threading.Semaphore(_MAX_CONCURRENT)
+_executor = ThreadPoolExecutor(max_workers=_MAX_CONCURRENT)
 
 
 def _retry(max_attempts: int = 3, base_delay: float = 2.0):
@@ -152,14 +159,36 @@ class LLMClient:
         Automatically retries on transient failures (network timeout, API
         503) with exponential backoff. The caller never needs to know which
         backend is actually serving the request.
+
+        Applies a global semaphore to cap concurrent generations (default 1)
+        and enforces a per-call timeout (default 120 s) to prevent hangs.
         """
-        if self.backend == "llama_cpp":
-            return self._generate_llama_cpp(prompt, system, max_tokens, temperature)
-        if self.backend == "anthropic":
-            return self._generate_anthropic(prompt, system, max_tokens)
-        if self.backend == "openai":
-            return self._generate_openai(prompt, system, max_tokens, temperature)
-        raise ValueError(f"Unknown backend: {self.backend}")
+        from logging_config import log_timer
+
+        acquired = _llm_semaphore.acquire(timeout=_LLM_TIMEOUT)
+        if not acquired:
+            raise TimeoutError(
+                f"All {_MAX_CONCURRENT} generation slot(s) busy — try again later."
+            )
+        try:
+            if self.backend == "llama_cpp":
+                future = _executor.submit(self._generate_llama_cpp, prompt, system, max_tokens, temperature)
+            elif self.backend == "anthropic":
+                future = _executor.submit(self._generate_anthropic, prompt, system, max_tokens)
+            elif self.backend == "openai":
+                future = _executor.submit(self._generate_openai, prompt, system, max_tokens, temperature)
+            else:
+                raise ValueError(f"Unknown backend: {self.backend}")
+
+            with log_timer(logger, f"llm.{self.backend}"):
+                try:
+                    return future.result(timeout=_LLM_TIMEOUT)
+                except FuturesTimeout:
+                    raise TimeoutError(
+                        f"LLM ({self.backend}) did not respond within {_LLM_TIMEOUT}s timeout."
+                    ) from None
+        finally:
+            _llm_semaphore.release()
 
     def _generate_llama_cpp(self, prompt: str, system: str | None, max_tokens: int, temperature: float | None = None) -> str:
         messages = []

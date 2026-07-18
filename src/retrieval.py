@@ -233,6 +233,8 @@ def query_multi(
     If *cross_encoder_enabled*, final reranking refines the ranking.
     Falls back gracefully if cross-encoder is unavailable.
     """
+    from logging_config import log_timer
+
     if top_k is None:
         top_k = config.retrieval_top_k
     if min_relevance is None:
@@ -240,12 +242,14 @@ def query_multi(
 
     lookup = expand_query(query_text) if config.expansion_enabled else query_text
 
-    dense = _retrieve_dense(collection, query_text, lookup, min_relevance)
+    with log_timer(logger, "retrieve.dense"):
+        dense = _retrieve_dense(collection, query_text, lookup, min_relevance)
     if not dense:
         return []
 
     if config.hybrid_search_enabled:
-        bm25 = _retrieve_bm25(collection, lookup, ticker_filter)
+        with log_timer(logger, "retrieve.bm25"):
+            bm25 = _retrieve_bm25(collection, lookup, ticker_filter)
         candidates = rrf_merge(dense, bm25, top_k=None)
         _fill_missing_fields(candidates, query_text)
     else:
@@ -255,7 +259,8 @@ def query_multi(
 
     if config.cross_encoder_enabled:
         try:
-            return rerank(query_text, candidates, top_k=top_k)
+            with log_timer(logger, "rerank.ce"):
+                return rerank(query_text, candidates, top_k=top_k)
         except Exception as e:
             logger.warning("Cross-encoder failed, falling back to dense-only: %s", e)
 

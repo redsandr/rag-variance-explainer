@@ -56,6 +56,8 @@ def answer_question(
     calls the LLM, then runs number + metric verification on the answer.
     Returns structured dict with 'question', 'answer', and 'sources'.
     """
+    from logging_config import log_timer
+
     if top_k is None:
         top_k = config.retrieval_top_k
     if min_relevance is None:
@@ -67,13 +69,14 @@ def answer_question(
     client = get_client()
     collection = get_collection(client)
 
-    results = query_multi(
-        collection,
-        question,
-        top_k=top_k,
-        min_relevance=min_relevance,
-        ticker_filter=ticker_filter,
-    )
+    with log_timer(logger, "rag.retrieval"):
+        results = query_multi(
+            collection,
+            question,
+            top_k=top_k,
+            min_relevance=min_relevance,
+            ticker_filter=ticker_filter,
+        )
 
     context = build_context(results)
     prompt = (
@@ -87,7 +90,8 @@ def answer_question(
 
     if llm is None:
         llm = LLMClient()
-    answer = llm.generate(prompt, system=SYSTEM_PROMPT_RAG, max_tokens=config.llm_max_tokens, temperature=config.llm_temperature)
+    with log_timer(logger, "rag.generate"):
+        answer = llm.generate(prompt, system=SYSTEM_PROMPT_RAG, max_tokens=config.llm_max_tokens, temperature=config.llm_temperature)
     if on_progress:
         on_progress("done", "Done!")
 

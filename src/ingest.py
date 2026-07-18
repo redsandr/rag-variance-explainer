@@ -44,6 +44,7 @@ def _rate_limited_get(url: str, max_retries: int = 5, base_delay: float = 5.0) -
     - Enforces minimum *SEC_REQUEST_DELAY* between requests (SEC mandate).
     - Retries on 429 (respecting Retry-After header) and connection errors
       (timeout, DNS, reset) with exponential backoff, up to *max_retries*.
+    - Applies 30 s connection / 60 s read timeout to prevent hangs.
     """
     global _LAST_REQUEST_TIME
     last_exception = None
@@ -52,7 +53,7 @@ def _rate_limited_get(url: str, max_retries: int = 5, base_delay: float = 5.0) -
             elapsed = time.time() - _LAST_REQUEST_TIME
             if elapsed < SEC_REQUEST_DELAY:
                 time.sleep(SEC_REQUEST_DELAY - elapsed)
-            response = _SESSION.get(url, timeout=30)
+            response = _SESSION.get(url, timeout=(30, 60))
             _LAST_REQUEST_TIME = time.time()
             if response.status_code == 429:
                 wait = int(response.headers.get("Retry-After", str(base_delay)))

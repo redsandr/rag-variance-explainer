@@ -187,18 +187,39 @@ Project ini pake gstack workflow. Beberapa hal yang perlu diingat:
 - **Peringatan baru**: `conftest.py` auto-patch LLM init — jangan hapus tanpa bikin mock alternatif
 - **Peringatan**: `scripts/update_readme_stats.py` requires ChromaDB data — jalanin setelah `build_index`
 
+#### Session 3 — mypy Debt + Test Coverage + CI Gate
+- **mypy 19→0**: Fixed all implicit `Optional` errors across core files (`llm.py`, `rag.py`, `retrieval.py`, `hybrid_search.py`, `query_expansion.py`, `post_process.py`, `ingest.py`, `eval_faithfulness.py`) + `ingest.py` return type narrowing
+- **rerank test**: 2 tests — empty candidates, single candidate with mocked cross-encoder
+- **build_index test**: 1 test — empty TICKERS dict, mocking client/collection
+- **CI upgrade**: `pytest --cov-fail-under=65`, `mypy src/`, `ruff check`, `bandit -r src/` all run on every push
+- **Peringatan baru**: `conftest.py` auto-patch LLM init — jangan hapus tanpa bikin mock alternatif
+- **Peringatan**: `scripts/update_readme_stats.py` requires ChromaDB data — jalanin setelah `build_index`
+
+#### Session 4 — app.py Bridge Audit + 4 Engineering Improvements
+- **5-role review**: CEO (production-grade signal), Engineer (reliability), Designer (UX), Programmer (testability), Business (P0-P3 priority)
+- **Sanitize input**: moved from `app.py` to `src/rag.py` — testable via pytest (2 new tests)
+- **Sidebar KPI**: hardcoded "5 companies" → "7" (consistency with System Analytics)
+- **Timeout**: `llm.generate()` → `ThreadPoolExecutor` + 120s timeout; SEC API → `timeout=(30, 60)`; concurrent generation semaphore (default 1 slot)
+- **Graceful degradation**: embedding model loads `all-MiniLM-L6-v2` fallback if nomic-embed fails
+- **Monitoring**: `log_timer` context manager logs latency per-stage: `embed.query`, `embed.Ndocs`, `retrieve.dense`, `retrieve.bm25`, `rerank.ce`, `llm.*`, `rag.retrieval`, `rag.generate`
+- **Profile recomm.** : run 5-10 queries → check `[timing]` logs → serang bottleneck terbesar (kemungkinan LLM generation ~80%)
+- `.streamlit/secrets.toml` added to `.gitignore` — deployment safety
+
 ### State akhir session
 | Commit | Message | Files |
 |--------|---------|-------|
 | `a0301bf` | Phase 2b complete | 14 files |
 | `4bb006e` | fix: docstrings, config validation, SEC retry, LLM test fixture, idempotency, README disclosure, auto-stats script | 16 files |
-| *(next)* | fix: mypy debt, rerank/build_index tests, pre-commit, CI coverage+bandit gate | 9 files |
+| `1c7b9b7` | fix: mypy debt, rerank/build_index tests, pre-commit, CI coverage+bandit | 15 files |
+| `9967ea2` | fix: app.py bridge audit — sanitize_input moved to src/, sidebar KPI 5->7, .gitignore secrets | 4 files |
+| *(next)* | feat: timeout, graceful degradation (embedding), monitoring (log_timer), concurrent semaphore, app.py bridge fixes | 8 files |
 
 ### Next yang direncanakan
-1. **Deploy live demo** — Streamlit Cloud (30 min)
-2. **Blog post** — "Building a Multi-Sector RAG Pipeline with 74% Faithfulness"
-3. **Benchmark GPT-4o** — requires API key
-4. **Run `build_index`** — for JNJ + XOM data (currently code-ready, no data)
+1. **Profile bottleneck** — `python src/rag.py` or via Streamlit, check `[timing]` logs, optimize biggest stage
+2. **Deploy live demo** — Streamlit Cloud (30 min)
+3. **Blog post** — "Building a Multi-Sector RAG Pipeline with 74% Faithfulness"
+4. **Benchmark GPT-4o** — requires API key
+5. **Run `build_index`** — for JNJ + XOM data (currently code-ready, no data)
 
 ### Peringatan
 - `src/ingest.py` TICKERS includes JNJ + XOM but data not yet indexed — run `python -m src.build_index` to fetch
@@ -206,3 +227,5 @@ Project ini pake gstack workflow. Beberapa hal yang perlu diingat:
 - Obsidian vault docs not synced this session — `docs/` in repo may be stale
 - `conftest.py` patches `LLMClient._init_*` — prevents accidental real LLM calls in CI. Don't remove without mock alternative.
 - `scripts/update_readme_stats.py` requires ChromaDB collection with data — run after `build_index`
+- `LLM_TIMEOUT` env var (default 120s) and `LLM_MAX_CONCURRENT` env var (default 1) available in `.env`
+- `[timing]` logs appear at INFO level — check stdout/stderr for per-stage latency breakdown
