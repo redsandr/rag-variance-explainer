@@ -213,6 +213,18 @@ def test_expand_query_unknown_terms_adds_no_synonyms() -> None:
     assert result.rstrip() == "quantum"
 
 
+def test_sanitize_input_strips_control_chars() -> None:
+    from src.rag import sanitize_input
+    assert sanitize_input("hello\x00world") == "helloworld"
+    assert sanitize_input("normal text") == "normal text"
+
+
+def test_sanitize_input_truncates_long() -> None:
+    from src.rag import sanitize_input, MAX_QUESTION_LENGTH
+    long = "x" * (MAX_QUESTION_LENGTH + 100)
+    assert len(sanitize_input(long)) == MAX_QUESTION_LENGTH
+
+
 def test_keyword_boost_stopwords_ignored() -> None:
     from src.retrieval import _keyword_boost
     assert _keyword_boost("the a an in of to", "any text here") == 0.0

@@ -1,4 +1,3 @@
-import re
 import time
 from pathlib import Path
 
@@ -6,7 +5,7 @@ import streamlit as st
 
 from config import config
 from llm import LLMClient
-from rag import answer_question
+from rag import answer_question, sanitize_input
 from retrieval import get_client, get_collection
 
 st.set_page_config(
@@ -107,13 +106,7 @@ SECTOR_MAP = {
     "XOM": "Energy",
 }
 
-MAX_QUESTION_LENGTH = 256
 _RATE_LIMIT_SECONDS = 10
-
-
-def _sanitize_question(raw: str) -> str:
-    cleaned = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', raw)
-    return cleaned[:MAX_QUESTION_LENGTH]
 
 
 def _rate_limited() -> str | None:
@@ -320,7 +313,7 @@ if "pending_question" in st.session_state:
     st.session_state.question_input = st.session_state.pop("pending_question")
 
 if ask and question.strip() and not st.session_state.get("processing", False):
-    question = _sanitize_question(question)
+    question = sanitize_input(question)
     if not question:
         st.warning("Question is empty after sanitization.")
     elif _rate_limited() is None:
@@ -511,8 +504,8 @@ st.markdown(
     f'<div class="kpi-stack">'
     f'<div class="kpi-stack-card">'
     f'<div class="kpi-row-label">Companies</div>'
-     f'<div class="kpi-row-value">5</div>'
-     f'<div class="kpi-row-sub">CMG &middot; DRI &middot; CBRL &middot; WMT &middot; TGT</div></div>'
+     f'<div class="kpi-row-value">7</div>'
+     f'<div class="kpi-row-sub">CMG &middot; DRI &middot; CBRL &middot; WMT &middot; TGT &middot; JNJ &middot; XOM</div></div>'
     f'<div class="kpi-stack-card">'
     f'<div class="kpi-row-label">Filings Indexed</div>'
     f'<div class="kpi-row-value">{filing_count}</div>'

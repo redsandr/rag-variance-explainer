@@ -4,6 +4,7 @@ a grounded answer via the swappable LLMClient.
 """
 
 import logging
+import re
 from collections.abc import Callable
 
 from config import config
@@ -13,6 +14,15 @@ from prompts import SYSTEM_PROMPT_RAG
 from retrieval import get_client, get_collection, query_multi
 
 logger = logging.getLogger(__name__)
+
+
+MAX_QUESTION_LENGTH = 256
+
+
+def sanitize_input(raw: str) -> str:
+    """Strip control characters and truncate to safe length."""
+    cleaned = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', raw)
+    return cleaned[:MAX_QUESTION_LENGTH]
 
 
 def build_context(results: list[dict]) -> str:
