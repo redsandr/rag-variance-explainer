@@ -112,10 +112,23 @@ export default function Home() {
   const [tab, setTab] = useState('local');
   const [copyLabel, setCopyLabel] = useState('Copy');
 
+  // On first load: use a previously saved choice on this device/browser if
+  // there is one, otherwise fall back to the OS/browser's dark mode setting.
+  useEffect(() => {
+    const saved = window.localStorage.getItem('theme');
+    if (saved === 'dark' || saved === 'light') {
+      setTheme(saved);
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      setTheme('dark');
+    }
+  }, []);
+
   // Apply theme to the actual <html> element so CSS selectors
-  // like html[data-theme="dark"] in globals.css take effect.
+  // like html[data-theme="dark"] in globals.css take effect, and
+  // remember the choice for next time on this device/browser.
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    window.localStorage.setItem('theme', theme);
   }, [theme]);
 
   // Pipeline animation state
@@ -261,10 +274,7 @@ export default function Home() {
             </div>
             <span className="text-sm font-semibold tracking-tight">RAG Variance Explainer</span>
           </div>
-          <nav className="hidden md:flex items-center gap-8 text-sm">
-            <a href="#how" className="nav-link">How it works</a>
-            <a href="#evidence" className="nav-link">Evidence</a>
-            <a href="#features" className="nav-link">Features</a>
+          <div className="flex items-center gap-3">
             <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle dark mode">
               {theme === 'dark' ? (
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -277,10 +287,15 @@ export default function Home() {
                 </svg>
               )}
             </button>
-            <a href="https://github.com/redsandr/rag-variance-explainer" className="px-4 py-2 rounded-lg text-sm font-medium btn-primary">
-              GitHub
-            </a>
-          </nav>
+            <nav className="hidden md:flex items-center gap-8 text-sm">
+              <a href="#how" className="nav-link">How it works</a>
+              <a href="#evidence" className="nav-link">Evidence</a>
+              <a href="#features" className="nav-link">Features</a>
+              <a href="https://github.com/redsandr/rag-variance-explainer" className="px-4 py-2 rounded-lg text-sm font-medium btn-primary">
+                GitHub
+              </a>
+            </nav>
+          </div>
         </div>
       </header>
 
@@ -419,15 +434,15 @@ export default function Home() {
             <p className="text-3xl md:text-4xl font-bold">Ask. Retrieve. Answer.</p>
           </div>
 
-          <div className="rounded-2xl card p-8 md:p-10">
+          <div className="rounded-2xl card p-4 sm:p-8 md:p-10">
             <div className="mono text-sm mb-8 text-center" style={{ color: 'var(--text-dim)', minHeight: 24 }}>
               <span style={{ color: 'var(--accent)' }}>&gt;</span> {pipeTyped}
               <span className="cursor-blink">&#9608;</span>
             </div>
 
-            <div className="grid grid-cols-4 gap-2 md:gap-4 mb-8">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4 mb-8">
               {PIPE_STEPS.map((step, i) => (
-                <div key={step.title} className={`pipe-node rounded-xl p-4 text-center ${activeStep >= i ? 'active' : ''}`}>
+                <div key={step.title} className={`pipe-node rounded-xl p-3 sm:p-4 text-center ${activeStep >= i ? 'active' : ''}`}>
                   <div className="text-xs font-semibold mb-2">{step.title}</div>
                   <div
                     className="mono text-lg font-bold tabular"
@@ -572,7 +587,7 @@ export default function Home() {
             <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>Use cases</div>
             <p className="text-3xl md:text-4xl font-bold">Real questions, real answers.</p>
           </div>
-          <div className="rounded-2xl overflow-hidden card">
+          <div className="rounded-2xl overflow-hidden card hidden md:block">
             <table className="w-full text-left text-sm">
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--surface-alt)' }}>
@@ -598,6 +613,22 @@ export default function Home() {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile: stacked cards instead of a squeezed table */}
+          <div className="space-y-3 md:hidden">
+            {USE_CASES.map((uc) => (
+              <div key={uc.q} className="rounded-xl p-4 card">
+                <div className="text-sm font-medium mb-2">{uc.q}</div>
+                <div className="text-sm mb-3" style={{ color: 'var(--text-dim)' }}>{uc.a}</div>
+                <span
+                  className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+                  style={{ background: 'var(--accent-soft)', color: 'var(--accent-dark)' }}
+                >
+                  {uc.src}
+                </span>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -625,12 +656,12 @@ export default function Home() {
             <p className="text-base mt-3" style={{ color: 'var(--text-dim)' }}>For anyone who wants to run it themselves or review exactly how it works under the hood.</p>
           </div>
           <div className="rounded-2xl overflow-hidden card">
-            <div className="flex items-center justify-between" style={{ borderBottom: '1px solid var(--border)' }}>
-              <div className="flex">
+            <div className="flex flex-wrap items-center justify-between gap-y-2 gap-x-3 px-2 sm:px-0" style={{ borderBottom: '1px solid var(--border)' }}>
+              <div className="flex flex-wrap">
                 {['local', 'openai', 'claude'].map((t) => (
                   <button
                     key={t}
-                    className={`tab-btn px-6 py-3 text-sm font-medium ${tab === t ? 'active' : ''}`}
+                    className={`tab-btn px-3 sm:px-6 py-3 text-sm font-medium ${tab === t ? 'active' : ''}`}
                     style={{ borderBottom: tab === t ? '2px solid var(--accent)' : '2px solid transparent' }}
                     onClick={() => setTab(t)}
                   >
@@ -639,7 +670,7 @@ export default function Home() {
                 ))}
               </div>
               <button
-                className="copy-btn flex items-center gap-1.5 mr-4 px-3 py-1.5 rounded-lg text-xs font-medium"
+                className="copy-btn flex items-center gap-1.5 mb-2 sm:mb-0 sm:mr-4 px-3 py-1.5 rounded-lg text-xs font-medium"
                 style={{ border: '1px solid var(--border-strong)', color: 'var(--text-dim)' }}
                 onClick={copyCode}
               >
