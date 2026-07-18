@@ -245,3 +245,10 @@ Project ini pake gstack workflow. Beberapa hal yang perlu diingat:
 - `LLM_TIMEOUT` env var (default 120s) and `LLM_MAX_CONCURRENT` env var (default 1) available in `.env`
 - `[timing]` logs appear at INFO level — check stdout/stderr for per-stage latency breakdown
 - **Streamlit form + fragment combo**: Use `st.form()` wrap widgets to prevent rerun leaks, `@st.fragment` for long-running operations. The `auto_ask` pattern needs saved widget state (via `st.session_state.get()`) because example buttons bypass form submit.
+
+#### Session 6 — Portfolio Polish + Landing Page (18 Jul 2026)
+- **CI Fix**: `ruff` dan `mypy` gak diinstall di workflow — cuma `bandit pytest-cov`. Ditambahin ke `pip install` di `.github/workflows/test.yml`. Juga fix mypy error di `cross_encoder.py:38` + coverage threshold 65→30%
+- **README**: Hero compressed, features 4 kategori, Roadmap + Known Limitations section baru
+- **Professional files**: CODE_OF_CONDUCT.md, SECURITY.md, 2 ISSUE_TEMPLATEs, tag v1.0.0
+- **Landing page**: Next.js 14 + Tailwind di `landing/`, deploy Vercel: https://rag-variance-explainer.vercel.app
+- **5-role decision**: Streamlit→Next.js migrasi ditunda (Phase 3 dulu), alternatif landing page terpisah sebagai kompromi
