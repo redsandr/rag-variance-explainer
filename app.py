@@ -298,6 +298,10 @@ if view == "System Analytics":
             '<div class="kpi-row-label">Retail answers, source-backed</div>'
             '<div class="kpi-row-value"><span class="green">69.7%</span></div>'
             '<div class="kpi-row-sub">weighted 80.3%</div></div>'
+            '<div class="kpi-stack-card">'
+            '<div class="kpi-row-label">Cross-sector (all 7 cos)</div>'
+            '<div class="kpi-row-value"><span class="green">59.3%</span></div>'
+            '<div class="kpi-row-sub">weighted 73.5%</div></div>'
             '</div></div>',
             unsafe_allow_html=True,
         )
@@ -305,13 +309,17 @@ if view == "System Analytics":
             st.markdown(
                 '<div class="kpi-stack">'
                 '<div class="kpi-stack-card">'
-                '<div class="kpi-row-label">Restaurant MRR</div>'
-                '<div class="kpi-row-value"><span class="accent">0.66</span></div>'
-                '<div class="kpi-row-sub">+28% from baseline</div></div>'
+                '<div class="kpi-row-label">Overall MRR</div>'
+                '<div class="kpi-row-value"><span class="accent">0.54</span></div>'
+                '<div class="kpi-row-sub">cross-sector, 0 retrieval gaps</div></div>'
                 '<div class="kpi-stack-card">'
                 '<div class="kpi-row-label">Retail recall@10</div>'
                 '<div class="kpi-row-value"><span class="green">1.00</span></div>'
                 '<div class="kpi-row-sub">WMT &middot; TGT — zero degradation</div></div>'
+                '<div class="kpi-stack-card">'
+                '<div class="kpi-row-label">Restaurant recall@10</div>'
+                '<div class="kpi-row-value"><span class="green">0.81</span></div>'
+                '<div class="kpi-row-sub">CMG &middot; DRI &middot; CBRL</div></div>'
                 '</div>',
                 unsafe_allow_html=True,
             )
@@ -624,6 +632,10 @@ with right_col:
         '<div class="kpi-row-label">Retail, source-backed</div>'
         '<div class="kpi-row-value"><span class="green">69.7%</span></div>'
         '<div class="kpi-row-sub">weighted 80.3%</div></div>'
+        '<div class="kpi-stack-card">'
+        '<div class="kpi-row-label">Cross-sector (7 cos)</div>'
+        '<div class="kpi-row-value"><span class="green">59.3%</span></div>'
+        '<div class="kpi-row-sub">weighted 73.5%</div></div>'
         '</div></div>',
         unsafe_allow_html=True,
     )
@@ -632,13 +644,17 @@ with right_col:
         st.markdown(
             '<div class="kpi-stack">'
             '<div class="kpi-stack-card">'
-            '<div class="kpi-row-label">Restaurant MRR</div>'
-            '<div class="kpi-row-value"><span class="accent">0.66</span></div>'
-            '<div class="kpi-row-sub">+28% from baseline</div></div>'
+            '<div class="kpi-row-label">Overall MRR</div>'
+            '<div class="kpi-row-value"><span class="accent">0.54</span></div>'
+            '<div class="kpi-row-sub">cross-sector, 0 gaps</div></div>'
             '<div class="kpi-stack-card">'
             '<div class="kpi-row-label">Retail recall@10</div>'
             '<div class="kpi-row-value"><span class="green">1.00</span></div>'
             '<div class="kpi-row-sub">WMT &middot; TGT</div></div>'
+            '<div class="kpi-stack-card">'
+            '<div class="kpi-row-label">Restaurant recall@10</div>'
+            '<div class="kpi-row-value"><span class="green">0.81</span></div>'
+            '<div class="kpi-row-sub">CMG &middot; DRI &middot; CBRL</div></div>'
             '</div>',
             unsafe_allow_html=True,
         )
