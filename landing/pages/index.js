@@ -391,7 +391,7 @@ export default function Home() {
                 className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium mb-6"
                 style={{ background: 'var(--accent-soft)', color: 'var(--accent-dark)' }}
               >
-                <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--green)' }}></span>
+                <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--accent)' }}></span>
                 7 companies &middot; 4 industries &middot; your data stays in-house
               </div>
               <h1 className="serif text-4xl md:text-5xl font-bold leading-[1.15] tracking-tight mb-5" style={{ color: 'var(--text)' }}>
@@ -413,7 +413,7 @@ export default function Home() {
 
               <div className="flex items-center gap-8 mt-10 pt-8" style={{ borderTop: '1px solid var(--border)' }}>
                 <div>
-                  <div className="text-2xl font-bold tabular" style={{ color: 'var(--green)' }}>4 hrs &rarr; 3 min</div>
+                  <div className="text-2xl font-bold tabular" style={{ color: 'var(--accent)' }}>4 hrs &rarr; 3 min</div>
                   <div className="text-xs mt-0.5" style={{ color: 'var(--text-mute)' }}>time per variance question</div>
                 </div>
                 <div>
@@ -506,7 +506,7 @@ export default function Home() {
                 <div key={item} className="flex items-center gap-2.5">
                   <span
                     className="flex items-center justify-center h-5 w-5 rounded-full shrink-0"
-                    style={{ background: 'var(--green-soft)', color: 'var(--green)' }}
+                    style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
                   >
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                       <path d="M5 13l4 4L19 7" />
@@ -665,15 +665,15 @@ export default function Home() {
             <div
               className="rounded-xl p-4 transition-opacity duration-300"
               style={{
-                background: 'var(--green-soft)',
+                background: 'var(--accent-soft)',
                 border: '1px solid var(--border-strong)',
                 opacity: pipeOutputVisible ? 1 : 0,
               }}
             >
               <div className="flex items-center gap-2 mb-1.5">
-                <span className="text-xs font-semibold" style={{ color: 'var(--green)' }}>Sourced answer ready</span>
+                <span className="text-xs font-semibold" style={{ color: 'var(--accent)' }}>Sourced answer ready</span>
               </div>
-              <p className="text-xs leading-relaxed" style={{ color: 'var(--green)' }}>
+              <p className="text-xs leading-relaxed" style={{ color: 'var(--accent)' }}>
                 Wage inflation and CA minimum wage increases, offset by sales leverage. Cited: CMG 10-K p.34, 10-Q p.12.
               </p>
             </div>
@@ -757,7 +757,7 @@ export default function Home() {
                 <span style={{ color: 'var(--text-dim)' }}>After ranking step</span>
               </div>
               <div className="pt-3">
-                <div className="text-3xl font-bold tabular" style={{ color: 'var(--green)' }}>0.52 &rarr; 0.66</div>
+                <div className="text-3xl font-bold tabular" style={{ color: 'var(--accent)' }}>0.52 &rarr; 0.66</div>
                 <div className="text-xs mt-1" style={{ color: 'var(--text-mute)' }}>search score (higher = right answer found sooner)</div>
               </div>
             </div>
@@ -769,7 +769,7 @@ export default function Home() {
               <div className="flex items-center gap-3 text-sm">
                 <span style={{ color: 'var(--text-mute)' }}>was result #17</span>
                 <span style={{ color: 'var(--text-mute)' }}>&rarr;</span>
-                <span className="font-semibold" style={{ color: 'var(--green)' }}>now #1</span>
+                <span className="font-semibold" style={{ color: 'var(--accent)' }}>now #1</span>
               </div>
             </div>
             <div className="rounded-xl p-5 card card-hover">
@@ -777,7 +777,7 @@ export default function Home() {
               <div className="flex items-center gap-3 text-sm">
                 <span style={{ color: 'var(--text-mute)' }}>was result #17</span>
                 <span style={{ color: 'var(--text-mute)' }}>&rarr;</span>
-                <span className="font-semibold" style={{ color: 'var(--green)' }}>now #1</span>
+                <span className="font-semibold" style={{ color: 'var(--accent)' }}>now #1</span>
               </div>
             </div>
             <div className="rounded-xl p-5 card card-hover">
@@ -785,7 +785,7 @@ export default function Home() {
               <div className="flex items-center gap-3 text-sm">
                 <span style={{ color: 'var(--text-mute)' }}>4 of 20</span>
                 <span style={{ color: 'var(--text-mute)' }}>&rarr;</span>
-                <span className="font-semibold" style={{ color: 'var(--green)' }}>0 of 20</span>
+                <span className="font-semibold" style={{ color: 'var(--accent)' }}>0 of 20</span>
               </div>
             </div>
           </div>

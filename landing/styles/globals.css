@@ -16,8 +16,6 @@
   --accent-dark: #8A6D0C;
   --accent-light: #C9A227;
   --accent-soft: #F6EDD3;
-  --green: #1FAE73;
-  --green-soft: #E6F7EF;
   --amber: #A9860F;
   --amber-soft: #F6EDD3;
   --btn-text-on-accent: #FFFFFF;
@@ -38,8 +36,6 @@ html[data-theme='dark'] {
   --accent-dark: #A9860F;
   --accent-light: #E8C766;
   --accent-soft: #2B240F;
-  --green: #3DDC97;
-  --green-soft: #10251A;
   --amber: #E8C766;
   --amber-soft: #2B240F;
   --btn-text-on-accent: #101208;
@@ -193,8 +189,8 @@ html[data-theme='dark'] {
   }
 
   .score-high {
-    background: var(--green-soft);
-    color: var(--green);
+    background: var(--accent-soft);
+    color: var(--accent-dark);
   }
   .score-mid {
     background: var(--amber-soft);
