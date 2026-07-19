@@ -47,6 +47,22 @@ select = ["E", "F", "W", "I", "N", "UP", "B", "SIM"]
 targets = ["src/"]
 skips = ["B404", "B603"]
 
+[tool.coverage.run]
+omit = [
+    "src/benchmark_methods.py",
+    "src/compact_judge_prompts.py",
+    "src/dataset_stats.py",
+    "src/eval_*.py",
+    "src/export_judge_prompts.py",
+    "src/logging_config.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+]
+
 [tool.mypy]
 python_version = "3.11"
 strict = false
