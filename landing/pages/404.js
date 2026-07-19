@@ -1,8 +1,12 @@
+import Head from 'next/head';
 import Vernie from '../components/Vernie';
 
 export default function Custom404() {
   return (
     <div className="antialiased bg-mesh min-h-screen flex items-center justify-center px-6">
+      <Head>
+        <title>Page not found &mdash; RAG Variance Explainer</title>
+      </Head>
       <div className="text-center max-w-md">
         <div className="flex justify-center mb-8">
           <Vernie pose="confused" size={80} />
