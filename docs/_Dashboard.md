@@ -45,9 +45,12 @@ Project 2/
 | Phase 2b.8 — Dataset | ✅ Complete (JNJ+XOM, 1079 chunks) |
 | Phase 2b.9 — GitHub Profile Polish | ✅ Complete (redesigned profile, landing page) |
 | Phase 2b.10 — Error Handling Lockdown | ✅ Complete (42 tests, LLM retry tests, manual verification) |
+| Phase A.1 — MCP Server | ✅ Complete (`src/server.py`, FastMCP dual transport) |
+| Phase A.2 — REST API | ✅ Complete (`src/api.py`, FastAPI 5 endpoints) |
+| Phase A.3 — Agent Skills | ✅ Complete (opencode skill + Cursor rules + CLAUDE.md) |
 | Companies | **7** (CMG, DRI, CBRL, WMT, TGT, JNJ, XOM) — 4 sectors |
 | Chunks | **1079** dari **56** filings |
-| Tests | **42** pytest + ruff (0) + mypy (0) + bandit (0) |
+| Tests | **47** pytest + ruff (0) + mypy (0) + bandit (0) |
 | CI | pytest --cov-fail-under=30 + mypy + ruff + bandit |
 | Coverage | ~44% |
 | Code quality | ruff (0) + mypy (0) + bandit (0) — pre-commit hooks |
@@ -104,13 +107,14 @@ Bingung mulai dari mana?  → _Dashboard.md (ini)
 | Aspek | Detail |
 |-------|--------|
 | **North star** | Multi-sektor RAG platform → AI-native RAG platform (MCP + REST + SDK) |
-| **Tahap** | Phase 2b — Code Lockdown ✅ Complete. Phase 2b.8-10 — Dataset + Polish + Error Handling ✅. Next: **Phase A — Surface Strategy** (MCP + REST API) |
+| **Tahap** | Phase 2b — Code Lockdown ✅ Complete. Phase 2b.8-10 — Dataset + Polish + Error Handling ✅. **Phase A — Surface Strategy: A.1-A.3 ✅ Complete.** Docker di-skip (Windows limitation). Next: A.5 Blog + A.6 Benchmark |
 | **Faithfulness** | Restaurant: **74.24% strict / 75.32% weighted**. Cross-sector (40q): **59.29% strict / 73.45% weighted** |
 | **Perusahaan** | **7** (CMG, DRI, CBRL, WMT, TGT, JNJ, XOM) — 4 sectors |
 | **Retail recall** | **WMT recall@10 = 1.00**, **TGT recall@10 = 1.00** — zero degradation |
 | **Overall recall** | **recall@10 = 0.81**, **MRR = 0.54** — 0 retrieval gaps |
-| **Code quality** | ruff (0) + mypy (0) + bandit (0) — 42 tests ✅ |
-| **Target berikut** | 🔴 MCP Server (Priority #1) → REST API → Agent Skills → Docker → Blog + Deploy |
+| **Code quality** | ruff (0) + mypy (0) + bandit (0) — **47** tests ✅ |
+| **Target berikut** | A.5 Blog Post (Medium) → A.6 Benchmark + Dataset (HF) |
+| **Phase A complete** | MCP Server (`src/server.py`), REST API (`src/api.py`), Agent Skills (`.opencode/skills/`, `.cursor/rules/`, `CLAUDE.md`) |
 
 ---
 
