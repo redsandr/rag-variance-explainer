@@ -53,6 +53,7 @@ Lo di sini sebagai **Engine Partner** — bukan sekadar coding assistant, tapi p
 | **Retail recall** | **WMT recall@10 = 1.00**, **TGT recall@10 = 1.00** — zero degradation |
 | **Tooling** | **40 pytest + ruff (0 errors) + mypy (0 errors)** — lint & typecheck in CI + ablation study script |
 | **Target berikut** | Benchmarking GPT-4o/Claude/Gemini, deploy live demo, blog posts |
+| **Overall recall** | **recall@10 = 0.81**, **MRR = 0.54** — 0 retrieval gaps |
 | **Model** | Qwen2.5-7B-Instruct Q4_K.M (llama.cpp) — **non-VL** |
 | **Chunks** | **1079 chunks across 56 filings** |
 | **Code quality** | Phase 2b: 59 lint + 10 type errors fixed. Retry decorator, BM25 cache, prompt injection guard, rate limit, SEC rate limiting, LLM fallback, GPU guard, health check |
@@ -277,6 +278,7 @@ Project ini pake gstack workflow. Beberapa hal yang perlu diingat:
 - **5 MD&A fixes**: JNJ 10-Q em dash separator, CBRL 10-Q separator class + IGNORECASE, XOM CIK override (holding co → real CIK), DRI 10-K chunk explosion (58→21), orphaned chunk cleanup via `delete_chunks_for_filing()`
 - **XOM 10-K 1 chunk**: Verified by design — Item 7 is a cross-reference paragraph (265 chars, 52 tokens)
 - **Build index**: `python src/build_index.py` → **1079 chunks, 56 filings, 0 failures** ✅
+- **Retrieval gap fix**: Chunk boundaries shifted after rebuild → 4 eval questions had stale golden IDs. Fixed all 4 (eval-012/016/017/020). recall@10 0.75→**0.81**, MRR 0.47→**0.54**, **0 retrieval gaps** ✅
 - **Docs updated**: `readme.md` (1079/56/40), `docs/dataset.md` (JNJ+XOM, 4 sectors)
 - **Obsidian vault**: `_Dashboard.md`, `02. Progress & Technical Documentation.md` updated
 - **CI**: ✅ (ruff, mypy, bandit, pytest — no code changes, only docs + fixes)
