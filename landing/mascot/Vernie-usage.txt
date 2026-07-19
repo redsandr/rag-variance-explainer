@@ -1,0 +1,24 @@
+// Usage examples for Vernie component
+
+import Vernie from "./components/Vernie";
+
+// Hero section - idle bounce
+<Vernie pose="idle" size={64} />
+
+// Loading state - searching
+<Vernie pose="searching" size={48} />
+
+// Answer found - sparkles!
+<Vernie pose="found" size={64} />
+
+// Thinking - dots appear
+<Vernie pose="thinking" size={48} />
+
+// Footer - waving
+<Vernie pose="waving" size={32} />
+
+// 404 page - confused
+<Vernie pose="confused" size={80} />
+
+// Favicon (use the standalone SVG)
+// Copy vernie_mascot.svg content and set as favicon

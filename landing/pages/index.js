@@ -1,7 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
+import Vernie from '../components/Vernie';
+import HeroIllustration from '../components/HeroIllustration';
 
-const HERO_QUESTION = "Why did Chipotle's labor costs increase?";
 const PIPE_QUESTION = "Why did Chipotle's labor costs increase?";
+
+const HERO_STATS = [
+  { to: 3, label: 'minutes per question, down from ~4 hrs', format: (v) => `${Math.round(v)} min` },
+  { to: 52, label: 'right source in top-5, up from 33%', format: (v) => `${Math.round(v)}%` },
+  { to: 74, label: 'answers verified against the filing', format: (v) => `${Math.round(v)}%` },
+  { to: 7, label: 'companies covered, 4 industries', format: (v) => `${Math.round(v)}` },
+];
 
 const TRUST_ITEMS = [
   'Grounded in real SEC filings',
@@ -140,11 +148,38 @@ streamlit run app.py`,
 };
 
 const PIPE_STEPS = [
-  { title: 'Understand the question', label: 'sections searched', kind: 'count', to: 740, duration: 700 },
-  { title: 'Search the filings', label: 'possible matches', kind: 'count', to: 20, duration: 600 },
-  { title: 'Rank by relevance', label: 'best match found', kind: 'score', to: 0.91, duration: 700 },
-  { title: 'Write the answer', label: 'sourced answer', kind: 'writing' },
+  { title: 'Understand the question', label: 'sections searched', kind: 'count', to: 740, duration: 700, icon: 'search' },
+  { title: 'Search the filings', label: 'possible matches', kind: 'count', to: 20, duration: 600, icon: 'filing' },
+  { title: 'Rank by relevance', label: 'best match found', kind: 'score', to: 0.91, duration: 700, icon: 'rank' },
+  { title: 'Write the answer', label: 'sourced answer', kind: 'writing', icon: 'pen' },
 ];
+
+const PIPE_ICONS = {
+  search: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <circle cx="11" cy="11" r="7" />
+      <path d="M21 21l-4.3-4.3" />
+    </svg>
+  ),
+  filing: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+      <path d="M14 2v6h6" />
+      <path d="M9 13h6M9 17h6" />
+    </svg>
+  ),
+  rank: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <path d="M6 20V10M12 20V4M18 20v-7" />
+    </svg>
+  ),
+  pen: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4z" />
+    </svg>
+  ),
+};
 
 function useTypewriter(text, { startDelay = 0, speed = 32, onDone } = [], deps = []) {
   const [typed, setTyped] = useState('');
@@ -172,8 +207,6 @@ function useTypewriter(text, { startDelay = 0, speed = 32, onDone } = [], deps =
 }
 
 export default function Home() {
-  const [theme, setTheme] = useState('light');
-  const [showHeroAnswer, setShowHeroAnswer] = useState(false);
   const [tab, setTab] = useState('local');
   const [copyLabel, setCopyLabel] = useState('Copy');
 
@@ -181,25 +214,6 @@ export default function Home() {
   const [activeDemoId, setActiveDemoId] = useState(DEMO_ANALYSES[0].id);
   const [demoLoading, setDemoLoading] = useState(false);
   const [demoRevealed, setDemoRevealed] = useState(true);
-
-  // On first load: use a previously saved choice on this device/browser if
-  // there is one, otherwise fall back to the OS/browser's dark mode setting.
-  useEffect(() => {
-    const saved = window.localStorage.getItem('theme');
-    if (saved === 'dark' || saved === 'light') {
-      setTheme(saved);
-    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setTheme('dark');
-    }
-  }, []);
-
-  // Apply theme to the actual <html> element so CSS selectors
-  // like html[data-theme="dark"] in globals.css take effect, and
-  // remember the choice for next time on this device/browser.
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    window.localStorage.setItem('theme', theme);
-  }, [theme]);
 
   // Pipeline animation state
   const [pipelineKey, setPipelineKey] = useState(0); // bump to restart
@@ -209,12 +223,11 @@ export default function Home() {
   const [pipelineRunning, setPipelineRunning] = useState(false);
   const howRef = useRef(null);
   const timersRef = useRef([]);
-
-  const heroTyped = useTypewriter(HERO_QUESTION, {
-    startDelay: 600,
-    speed: 35,
-    onDone: () => setTimeout(() => setShowHeroAnswer(true), 400),
-  });
+  const diffRef = useRef(null);
+  const [diffVisible, setDiffVisible] = useState(false);
+  const statsRef = useRef(null);
+  const [statValues, setStatValues] = useState(HERO_STATS.map(() => 0));
+  const statsAnimatedRef = useRef(false);
 
   const pipeTyped = useTypewriter(
     PIPE_QUESTION,
@@ -228,10 +241,6 @@ export default function Home() {
     },
     [pipelineKey]
   );
-
-  function toggleTheme() {
-    setTheme((t) => (t === 'dark' ? 'light' : 'dark'));
-  }
 
   function runDemo(id) {
     if (id === activeDemoId && demoRevealed) return;
@@ -308,6 +317,52 @@ export default function Home() {
     requestAnimationFrame(frame);
   }
 
+  // Trigger "The Difference" slide-in once, the first time it scrolls into view
+  useEffect(() => {
+    const el = diffRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setDiffVisible(true);
+            obs.disconnect();
+          }
+        });
+      },
+      { threshold: 0.35 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  // Count up the hero stats once, the first time they scroll into view
+  useEffect(() => {
+    const el = statsRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !statsAnimatedRef.current) {
+            statsAnimatedRef.current = true;
+            const start = performance.now();
+            const duration = 1200;
+            function frame(now) {
+              const t = Math.min(1, (now - start) / duration);
+              const eased = 1 - Math.pow(1 - t, 3);
+              setStatValues(HERO_STATS.map((s) => s.to * eased));
+              if (t < 1) requestAnimationFrame(frame);
+            }
+            requestAnimationFrame(frame);
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
   // IntersectionObserver to auto-loop pipeline
   useEffect(() => {
     const el = howRef.current;
@@ -358,18 +413,7 @@ export default function Home() {
             <span className="text-sm font-semibold tracking-tight serif">Variance Explainer</span>
           </div>
           <div className="flex items-center gap-3">
-            <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle dark mode">
-              {theme === 'dark' ? (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="4" />
-                  <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
-                </svg>
-              ) : (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
-                </svg>
-              )}
-            </button>
+            <Vernie pose="idle" size={28} />
             <nav className="hidden md:flex items-center gap-8 text-sm">
               <a href="#demo" className="nav-link">Sample analysis</a>
               <a href="#how" className="nav-link">How it works</a>
@@ -384,116 +428,50 @@ export default function Home() {
 
       <main>
         {/* HERO */}
-        <section className="relative min-h-screen flex items-center px-6 pt-24 pb-16 overflow-hidden">
-          <div className="mx-auto max-w-6xl w-full grid md:grid-cols-2 gap-16 items-center relative z-10">
-            <div>
+        <section className="relative flex items-center px-6 pt-32 pb-20 overflow-hidden">
+          <div className="mx-auto max-w-4xl w-full relative z-10 text-center">
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <Vernie pose="waving" size={40} />
               <div
-                className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium mb-6"
-                style={{ background: 'var(--accent-soft)', color: 'var(--accent-dark)' }}
+                className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium"
+                style={{ background: 'var(--accent-soft)', color: 'var(--accent-light)' }}
               >
                 <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--accent)' }}></span>
                 7 companies &middot; 4 industries &middot; your data stays in-house
               </div>
-              <h1 className="serif text-4xl md:text-5xl font-bold leading-[1.15] tracking-tight mb-5" style={{ color: 'var(--text)' }}>
-                Stop reading filings.
-                <br />
-                Start <span style={{ color: 'var(--accent)' }}>understanding variance.</span>
-              </h1>
-              <p className="text-base leading-relaxed mb-8 max-w-md" style={{ color: 'var(--text-dim)' }}>
-                Ask why the number moved — in plain English, with the exact filing and page cited, every time.
-              </p>
-              <div className="flex items-center gap-3">
-                <a href="#demo" className="px-5 py-3 rounded-xl text-sm font-semibold btn-primary">
-                  Try a sample analysis
-                </a>
-                <a href="https://github.com/redsandr/rag-variance-explainer" className="px-5 py-3 rounded-xl text-sm font-medium btn-secondary">
-                  View on GitHub
-                </a>
-              </div>
-
-              <div className="flex items-center gap-8 mt-10 pt-8" style={{ borderTop: '1px solid var(--border)' }}>
-                <div>
-                  <div className="text-2xl font-bold tabular" style={{ color: 'var(--accent)' }}>4 hrs &rarr; 3 min</div>
-                  <div className="text-xs mt-0.5" style={{ color: 'var(--text-mute)' }}>time per variance question</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold tabular" style={{ color: 'var(--accent)' }}>52%</div>
-                  <div className="text-xs mt-0.5" style={{ color: 'var(--text-mute)' }}>right source in top-5, up from 33%</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold tabular">74%</div>
-                  <div className="text-xs mt-0.5" style={{ color: 'var(--text-mute)' }}>of answers verified against the filing</div>
-                </div>
-              </div>
             </div>
+            <h1 className="serif text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.1] tracking-tight mb-6" style={{ color: 'var(--text)' }}>
+              Stop reading filings.
+              <br />
+              Start <span style={{ color: 'var(--accent)' }}>understanding variance.</span>
+            </h1>
+            <p className="text-lg md:text-xl leading-relaxed mb-9 max-w-2xl mx-auto" style={{ color: 'var(--text-dim)' }}>
+              Ask why the number moved — in plain English, with the exact page cited, every time.
+            </p>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <a href="#demo" className="px-6 py-3.5 rounded-xl text-sm font-semibold btn-primary">
+                Try a sample analysis
+              </a>
+              <a href="https://github.com/redsandr/rag-variance-explainer" className="px-6 py-3.5 rounded-xl text-sm font-medium btn-secondary">
+                View on GitHub
+              </a>
+            </div>
+          </div>
 
-            <div className="rounded-2xl overflow-hidden card" style={{ boxShadow: '0 30px 70px -20px rgba(111,143,0,0.18)' }}>
-              <div className="flex items-center gap-1.5 px-4 py-3" style={{ borderBottom: '1px solid var(--border)', background: 'var(--surface-alt)' }}>
-                <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--border-strong)' }}></span>
-                <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--border-strong)' }}></span>
-                <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--border-strong)' }}></span>
-                <span className="ml-3 text-xs mono" style={{ color: 'var(--text-mute)' }}>sample-analysis</span>
-                <span
-                  className="ml-auto text-[10px] font-semibold px-2 py-0.5 rounded-full"
-                  style={{ background: 'var(--accent-soft)', color: 'var(--accent-dark)' }}
-                >
-                  Example output
-                </span>
-              </div>
-              <div className="p-5">
-                <div className="mono text-sm mb-4" style={{ color: 'var(--text-dim)' }}>
-                  <span style={{ color: 'var(--accent)' }}>&gt;</span> {heroTyped}
-                  <span className="cursor-blink">&#9608;</span>
-                </div>
+          <div className="mx-auto max-w-5xl w-full relative z-10 mt-14 md:mt-20">
+            <HeroIllustration />
+          </div>
 
-                {showHeroAnswer && (
-                  <div>
-                    <div className="rounded-xl p-4 mb-3 fade-up" style={{ background: 'var(--surface-alt)', border: '1px solid var(--border)' }}>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xs font-semibold">Answer</span>
-                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full score-high">sourced</span>
-                      </div>
-                      <p className="text-xs leading-relaxed" style={{ color: 'var(--text-dim)' }}>
-                        Labor costs rose primarily due to California minimum wage increases and continued wage
-                        inflation, partially offset by sales leverage from higher transaction volume.
-                      </p>
-                    </div>
-
-                    <div className="text-[11px] font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-mute)' }}>
-                      Source passages &middot; 3
-                    </div>
-
-                    <div className="space-y-2">
-                      <div
-                        className="rounded-lg p-3 fade-up"
-                        style={{ background: 'var(--surface-alt)', borderLeft: '2px solid var(--accent)', animationDelay: '0.1s' }}
-                      >
-                        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded" style={{ background: 'var(--accent-soft)', color: 'var(--accent-dark)' }}>CMG</span>
-                          <span className="text-[10px] px-2 py-0.5 rounded" style={{ background: 'var(--accent-soft)', color: 'var(--text-mute)' }}>10-K</span>
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full score-high ml-auto">Top match</span>
-                        </div>
-                        <p className="text-[11px] mono leading-relaxed" style={{ color: 'var(--text-mute)' }}>
-                          &quot;...labor costs as a percentage of revenue increased due to wage inflation and minimum wage...&quot;
-                        </p>
-                      </div>
-                      <div
-                        className="rounded-lg p-3 fade-up"
-                        style={{ background: 'var(--surface-alt)', borderLeft: '2px solid var(--accent)', animationDelay: '0.2s' }}
-                      >
-                        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded" style={{ background: 'var(--accent-soft)', color: 'var(--accent-dark)' }}>CMG</span>
-                          <span className="text-[10px] px-2 py-0.5 rounded" style={{ background: 'var(--accent-soft)', color: 'var(--text-mute)' }}>10-Q</span>
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full score-mid ml-auto">Also relevant</span>
-                        </div>
-                        <p className="text-[11px] mono leading-relaxed" style={{ color: 'var(--text-mute)' }}>
-                          &quot;...partially offset by sales leverage as comparable restaurant sales grew...&quot;
-                        </p>
-                      </div>
-                    </div>
+          <div ref={statsRef} className="mx-auto max-w-4xl w-full relative z-10 mt-16 md:mt-20">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 text-center">
+              {HERO_STATS.map((s, i) => (
+                <div key={s.label}>
+                  <div className="serif text-3xl md:text-5xl font-bold tabular" style={{ color: i === 0 ? 'var(--accent)' : 'var(--text)' }}>
+                    {s.format(statValues[i])}
                   </div>
-                )}
-              </div>
+                  <div className="text-xs mt-2" style={{ color: 'var(--text-mute)' }}>{s.label}</div>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -537,30 +515,94 @@ export default function Home() {
         </section>
 
         {/* PROBLEM VS SOLUTION */}
-        <section className="max-w-6xl mx-auto px-6 pb-24 md:pb-32">
-          <div className="mb-14">
+        <section id="difference" ref={diffRef} className="max-w-6xl mx-auto px-6 pb-24 md:pb-32">
+          <div className="mb-14 text-center">
             <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>The difference</div>
             <p className="serif text-3xl md:text-4xl font-bold">Typical RAG vs. this pipeline.</p>
           </div>
-          <div className="grid md:grid-cols-2 gap-5">
-            <div className="rounded-2xl p-6 md:p-8 card" style={{ opacity: 0.72 }}>
-              <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--text-mute)' }}>Typical RAG</div>
-              <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--text-dim)' }}>
+          <div className="relative grid md:grid-cols-2 gap-5">
+            {/* VS badge, centered over the seam on desktop */}
+            <div
+              className="hidden md:flex absolute z-20 items-center justify-center rounded-full font-bold text-xs mono"
+              style={{
+                top: '50%',
+                left: '50%',
+                width: 52,
+                height: 52,
+                transform: diffVisible ? 'translate(-50%, -50%) scale(1)' : 'translate(-50%, -50%) scale(0.4)',
+                opacity: diffVisible ? 1 : 0,
+                transition: 'opacity 0.4s ease 0.5s, transform 0.4s cubic-bezier(0.34,1.56,0.64,1) 0.5s',
+                background: 'var(--accent)',
+                color: 'var(--btn-text-on-accent)',
+                boxShadow: '0 0 0 6px var(--bg), 0 0 24px rgba(212,175,55,0.5)',
+              }}
+            >
+              VS
+            </div>
+
+            {/* Typical RAG — muted, gray, blurry */}
+            <div
+              className="rounded-2xl p-6 md:p-8"
+              style={{
+                background: 'var(--surface)',
+                border: '1px solid #333',
+                opacity: diffVisible ? 0.68 : 0,
+                transform: diffVisible ? 'translateX(0)' : 'translateX(-48px)',
+                transition: 'transform 0.7s cubic-bezier(0.16,1,0.3,1), opacity 0.7s ease',
+              }}
+            >
+              <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: '#666' }}>Typical RAG</div>
+              <p
+                className="text-sm leading-relaxed mb-5"
+                style={{ color: '#8a8a8a', filter: 'blur(0.4px)', textShadow: '0 0 1px rgba(255,255,255,0.15)' }}
+              >
                 &quot;Labor costs increased due to various operational factors during the period.&quot;
               </p>
-              <div className="text-xs font-medium" style={{ color: 'var(--text-mute)' }}>No source. No confidence.</div>
+              <div className="flex items-center gap-2 text-xs font-medium" style={{ color: '#666' }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M15 9l-6 6M9 9l6 6" />
+                </svg>
+                No source. No confidence.
+              </div>
             </div>
-            <div className="rounded-2xl p-6 md:p-8 card card-hover" style={{ borderColor: 'var(--accent)' }}>
+
+            {/* Our approach — gold, sharp, glowing */}
+            <div
+              className="rounded-2xl p-6 md:p-8 card-hover"
+              style={{
+                background: 'var(--surface)',
+                border: '1.5px solid var(--accent)',
+                boxShadow: diffVisible ? '0 0 50px -12px rgba(212,175,55,0.4)' : 'none',
+                opacity: diffVisible ? 1 : 0,
+                transform: diffVisible ? 'translateX(0)' : 'translateX(48px)',
+                transition: 'transform 0.7s cubic-bezier(0.16,1,0.3,1) 0.15s, opacity 0.7s ease 0.15s, box-shadow 0.7s ease 0.15s',
+              }}
+            >
               <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>Our approach</div>
               <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--text)' }}>
                 {DEMO_ANALYSES[0].answer}
               </p>
-              <span
-                className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
-                style={{ background: 'var(--accent-soft)', color: 'var(--accent-dark)' }}
-              >
-                Cited from {DEMO_ANALYSES[0].citation}
-              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                <span
+                  className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold mono"
+                  style={{ background: 'var(--accent-soft)', color: 'var(--accent-light)', border: '1px solid var(--border-strong)' }}
+                >
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                    <path d="M14 2v6h6" />
+                  </svg>
+                  {DEMO_ANALYSES[0].citation}
+                </span>
+                <span
+                  className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold mono score-high"
+                >
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                    <path d="M5 13l4 4L19 7" />
+                  </svg>
+                  {DEMO_ANALYSES[0].confidence}%
+                </span>
+              </div>
             </div>
           </div>
         </section>
@@ -601,7 +643,7 @@ export default function Home() {
             ) : (
               <div className="fade-up" key={activeDemo.id}>
                 <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded" style={{ background: 'var(--accent-soft)', color: 'var(--accent-dark)' }}>{activeDemo.ticker}</span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded" style={{ background: 'var(--accent-soft)', color: 'var(--accent-light)' }}>{activeDemo.ticker}</span>
                   <span className="text-[10px] px-2 py-0.5 rounded" style={{ background: 'var(--accent-soft)', color: 'var(--text-mute)' }}>{activeDemo.form}</span>
                   <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full score-high ml-auto">{activeDemo.confidence}% confidence</span>
                 </div>
@@ -636,17 +678,56 @@ export default function Home() {
               <span className="cursor-blink">&#9608;</span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4 mb-8">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4 mb-8 relative">
               {PIPE_STEPS.map((step, i) => (
-                <div key={step.title} className={`pipe-node rounded-xl p-3 sm:p-4 text-center ${activeStep >= i ? 'active' : ''}`}>
-                  <div className="text-xs font-semibold mb-2">{step.title}</div>
-                  <div
-                    className="mono text-lg font-bold tabular"
-                    style={{ color: i === 2 && activeStep >= 2 ? 'var(--accent)' : activeStep >= 3 && i === 3 ? 'var(--text)' : 'var(--text-mute)' }}
-                  >
-                    {stepValues[i]}
+                <div key={step.title} className="relative">
+                  <div className={`pipe-node rounded-xl p-3 sm:p-4 text-center ${activeStep >= i ? 'active' : ''}`}>
+                    <div
+                      className="mx-auto mb-2 flex items-center justify-center h-8 w-8 rounded-lg transition-colors duration-300"
+                      style={{
+                        background: activeStep >= i ? 'var(--accent-soft)' : 'var(--surface-alt)',
+                        color: activeStep >= i ? 'var(--accent)' : 'var(--text-mute)',
+                      }}
+                    >
+                      {PIPE_ICONS[step.icon]}
+                    </div>
+                    <div className="text-xs font-semibold mb-2">{step.title}</div>
+                    <div
+                      className="mono text-lg font-bold tabular"
+                      style={{ color: i === 2 && activeStep >= 2 ? 'var(--accent)' : activeStep >= 3 && i === 3 ? 'var(--text)' : 'var(--text-mute)' }}
+                    >
+                      {stepValues[i]}
+                    </div>
+                    <div className="text-[10px] mt-1" style={{ color: 'var(--text-mute)' }}>{step.label}</div>
                   </div>
-                  <div className="text-[10px] mt-1" style={{ color: 'var(--text-mute)' }}>{step.label}</div>
+                  {/* Connecting arrow, drawn on when this step becomes active */}
+                  {i < PIPE_STEPS.length - 1 && (
+                    <svg
+                      className="hidden sm:block absolute pointer-events-none"
+                      style={{ top: '20%', left: '100%', width: 'calc(0.5rem + 1rem)', height: 12, transform: 'translateX(-4px)' }}
+                      viewBox="0 0 24 12"
+                    >
+                      <path
+                        d="M0 6h16"
+                        fill="none"
+                        stroke="var(--accent)"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeDasharray="16"
+                        strokeDashoffset={activeStep > i ? 0 : 16}
+                        style={{ transition: 'stroke-dashoffset 0.5s ease' }}
+                      />
+                      <path
+                        d="M14 2l5 4-5 4"
+                        fill="none"
+                        stroke="var(--accent)"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        style={{ opacity: activeStep > i ? 1 : 0, transition: 'opacity 0.3s ease 0.3s' }}
+                      />
+                    </svg>
+                  )}
                 </div>
               ))}
             </div>
@@ -663,13 +744,25 @@ export default function Home() {
             </div>
 
             <div
-              className="rounded-xl p-4 transition-opacity duration-300"
+              className="relative rounded-xl p-4 transition-opacity duration-300"
               style={{
                 background: 'var(--accent-soft)',
                 border: '1px solid var(--border-strong)',
+                boxShadow: pipeOutputVisible ? '0 0 40px -10px rgba(212,175,55,0.45)' : 'none',
                 opacity: pipeOutputVisible ? 1 : 0,
               }}
             >
+              {/* Vernie peeking from behind the finished answer card */}
+              <div
+                className="hidden sm:block absolute -top-5 -right-3"
+                style={{
+                  opacity: pipeOutputVisible ? 1 : 0,
+                  transform: pipeOutputVisible ? 'translateY(0)' : 'translateY(8px)',
+                  transition: 'opacity 0.4s ease 0.2s, transform 0.4s ease 0.2s',
+                }}
+              >
+                <Vernie pose="found" size={36} />
+              </div>
               <div className="flex items-center gap-2 mb-1.5">
                 <span className="text-xs font-semibold" style={{ color: 'var(--accent)' }}>Sourced answer ready</span>
               </div>
@@ -814,7 +907,7 @@ export default function Home() {
                     <td className="px-6 py-4">
                       <span
                         className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
-                        style={{ background: 'var(--accent-soft)', color: 'var(--accent-dark)' }}
+                        style={{ background: 'var(--accent-soft)', color: 'var(--accent-light)' }}
                       >
                         {uc.src}
                       </span>
@@ -833,7 +926,7 @@ export default function Home() {
                 <div className="text-sm mb-3" style={{ color: 'var(--text-dim)' }}>{uc.a}</div>
                 <span
                   className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
-                  style={{ background: 'var(--accent-soft)', color: 'var(--accent-dark)' }}
+                  style={{ background: 'var(--accent-soft)', color: 'var(--accent-light)' }}
                 >
                   {uc.src}
                 </span>
@@ -916,7 +1009,8 @@ export default function Home() {
 
       <footer style={{ borderTop: '1px solid var(--border)' }}>
         <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-mute)' }}>
+          <div className="flex items-center gap-3 text-sm" style={{ color: 'var(--text-mute)' }}>
+            <Vernie pose="idle" size={32} />
             <span>MIT License</span><span>&middot;</span><span>2026</span>
           </div>
           <div className="flex items-center gap-6 text-sm">
