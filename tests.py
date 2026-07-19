@@ -317,6 +317,32 @@ def test_retry_decorator_exhausts_attempts() -> None:
     assert call_count == 3
 
 
+# --- MCP server tests ---
+
+
+def test_mcp_server_has_four_tools() -> None:
+    from src.server import mcp
+
+    tools = mcp._tool_manager.list_tools()
+    names = [t.name for t in tools]
+    assert len(names) == 4
+    assert "rag.answer" in names
+    assert "rag.search" in names
+    assert "rag.list_companies" in names
+    assert "rag.list_questions" in names
+
+
+def test_mcp_list_companies_returns_all_tickers() -> None:
+    from src.server import list_companies
+
+    result = list_companies()
+    assert "CMG" in result
+    assert "XOM" in result
+    assert "7 companies" in result
+    assert "Restaurant" in result
+    assert "Energy" in result
+
+
 # --- build_index tests ---
 
 

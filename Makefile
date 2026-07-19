@@ -18,6 +18,12 @@ check: test lint typecheck
 run:
 	streamlit run app.py
 
+mcp:
+	python src/server.py
+
+mcp-sse:
+	python src/server.py --sse --port 8765
+
 eval-recall:
 	python src/eval_recall.py
 
