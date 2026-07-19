@@ -3,11 +3,76 @@ import { useEffect, useRef, useState } from 'react';
 const HERO_QUESTION = "Why did Chipotle's labor costs increase?";
 const PIPE_QUESTION = "Why did Chipotle's labor costs increase?";
 
+const TRUST_ITEMS = [
+  'Grounded in real SEC filings',
+  'Every answer cited to a page',
+  'Tested across 4 industries',
+  'Open source, MIT licensed',
+];
+
+const DEMO_ANALYSES = [
+  {
+    id: 'cmg-labor',
+    question: "Why did Chipotle's labor costs increase?",
+    ticker: 'CMG',
+    form: '10-Q',
+    citation: 'CMG 10-Q, p. 12',
+    evidence:
+      '"...labor costs as a percentage of revenue increased due to wage inflation and minimum wage increases, partially offset by sales leverage as comparable restaurant sales grew..."',
+    answer:
+      "Labor costs rose mainly from wage inflation and minimum wage increases in states like California, partially offset by sales leverage as comparable restaurant sales grew.",
+    confidence: 94,
+  },
+  {
+    id: 'wmt-ecom',
+    question: "What drove Walmart's e-commerce growth?",
+    ticker: 'WMT',
+    form: '10-K',
+    citation: 'WMT 10-K, p. 28',
+    evidence:
+      '"...e-commerce growth was driven by increased omnichannel penetration and continued adoption of store-fulfilled pickup and delivery..."',
+    answer:
+      "Growth came mainly from higher omnichannel penetration and continued adoption of store-fulfilled pickup and delivery.",
+    confidence: 91,
+  },
+  {
+    id: 'tgt-margin',
+    question: "How did Target's gross margin change?",
+    ticker: 'TGT',
+    form: '10-Q',
+    citation: 'TGT 10-Q, p. 19',
+    evidence:
+      '"...gross margin rate increased, reflecting a favorable shift in merchandise mix and lower promotional and shrink-related costs..."',
+    answer:
+      "Gross margin improved on a favorable shift in merchandise mix, along with lower promotional activity and reduced shrink.",
+    confidence: 88,
+  },
+  {
+    id: 'dri-acq',
+    question: "How did the Chuy's acquisition affect Darden's revenue?",
+    ticker: 'DRI',
+    form: '10-K',
+    citation: 'DRI 10-K, p. 41',
+    evidence:
+      '"...the increase in total revenue was driven in part by the acquisition of Chuy\'s, which contributed segment sales beginning in the fiscal third quarter..."',
+    answer:
+      "The Chuy's acquisition added incremental segment revenue starting in fiscal Q3, contributing to the total revenue increase for the period.",
+    confidence: 90,
+  },
+];
+
 const CHART_DATA = [
   { label: 'Top 1', base: 0.18, ce: 0.23 },
   { label: 'Top 3', base: 0.24, ce: 0.45 },
   { label: 'Top 5', base: 0.33, ce: 0.52 },
   { label: 'Top 10', base: 0.55, ce: 0.7 },
+];
+
+const METRICS = [
+  { value: '7', label: 'companies covered', sub: '4 industries' },
+  { value: '52%', label: 'right source found first try', sub: 'top-5, up from 33%' },
+  { value: '74%', label: 'answers fully verified', sub: 'restaurant filings' },
+  { value: '3 min', label: 'per variance question', sub: 'down from ~4 hours' },
 ];
 
 const USE_CASES = [
@@ -19,12 +84,12 @@ const USE_CASES = [
 ];
 
 const FEATURES = [
-  { t: 'Understands plain-language questions', d: "Ask the way you'd ask a colleague. No need to know exact filing terms or section names." },
-  { t: 'Cites its sources', d: 'Every answer points back to the exact filing and page, so you can verify it yourself before it goes in a report.' },
-  { t: 'Pulls straight from SEC filings', d: 'Automatically fetches the relevant sections from 10-Ks and 10-Qs across 7 companies — no manual PDF searching.' },
-  { t: 'Works across industries', d: 'Tested on retail with no drop in accuracy compared to restaurants — not tuned to look good on just one industry.' },
-  { t: 'Checked against the source', d: 'Roughly 3 out of 4 answers verified as fully accurate against the original filing text, with ongoing work to improve that further.' },
-  { t: 'Flexible on privacy and cost', d: 'Runs fully offline on your own machine, or connects to a cloud AI provider if you prefer — your data, your choice.' },
+  { t: 'Ask like you would a colleague', d: "No filing jargon required. Ask in plain English and get an answer scoped to what you actually meant." },
+  { t: 'Every claim cited to a page', d: 'Each answer points back to the exact filing and page, so you can verify it before it goes in a report.' },
+  { t: 'Pulls directly from SEC filings', d: 'Reads straight from 10-Ks and 10-Qs across 7 companies — no manual searching through PDFs.' },
+  { t: 'Works across sectors, not just one', d: 'Tested on restaurant, retail, healthcare, and energy filings, with no drop in accuracy between them.' },
+  { t: 'Checked against the source', d: "Roughly 3 in 4 answers verified as fully accurate against the original filing text, with ongoing work to push that higher." },
+  { t: 'Your filings stay yours', d: 'Runs fully offline on your own machine, or connects to a cloud provider if you prefer — your data, your choice.' },
 ];
 
 const ROADMAP = [
@@ -112,6 +177,11 @@ export default function Home() {
   const [tab, setTab] = useState('local');
   const [copyLabel, setCopyLabel] = useState('Copy');
 
+  // Sample-analysis demo state
+  const [activeDemoId, setActiveDemoId] = useState(DEMO_ANALYSES[0].id);
+  const [demoLoading, setDemoLoading] = useState(false);
+  const [demoRevealed, setDemoRevealed] = useState(true);
+
   // On first load: use a previously saved choice on this device/browser if
   // there is one, otherwise fall back to the OS/browser's dark mode setting.
   useEffect(() => {
@@ -162,6 +232,19 @@ export default function Home() {
   function toggleTheme() {
     setTheme((t) => (t === 'dark' ? 'light' : 'dark'));
   }
+
+  function runDemo(id) {
+    if (id === activeDemoId && demoRevealed) return;
+    setActiveDemoId(id);
+    setDemoRevealed(false);
+    setDemoLoading(true);
+    setTimeout(() => {
+      setDemoLoading(false);
+      setDemoRevealed(true);
+    }, 550);
+  }
+
+  const activeDemo = DEMO_ANALYSES.find((d) => d.id === activeDemoId) || DEMO_ANALYSES[0];
 
   // Drive pipeline steps
   useEffect(() => {
@@ -272,7 +355,7 @@ export default function Home() {
                 <path d="M12 2 L22 8 L22 16 L12 22 L2 16 L2 8 Z" />
               </svg>
             </div>
-            <span className="text-sm font-semibold tracking-tight">RAG Variance Explainer</span>
+            <span className="text-sm font-semibold tracking-tight">Variance Explainer</span>
           </div>
           <div className="flex items-center gap-3">
             <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle dark mode">
@@ -288,9 +371,9 @@ export default function Home() {
               )}
             </button>
             <nav className="hidden md:flex items-center gap-8 text-sm">
+              <a href="#demo" className="nav-link">Sample analysis</a>
               <a href="#how" className="nav-link">How it works</a>
               <a href="#evidence" className="nav-link">Evidence</a>
-              <a href="#features" className="nav-link">Features</a>
               <a href="https://github.com/redsandr/rag-variance-explainer" className="px-4 py-2 rounded-lg text-sm font-medium btn-primary">
                 GitHub
               </a>
@@ -312,20 +395,20 @@ export default function Home() {
                 7 companies &middot; 4 industries &middot; your data stays in-house
               </div>
               <h1 className="text-4xl md:text-5xl font-bold leading-[1.1] tracking-tight mb-5" style={{ color: 'var(--text)' }}>
-                Ask why a metric moved.
+                Stop reading 300-page filings.
                 <br />
-                Get an answer <span style={{ color: 'var(--accent)' }}>sourced from the filing.</span>
+                Ask <span style={{ color: 'var(--accent)' }}>why the number moved.</span>
               </h1>
               <p className="text-base leading-relaxed mb-8 max-w-md" style={{ color: 'var(--text-dim)' }}>
-                Ask a plain-language question about real SEC filings — 10-Ks, 10-Qs, MD&amp;A sections — and get a
-                sourced answer in minutes, not hours of digging through pages by hand.
+                Ask a plain-language question about a 10-K, 10-Q, or MD&amp;A section, and get an answer grounded
+                in the filing — with the exact page cited, every time.
               </p>
               <div className="flex items-center gap-3">
-                <a href="https://github.com/redsandr/rag-variance-explainer" className="px-5 py-3 rounded-xl text-sm font-semibold btn-primary">
-                  View on GitHub
+                <a href="#demo" className="px-5 py-3 rounded-xl text-sm font-semibold btn-primary">
+                  Try a sample analysis
                 </a>
-                <a href="#how" className="px-5 py-3 rounded-xl text-sm font-medium btn-secondary">
-                  See how it works
+                <a href="https://github.com/redsandr/rag-variance-explainer" className="px-5 py-3 rounded-xl text-sm font-medium btn-secondary">
+                  View on GitHub
                 </a>
               </div>
 
@@ -350,7 +433,13 @@ export default function Home() {
                 <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--border-strong)' }}></span>
                 <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--border-strong)' }}></span>
                 <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--border-strong)' }}></span>
-                <span className="ml-3 text-xs mono" style={{ color: 'var(--text-mute)' }}>query.stream</span>
+                <span className="ml-3 text-xs mono" style={{ color: 'var(--text-mute)' }}>sample-analysis</span>
+                <span
+                  className="ml-auto text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                  style={{ background: 'var(--accent-soft)', color: 'var(--accent-dark)' }}
+                >
+                  Example output
+                </span>
               </div>
               <div className="p-5">
                 <div className="mono text-sm mb-4" style={{ color: 'var(--text-dim)' }}>
@@ -362,7 +451,7 @@ export default function Home() {
                   <div>
                     <div className="rounded-xl p-4 mb-3 fade-up" style={{ background: 'var(--surface-alt)', border: '1px solid var(--border)' }}>
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xs font-semibold">AI Analysis</span>
+                        <span className="text-xs font-semibold">Answer</span>
                         <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full score-high">sourced</span>
                       </div>
                       <p className="text-xs leading-relaxed" style={{ color: 'var(--text-dim)' }}>
@@ -410,6 +499,27 @@ export default function Home() {
           </div>
         </section>
 
+        {/* TRUST BAR */}
+        <section className="px-6 pb-20 md:pb-28">
+          <div className="max-w-6xl mx-auto rounded-2xl card px-6 py-6 md:px-10 md:py-7">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-y-4 gap-x-6">
+              {TRUST_ITEMS.map((item) => (
+                <div key={item} className="flex items-center gap-2.5">
+                  <span
+                    className="flex items-center justify-center h-5 w-5 rounded-full shrink-0"
+                    style={{ background: 'var(--green-soft)', color: 'var(--green)' }}
+                  >
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                      <path d="M5 13l4 4L19 7" />
+                    </svg>
+                  </span>
+                  <span className="text-sm font-medium" style={{ color: 'var(--text-dim)' }}>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* PROBLEM */}
         <section className="max-w-4xl mx-auto px-6 py-24 md:py-32">
           <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>The problem</div>
@@ -425,6 +535,64 @@ export default function Home() {
               retail, healthcare, energy — not just tuned to look good on one company.
             </span>
           </p>
+        </section>
+
+        {/* SAMPLE ANALYSIS DEMO */}
+        <section id="demo" className="max-w-6xl mx-auto px-6 py-24 md:py-32">
+          <div className="mb-14 text-center">
+            <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>Try it</div>
+            <p className="text-3xl md:text-4xl font-bold mb-4">Pick a question. See the answer.</p>
+            <p className="text-base max-w-xl mx-auto" style={{ color: 'var(--text-dim)' }}>
+              Sample output from real questions the tool was tested on — no install required.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-2.5 mb-8">
+            {DEMO_ANALYSES.map((d) => (
+              <button
+                key={d.id}
+                onClick={() => runDemo(d.id)}
+                className="px-4 py-2.5 rounded-xl text-sm font-medium text-left"
+                style={
+                  d.id === activeDemoId
+                    ? { background: 'var(--accent)', color: 'var(--btn-text-on-accent)' }
+                    : { background: 'var(--surface)', border: '1px solid var(--border-strong)', color: 'var(--text)' }
+                }
+              >
+                {d.question}
+              </button>
+            ))}
+          </div>
+
+          <div className="rounded-2xl card p-6 md:p-8 max-w-2xl mx-auto">
+            {demoLoading ? (
+              <div className="flex items-center gap-3 py-10 justify-center" style={{ color: 'var(--text-mute)' }}>
+                <span className="mono text-sm">Analyzing filing</span>
+                <span className="cursor-blink mono text-sm">&#9608;</span>
+              </div>
+            ) : (
+              <div className="fade-up" key={activeDemo.id}>
+                <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded" style={{ background: 'var(--accent-soft)', color: 'var(--accent-dark)' }}>{activeDemo.ticker}</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded" style={{ background: 'var(--accent-soft)', color: 'var(--text-mute)' }}>{activeDemo.form}</span>
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full score-high ml-auto">{activeDemo.confidence}% confidence</span>
+                </div>
+                <p className="text-sm font-semibold mb-4">{activeDemo.question}</p>
+
+                <div className="rounded-xl p-4 mb-4" style={{ background: 'var(--surface-alt)', border: '1px solid var(--border)' }}>
+                  <div className="text-xs font-semibold mb-1.5">Answer</div>
+                  <p className="text-sm leading-relaxed" style={{ color: 'var(--text-dim)' }}>{activeDemo.answer}</p>
+                </div>
+
+                <div className="rounded-xl p-4" style={{ background: 'var(--surface-alt)', borderLeft: '2px solid var(--accent)' }}>
+                  <div className="text-[11px] font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-mute)' }}>
+                    Cited from {activeDemo.citation}
+                  </div>
+                  <p className="text-xs mono leading-relaxed" style={{ color: 'var(--text-mute)' }}>{activeDemo.evidence}</p>
+                </div>
+              </div>
+            )}
+          </div>
         </section>
 
         {/* HOW IT WORKS */}
@@ -490,9 +658,19 @@ export default function Home() {
             <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>Evidence, not claims</div>
             <p className="text-3xl md:text-4xl font-bold mb-4">Accuracy, tested and measured.</p>
             <p className="text-base max-w-2xl" style={{ color: 'var(--text-dim)' }}>
-              Tested against 40 real questions with known correct answers, before and after adding a
-              relevance-ranking step. The hardest cases went from being missed entirely to found first.
+              Tested against 40 real questions with known correct answers, before and after adding a relevance-ranking
+              step. The hardest cases went from being missed entirely to found first.
             </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            {METRICS.map((m) => (
+              <div key={m.label} className="rounded-2xl p-5 card">
+                <div className="text-3xl font-bold tabular mb-1" style={{ color: 'var(--accent)' }}>{m.value}</div>
+                <div className="text-sm font-medium mb-1">{m.label}</div>
+                <div className="text-xs" style={{ color: 'var(--text-mute)' }}>{m.sub}</div>
+              </div>
+            ))}
           </div>
 
           <div className="grid md:grid-cols-5 gap-6 items-end mb-6 rounded-2xl p-8 card">
@@ -538,6 +716,10 @@ export default function Home() {
               </div>
             </div>
             <div className="md:col-span-2 space-y-4 md:pl-6 md:border-l" style={{ borderColor: 'var(--border)' }}>
+              <div>
+                <div className="text-sm font-semibold mb-1">Right source found on the first try</div>
+                <div className="text-xs" style={{ color: 'var(--text-mute)' }}>Before vs. after adding a relevance-ranking step</div>
+              </div>
               <div className="flex items-center gap-2 text-xs">
                 <span className="h-2.5 w-2.5 rounded-sm" style={{ background: 'var(--border-strong)' }}></span>
                 <span style={{ color: 'var(--text-dim)' }}>Before ranking step</span>
@@ -635,7 +817,7 @@ export default function Home() {
         {/* FEATURES */}
         <section id="features" className="max-w-6xl mx-auto px-6 py-24 md:py-32">
           <div className="mb-14">
-            <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>Features</div>
+            <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>Why financial teams use it</div>
             <p className="text-3xl md:text-4xl font-bold">Built for accuracy, security, and trust.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-4">
@@ -651,9 +833,9 @@ export default function Home() {
         {/* QUICK START */}
         <section className="max-w-4xl mx-auto px-6 py-24 md:py-32">
           <div className="mb-14">
-            <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>Quick start</div>
+            <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>For engineers &amp; reviewers</div>
             <p className="text-3xl md:text-4xl font-bold">Running in two minutes.</p>
-            <p className="text-base mt-3" style={{ color: 'var(--text-dim)' }}>For anyone who wants to run it themselves or review exactly how it works under the hood.</p>
+            <p className="text-base mt-3" style={{ color: 'var(--text-dim)' }}>Want to run it yourself or see exactly how it works under the hood? Here&apos;s the full setup.</p>
           </div>
           <div className="rounded-2xl overflow-hidden card">
             <div className="flex flex-wrap items-center justify-between gap-y-2 gap-x-3 px-2 sm:px-0" style={{ borderBottom: '1px solid var(--border)' }}>
@@ -710,6 +892,7 @@ export default function Home() {
             <span>MIT License</span><span>&middot;</span><span>2026</span>
           </div>
           <div className="flex items-center gap-6 text-sm">
+            <a href="#how" className="nav-link">Methodology</a>
             <a href="https://github.com/redsandr/rag-variance-explainer" className="nav-link">GitHub</a>
             <a href="https://github.com/redsandr/rag-variance-explainer/tree/master/docs" className="nav-link">Docs</a>
           </div>
