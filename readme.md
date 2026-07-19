@@ -10,7 +10,7 @@
   <a href="https://github.com/redsandr/rag-variance-explainer/actions"><img src="https://github.com/redsandr/rag-variance-explainer/actions/workflows/test.yml/badge.svg" alt="CI"></a>
 </p>
 
-> **Turn a 4-hour manual variance review into a 3-minute query.** Ask *"why did this financial metric change?"* in plain language and get a sourced, citation-backed answer from real SEC filings — across **7 companies, 4 sectors**, locally, at zero cost per query.
+> **Turn a 4-hour manual variance review into a 3-minute query.** Ask *"why did this financial metric change?"* in plain language and get a sourced, citation-backed answer from real SEC filings — across **7 companies, 4 sectors**, running fully offline at zero cost per query.
 
 Financial analysts read MD&A sections for hours every quarter. Most RAG demos work on one dataset in one domain — **generalization is the hard part.** This project proves a financial RAG pipeline can generalize across sectors without degrading retrieval quality.
 
@@ -94,12 +94,13 @@ flowchart TD
 | Dense Only (nomic-embed) | 0.06 | 0.18 | 0.29 | 0.51 | 0.272 |
 | Hybrid (dense + BM25) | 0.05 | 0.20 | 0.26 | 0.45 | 0.266 |
 | Hybrid + Cross-Encoder | 0.19 | 0.46 | 0.60 | 0.72 | 0.459 |
-| **Full Pipeline** | **0.23** | **0.49** | **0.65** | **0.75** | **0.486** |
+| **Full Pipeline** | **0.27** | **0.50** | **0.68** | **0.81** | **0.540** |
 
 Key findings:
 - **BM25 alone fails** on financial text — recall@10=0.35, keyword matching insufficient for nuanced MD&A language
 - **Hybrid without expansion hurts** — RRF merge dilutes dense precision when query expansion is off (0.51 → 0.45)
 - **Cross-encoder is the largest single contributor** — recall@10 jumps from 0.45 → 0.72 (+0.27)
+- **Index rebuild + chunk boundary fix** added +0.06 recall@10 to full pipeline (0.75 → 0.81)
 
 ### Retrieval Recall@k — Ablation Study
 
@@ -112,7 +113,8 @@ Additive component breakdown on the same eval set.
 | + Hybrid Search (BM25) | 0.07 | 0.32 | 0.37 | 0.47 | 0.347 |
 | **+ Cross-Encoder** | **0.23** | **0.49** | **0.65** | **0.75** | **0.486** |
 | + Forward-Looking Penalty | 0.23 | 0.49 | 0.65 | 0.75 | 0.486 |
-| **Full Pipeline** | **0.23** | **0.49** | **0.65** | **0.75** | **0.486** |
+| + Index rebuild (chunk boundary fix) | 0.27 | 0.50 | 0.68 | 0.81 | 0.540 |
+| **Full Pipeline** | **0.27** | **0.50** | **0.68** | **0.81** | **0.540** |
 
 Key findings:
 - **Cross-encoder is the dominant component** — recall@10 jumps from 0.47 → 0.75 (+0.28)
@@ -142,20 +144,33 @@ Pipeline tested on retail without any domain-specific tuning:
 
 ### Faithfulness (LLM-as-Judge)
 
+**Restaurant sector (20 questions, 3 companies):**
+
 | Phase | Model | Strict | Weighted | Δ Strict |
 |-------|-------|--------|----------|----------|
 | Baseline | Qwen2.5-VL-7B | 65.8% | 78.9% | — |
 | Phase 7e (3 fixes + model swap) | Qwen2.5-7B-Instruct | **74.24%** | 75.0% | **+8.44pp** |
 | Phase 7f (prompt + parser fix) | Qwen2.5-7B-Instruct | — | **75.32%** | — |
 
-> Weighted baseline (78.9%) and post-fix (75.32%) are not directly comparable — methodology was refined between iterations. **Strict metric is the reliable indicator**: 65.8% → 74.24% (+8.44pp).
+> Weighted baseline (78.9%) and post-fix (75.32%) are not directly comparable — methodology was refined between iterations.
 
-Three targeted fixes drove the improvement:
+**Cross-sector (40 questions, 7 companies, 4 industries):**
+
+| Metric | Score |
+|--------|-------|
+| Strict faithfulness | 59.29% |
+| Weighted faithfulness | 73.45% |
+| Questions evaluated | 40 |
+| Total claims | 113 |
+
+Three targeted fixes drove the restaurant improvement:
 1. **Number transposition** — `verify_answer()` catches decimal shifts & year mismatches
 2. **Metric conflation** — `MetricVerifier` cross-checks labels against source metadata
 3. **Causal proximity** — `tag_chunk()` metric enrichment filters retrieval
 
-**Methodology:** Qwen2.5-7B-Instruct acts as the judge. Cross-validated against Claude (Anthropic) on 20 questions × 66 claims — no manual human annotation.
+**Methodology:** Qwen2.5-7B-Instruct acts as the judge. Cross-validated against Claude (Anthropic) on 20 questions × 66 claims — no manual human annotation. Cross-sector eval spans all 7 companies across restaurant, retail, healthcare, and energy filings.
+
+> **Note:** The cross-sector score is lower (59.29% strict) because it covers a broader, harder set of questions including cross-company comparisons and multi-hop questions that test the pipeline's architectural limits — not just single-company single-filing lookups.
 
 ---
 
@@ -228,9 +243,10 @@ All parameters via env vars — no hardcoded magic numbers.
 - Cross-sector generalization: retail recall@10 = **1.00** — pipeline is domain-agnostic
 
 **Quality & UI**
-- Faithfulness evaluation: strict **74.24%**, weighted **75.32%** — LLM-as-judge + Claude cross-validation
-- 40 pytest + ruff + mypy CI — strict linting and type checking
+- Faithfulness evaluation: strict **74.24%** (restaurant) / **59.29%** (cross-sector) — LLM-as-judge + Claude cross-validation
+- 40 pytest + ruff + mypy + bandit CI — strict linting and type checking
 - Streamlit dashboard: OLED dark mode, 2 views (Q&A + System Analytics), WCAG contrast
+- Landing page: Next.js 14 + Tailwind, light/dark mode, interactive pipeline demo, Vernie mascot — [rag-variance-explainer.vercel.app](https://rag-variance-explainer.vercel.app)
 
 ---
 
@@ -244,6 +260,7 @@ All parameters via env vars — no hardcoded magic numbers.
 ├── tests.py                     # 40 pytest tests (9 modules)
 ├── .github/workflows/test.yml # CI pipeline
 ├── docs/                      # Extended documentation
+├── landing/                   # Landing page (Next.js 14, Vercel)
 ├── src/
 │   ├── rag.py                 # RAG orchestrator
 │   ├── retrieval.py           # ChromaDB + multi-strategy retrieval
@@ -281,7 +298,7 @@ All parameters via env vars — no hardcoded magic numbers.
 
 ## Known Limitations
 
-- **Faithfulness ~74% strict** — occasional hallucination on ambiguous multi-period comparisons; cross-validation with Claude shows systematic overestimation addressed in v2
+- **Faithfulness ~74% strict (restaurant) / ~59% strict (cross-sector)** — cross-sector score drops on multi-hop and cross-company questions; cross-validation with Claude shows systematic overestimation addressed in v2
 - **Cross-encoder re-ranking** adds ~200ms latency per query
 - **SEC EDGAR ingestion** limited to 10-K/10-Q (no 8-K event-driven filings)
 - **Single-user** — no session management or multi-tenant support
