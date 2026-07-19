@@ -24,6 +24,9 @@ mcp:
 mcp-sse:
 	python src/server.py --sse --port 8765
 
+api:
+	uvicorn src.api:app --reload --port 8000
+
 eval-recall:
 	python src/eval_recall.py
 

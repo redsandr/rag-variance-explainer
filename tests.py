@@ -357,3 +357,34 @@ def test_build_index_empty_db_handles_gracefully() -> None:
     ):
         mock_collection.return_value.count.return_value = 0
         bi.build_index()
+
+
+# --- API tests ---
+
+
+def test_api_root_returns_service_info() -> None:
+    from src.api import app
+
+    client = app.__class__
+    assert app.title == "RAG Variance Explainer API"
+    assert app.version == "1.0.0"
+
+
+def test_api_companies_endpoint() -> None:
+    from src.api import app
+
+    for route in app.routes:
+        if hasattr(route, "path") and route.path == "/companies" and "GET" in route.methods:
+            assert route.path == "/companies"
+            return
+    raise AssertionError("GET /companies route not found")
+
+
+def test_api_health_endpoint() -> None:
+    from src.api import app
+
+    for route in app.routes:
+        if hasattr(route, "path") and route.path == "/health":
+            assert "GET" in route.methods
+            return
+    raise AssertionError("GET /health route not found")
