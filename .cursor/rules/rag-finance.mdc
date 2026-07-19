@@ -1,0 +1,59 @@
+---
+description: RAG Financial Variance Explainer — project context for Cursor
+globs: src/**/*.py, app.py, tests.py
+---
+
+# RAG Variance Explainer
+
+Financial RAG pipeline analyzing SEC filing MD&A sections.
+7 companies across 4 sectors (Restaurant, Retail, Healthcare, Energy).
+
+## Architecture
+
+```
+app.py (Streamlit UI) → src/rag.py (orchestrator) → src/retrieval.py (ChromaDB + BM25 + cross-encoder) → src/llm.py (Qwen2.5-7B via llama.cpp)
+```
+
+## Key Files
+
+| File | Role |
+|------|------|
+| `src/rag.py` | `answer_question()` — end-to-end RAG pipeline |
+| `src/retrieval.py` | `query_multi()` — multi-stage retrieval (dense → hybrid → cross-encoder) |
+| `src/llm.py` | `LLMClient` singleton with 3 backends (llama.cpp, OpenAI, Anthropic) |
+| `src/server.py` | MCP server (stdio + SSE) with 4 tools |
+| `src/api.py` | FastAPI REST API |
+| `src/config.py` | Centralized config via env vars |
+| `app.py` | Streamlit dashboard |
+
+## MCP Server
+
+```bash
+python src/server.py              # stdio (for Cursor MCP)
+python src/server.py --sse :8765  # SSE (for remote)
+```
+
+Tools: `rag.answer`, `rag.search`, `rag.list_companies`, `rag.list_questions`
+
+## REST API
+
+```bash
+uvicorn src.api:app --reload
+```
+
+Endpoints: `POST /answer`, `POST /search`, `GET /companies`, `GET /health`
+
+## Evaluation Metrics
+
+- recall@10: **0.81**, MRR: **0.54**
+- Faithfulness strict: **59.29%** (cross-sector), **74.24%** (restaurant)
+- Faithfulness weighted: **73.45%** (cross-sector), **75.32%** (restaurant)
+- Tests: **47 pytest**, ruff 0, mypy 0, bandit 0
+
+## Coding Conventions
+
+- Type hints everywhere (`str | None`, not `Optional[str]`)
+- Logging via `logging.getLogger(__name__)` — no print()
+- Config via `src/config.py` — no hardcoded magic numbers
+- Tests in `tests.py` + `conftest.py` (auto-mocks LLM)
+- Pre-commit: ruff + mypy
