@@ -41,6 +41,13 @@ def get_collection(client: Any) -> Any:
     )
 
 
+def delete_chunks_for_filing(collection: Any, ticker: str, accession_number: str) -> None:
+    """Delete all chunks for a given ticker + filing to avoid orphaning."""
+    existing = collection.get(where={"$and": [{"ticker": ticker}, {"accession_number": accession_number}]})
+    if existing and existing["ids"]:
+        collection.delete(ids=existing["ids"])
+
+
 def add_chunks(
     collection: Any,
     chunks: list[str],

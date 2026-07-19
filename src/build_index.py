@@ -14,7 +14,7 @@ from ingest import (
     list_10k_10q_filings,
 )
 from post_process import tag_chunk
-from retrieval import add_chunks, get_client, get_collection
+from retrieval import add_chunks, delete_chunks_for_filing, get_client, get_collection
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +50,8 @@ def build_index() -> None:
                     cik, accession, filing["primaryDocument"]
                 )
                 chunks = chunk_document(mda_text, chunk_size=500, chunk_overlap=50)
+
+                delete_chunks_for_filing(collection, ticker, accession)
 
                 enriched_metadatas = []
                 for i, chunk in enumerate(chunks):

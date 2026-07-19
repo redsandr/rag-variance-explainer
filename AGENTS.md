@@ -46,15 +46,15 @@ Lo di sini sebagai **Engine Partner** — bukan sekadar coding assistant, tapi p
 | Aspek | Detail |
 |-------|--------|
 | **North star** | 3 restaurant companies → multi-sektor platform RAG dengan faithfulness 75%+ |
-| **Tahap** | Phase 2b — Code Lockdown ✅ Complete. Phase 3 — Benchmarking & Blog next. |
+| **Tahap** | Phase 2b — Code Lockdown ✅ Complete. Phase 2b.8 — Dataset Completion ✅ Complete. Phase 3 — Benchmarking & Blog next. |
 | **Faithfulness** | Restaurant: **74.24% strict / 75.32% weighted**. Retail: **69.70% strict / 80.30% weighted**. |
 | **Perusahaan** | **7** (CMG, DRI, CBRL, WMT, TGT, JNJ, XOM) — 4 sectors |
 | **Sectors** | Restaurant, Retail, Healthcare, Energy |
 | **Retail recall** | **WMT recall@10 = 1.00**, **TGT recall@10 = 1.00** — zero degradation |
-| **Tooling** | **38 pytest + ruff (0 errors) + mypy (0 errors)** — lint & typecheck in CI + ablation study script |
+| **Tooling** | **40 pytest + ruff (0 errors) + mypy (0 errors)** — lint & typecheck in CI + ablation study script |
 | **Target berikut** | Benchmarking GPT-4o/Claude/Gemini, deploy live demo, blog posts |
 | **Model** | Qwen2.5-7B-Instruct Q4_K.M (llama.cpp) — **non-VL** |
-| **Chunks** | **740+ chunks across 40+ filings** |
+| **Chunks** | **1079 chunks across 56 filings** |
 | **Code quality** | Phase 2b: 59 lint + 10 type errors fixed. Retry decorator, BM25 cache, prompt injection guard, rate limit, SEC rate limiting, LLM fallback, GPU guard, health check |
 
 ---
@@ -231,20 +231,18 @@ Project ini pake gstack workflow. Beberapa hal yang perlu diingat:
 - **`disabled=processing`**: Widget harus render dengan `disabled=True` selama processing — tapi `st.session_state.processing` harus di-set SEBELUM widget render, bukan sesudahnya (pakai two-pass: set processing → rerun → render disabled).
 
 ### Next yang direncanakan
-1. **System Analytics test** — test the KPI grid, About card, refresh button
-2. **Error handling test** — empty states, sanitization edge cases, rate limiting
-3. **Deploy live demo** — Streamlit Cloud (30 min)
-4. **Blog post** — "Building a Multi-Sector RAG Pipeline with 74% Faithfulness"
-5. **Run `build_index`** — for JNJ + XOM data
+1. **Run eval** — re-run faithfulness/benchmark with new data (1079 chunks, 7 companies)
+2. **System Analytics test** — test the KPI grid, About card, refresh button
+3. **Error handling test** — empty states, sanitization edge cases, rate limiting
+4. **Deploy live demo** — Streamlit Cloud (30 min)
+5. **Blog post** — "Building a Multi-Sector RAG Pipeline with 74% Faithfulness"
 
 ### Peringatan
-- `src/ingest.py` TICKERS includes JNJ + XOM but data not yet indexed — run `python -m src.build_index` to fetch
-- LLM model path must be set in `.env` — see `.env.example`
 - `conftest.py` patches `LLMClient._init_*` — prevents accidental real LLM calls in CI. Don't remove without mock alternative.
-- `scripts/update_readme_stats.py` requires ChromaDB collection with data — run after `build_index`
+- `scripts/update_readme_stats.py` requires ChromaDB collection with data
 - `LLM_TIMEOUT` env var (default 120s) and `LLM_MAX_CONCURRENT` env var (default 1) available in `.env`
 - `[timing]` logs appear at INFO level — check stdout/stderr for per-stage latency breakdown
-- **Streamlit form + fragment combo**: Use `st.form()` wrap widgets to prevent rerun leaks, `@st.fragment` for long-running operations. The `auto_ask` pattern needs saved widget state (via `st.session_state.get()`) because example buttons bypass form submit.
+- XOM 10-K MD&A = 1 chunk (by design — Item 7 is a cross-reference paragraph)
 
 #### Session 6 — Portfolio Polish + Landing Page (18 Jul 2026)
 - **CI Fix**: `ruff` dan `mypy` gak diinstall di workflow — cuma `bandit pytest-cov`. Ditambahin ke `pip install` di `.github/workflows/test.yml`. Juga fix mypy error di `cross_encoder.py:38` + coverage threshold 65→30%
@@ -262,3 +260,23 @@ Project ini pake gstack workflow. Beberapa hal yang perlu diingat:
 - **New files**: `src/eval_ablation.py`, Makefile target `eval-ablation`
 - **CI**: ruff ✅, mypy ✅
 - **Belum**: Screenshot/GIF (user take sendiri), commit done
+
+#### Session 8 — Landing Page Redesign + Benchmark Scripts + CI Fixes (19 Jul 2026)
+- **Landing page redesign** (3 commits): Light/dark mode toggle (olive accent #6F8F00), animated pipeline (IntersectionObserver auto-loop + real-time counter), evidence section (bar chart before/after CE, hardest-case turnaround cards), mobile responsive (grid-cols-2→4, card fallback for tables), theme persistence via localStorage + prefers-color-scheme
+- **Copywriting** (commit 2): Hero subheadline, problem section, evidence narrative refined
+- **Mobile polish** (commit 3): overflow-x: hidden, responsive padding, mobile card fallback for use cases table
+- **Method benchmark**: `src/benchmark_methods.py` — 5 methods comparison (BM25 only, Dense only, Hybrid, Hybrid+CE, Full Pipeline) via subprocess
+- **Dataset stats**: `src/dataset_stats.py` — extract ChromaDB composition, `docs/dataset.md` — dataset documentation (740 chunks, 40 filings)
+- **README**: Added Benchmark Hardware table + Retrieval Method Benchmark table (sebelum ablation table)
+- **Makefile**: `benchmark` + `dataset-stats` targets
+- **CI fix**: bandit B404/B603 skip (subprocess intentional), coverage omit standalone scripts (eval_*.py, benchmark, dataset_stats)
+- **Commit**: `52d04ed` feat + `1d84115` bandit fix + `1b7c864` coverage fix
+- **CI**: ✅ all green (40 tests, ruff 0, mypy 0, bandit 0, coverage ~44%)
+
+#### Session 9 — Dataset Completion + MD&A Edge Case Fixes (19 Jul 2026)
+- **5 MD&A fixes**: JNJ 10-Q em dash separator, CBRL 10-Q separator class + IGNORECASE, XOM CIK override (holding co → real CIK), DRI 10-K chunk explosion (58→21), orphaned chunk cleanup via `delete_chunks_for_filing()`
+- **XOM 10-K 1 chunk**: Verified by design — Item 7 is a cross-reference paragraph (265 chars, 52 tokens)
+- **Build index**: `python src/build_index.py` → **1079 chunks, 56 filings, 0 failures** ✅
+- **Docs updated**: `readme.md` (1079/56/40), `docs/dataset.md` (JNJ+XOM, 4 sectors)
+- **Obsidian vault**: `_Dashboard.md`, `02. Progress & Technical Documentation.md` updated
+- **CI**: ✅ (ruff, mypy, bandit, pytest — no code changes, only docs + fixes)

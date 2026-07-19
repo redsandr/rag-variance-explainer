@@ -1,49 +1,51 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --bg: #FBFCF7;
-  --bg-mist: #F4F7E9;
+  --bg: #FBF9F4;
+  --bg-mist: #F6EDD3;
   --surface: #FFFFFF;
-  --surface-alt: #FCFBF6;
-  --header-bg: rgba(251, 252, 247, 0.85);
-  --border: #E7EBD9;
-  --border-strong: #D3DABE;
-  --accent: #6F8F00;
-  --accent-dark: #5A7400;
-  --accent-soft: #EEF4D6;
+  --surface-alt: #FAF6EC;
+  --header-bg: rgba(251, 249, 244, 0.85);
+  --border: #EBE2CB;
+  --border-strong: #DCCE9F;
+  --accent: #A9860F;
+  --accent-dark: #8A6D0C;
+  --accent-light: #C9A227;
+  --accent-soft: #F6EDD3;
   --green: #1FAE73;
   --green-soft: #E6F7EF;
-  --amber: #B87A0A;
-  --amber-soft: #FDF3E3;
+  --amber: #A9860F;
+  --amber-soft: #F6EDD3;
   --btn-text-on-accent: #FFFFFF;
-  --text: #1C2210;
-  --text-dim: #666F52;
-  --text-mute: #92987F;
+  --text: #22201A;
+  --text-dim: #62594A;
+  --text-mute: #93876E;
 }
 
 html[data-theme='dark'] {
-  --bg: #0E1108;
-  --bg-mist: #12160A;
-  --surface: #171B0F;
-  --surface-alt: #1D2213;
-  --header-bg: rgba(14, 17, 8, 0.85);
-  --border: #262C17;
-  --border-strong: #343B20;
-  --accent: #DAFE1E;
-  --accent-dark: #C2E600;
-  --accent-soft: #232B0C;
+  --bg: #0B0B0A;
+  --bg-mist: #12110D;
+  --surface: #151412;
+  --surface-alt: #1B1916;
+  --header-bg: rgba(11, 11, 10, 0.85);
+  --border: #2A2620;
+  --border-strong: #3A3527;
+  --accent: #C9A227;
+  --accent-dark: #A9860F;
+  --accent-light: #E8C766;
+  --accent-soft: #2B240F;
   --green: #3DDC97;
   --green-soft: #10251A;
-  --amber: #F2B94D;
-  --amber-soft: #2B2308;
+  --amber: #E8C766;
+  --amber-soft: #2B240F;
   --btn-text-on-accent: #101208;
-  --text: #F2F5E8;
-  --text-dim: #A6AD93;
-  --text-mute: #6E7560;
+  --text: #F3EFE6;
+  --text-dim: #B8B0A0;
+  --text-mute: #7A7364;
 }
 
 @layer base {
@@ -64,7 +66,7 @@ html[data-theme='dark'] {
     max-width: 100vw;
   }
   ::selection {
-    background: rgba(111, 143, 0, 0.18);
+    background: rgba(169, 134, 15, 0.2);
     color: var(--text);
   }
 }
@@ -73,13 +75,18 @@ html[data-theme='dark'] {
   .mono {
     font-family: 'JetBrains Mono', monospace;
   }
+  .serif {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
   .tabular {
     font-variant-numeric: tabular-nums;
   }
 
   .bg-mesh {
-    background: radial-gradient(700px circle at 15% 0%, rgba(111, 143, 0, 0.1), transparent 60%),
-      radial-gradient(600px circle at 90% 15%, rgba(31, 174, 115, 0.06), transparent 55%), var(--bg);
+    background: radial-gradient(700px circle at 15% 0%, rgba(169, 134, 15, 0.12), transparent 60%),
+      radial-gradient(600px circle at 90% 15%, rgba(31, 174, 115, 0.05), transparent 55%),
+      radial-gradient(circle, var(--border) 1px, transparent 1px) 0 0 / 28px 28px,
+      var(--bg);
   }
 
   .card {
@@ -98,11 +105,11 @@ html[data-theme='dark'] {
     background: var(--accent);
     color: var(--btn-text-on-accent);
     transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
-    box-shadow: 0 1px 2px rgba(111, 143, 0, 0.2);
+    box-shadow: 0 1px 2px rgba(169, 134, 15, 0.25);
   }
   .btn-primary:hover {
     background: var(--accent-dark);
-    box-shadow: 0 6px 20px -4px rgba(111, 143, 0, 0.4);
+    box-shadow: 0 6px 20px -4px rgba(169, 134, 15, 0.45);
   }
   .btn-primary:active {
     transform: scale(0.97);

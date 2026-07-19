@@ -279,9 +279,9 @@
     }
     .source-card .sector-tag.restaurant,
     .sector-badge.restaurant {
-        background: var(--amber-soft);
-        color: var(--amber);
-        border: 1px solid var(--amber-soft);
+        background: var(--terracotta-soft);
+        color: var(--terracotta);
+        border: 1px solid var(--terracotta-soft);
     }
     .source-card .sector-tag.retail,
     .sector-badge.retail {

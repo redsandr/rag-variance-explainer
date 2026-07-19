@@ -14,8 +14,62 @@ st.set_page_config(
     layout="wide",
 )
 
-css_path = Path(__file__).parent / "src" / "styles.css"
-st.markdown(css_path.read_text(encoding="utf-8"), unsafe_allow_html=True)
+# Same palette as the marketing site's globals.css (:root / [data-theme='dark']),
+# so the app and the landing page read as one product.
+THEME_VARS = {
+    "light": {
+        "bg": "#FBF9F4", "bg-mist": "#F6EDD3", "surface": "#FFFFFF", "surface-alt": "#FAF6EC",
+        "border": "#EBE2CB", "border-strong": "#DCCE9F",
+        "accent": "#A9860F", "accent-dark": "#8A6D0C", "accent-light": "#C9A227", "accent-soft": "#F6EDD3",
+        "green": "#1FAE73", "green-soft": "#E6F7EF",
+        "amber": "#A9860F", "amber-soft": "#F6EDD3",
+        "red": "#C1443D", "red-soft": "#FBEAE8",
+        "blue": "#3B6FA0", "blue-soft": "#EAF1F8",
+        "terracotta": "#B5622E", "terracotta-soft": "#FBEDE3",
+        "text": "#22201A", "text-dim": "#62594A", "text-mute": "#93876E",
+        "btn-text-on-accent": "#FFFFFF",
+        "shadow-lg": "0 4px 20px rgba(27, 24, 48, 0.08)",
+        "shadow-md": "0 4px 16px rgba(27, 24, 48, 0.06)",
+        "icon-glow": "0 0 20px rgba(169, 134, 15, 0.2)",
+        "accent-glow-hover": "0 0 20px rgba(169, 134, 15, 0.12), 0 0 40px rgba(169, 134, 15, 0.06)",
+        "accent-glow-sm": "0 0 20px rgba(169, 134, 15, 0.08)",
+        "btn-glow": "0 2px 12px rgba(169, 134, 15, 0.25)",
+        "btn-glow-hover": "0 6px 20px rgba(169, 134, 15, 0.35)",
+        "focus-ring": "0 0 0 3px rgba(169, 134, 15, 0.15)",
+    },
+    "dark": {
+        "bg": "#0B0B0A", "bg-mist": "#12110D", "surface": "#151412", "surface-alt": "#1B1916",
+        "border": "#2A2620", "border-strong": "#3A3527",
+        "accent": "#C9A227", "accent-dark": "#A9860F", "accent-light": "#E8C766", "accent-soft": "#2B240F",
+        "green": "#3DDC97", "green-soft": "#10251A",
+        "amber": "#E8C766", "amber-soft": "#2B240F",
+        "red": "#FF6B61", "red-soft": "#2B1512",
+        "blue": "#7FB2E0", "blue-soft": "#101A24",
+        "terracotta": "#D97F4A", "terracotta-soft": "#2B1B10",
+        "text": "#F3EFE6", "text-dim": "#B8B0A0", "text-mute": "#7A7364",
+        "btn-text-on-accent": "#101208",
+        "shadow-lg": "0 4px 24px rgba(0, 0, 0, 0.3)",
+        "shadow-md": "0 4px 20px rgba(0, 0, 0, 0.2)",
+        "icon-glow": "0 0 24px rgba(201, 162, 39, 0.2)",
+        "accent-glow-hover": "0 0 24px rgba(201, 162, 39, 0.12), 0 0 48px rgba(201, 162, 39, 0.06)",
+        "accent-glow-sm": "0 0 24px rgba(201, 162, 39, 0.08)",
+        "btn-glow": "0 0 20px rgba(201, 162, 39, 0.2)",
+        "btn-glow-hover": "0 0 30px rgba(201, 162, 39, 0.3)",
+        "focus-ring": "0 0 0 3px rgba(201, 162, 39, 0.15)",
+    },
+}
+
+if "theme" not in st.session_state:
+    st.session_state.theme = "dark"
+
+
+def _render_css(theme: str) -> str:
+    vars_css = "\n".join(f"        --{k}: {v};" for k, v in THEME_VARS[theme].items())
+    css_path = Path(__file__).parent / "src" / "styles.css"
+    return css_path.read_text(encoding="utf-8").replace("/*__THEME_VARS__*/", vars_css)
+
+
+st.markdown(_render_css(st.session_state.theme), unsafe_allow_html=True)
 
 
 @st.cache_resource
@@ -188,6 +242,15 @@ with st.sidebar:
         "https://github.com/redsandr/rag-variance-explainer",
         use_container_width=True,
     )
+    is_dark = st.toggle(
+        "Dark mode",
+        value=(st.session_state.theme == "dark"),
+        key="theme_toggle",
+    )
+    new_theme = "dark" if is_dark else "light"
+    if new_theme != st.session_state.theme:
+        st.session_state.theme = new_theme
+        st.rerun()
 
 if view == "System Analytics":
     chunk_count, filing_count = _get_db_stats()
@@ -225,46 +288,55 @@ if view == "System Analytics":
         )
         st.markdown(
             '<div class="hero-card">'
-            f'<div class="hero-label">{TARGET_SVG} Retrieval Performance</div>'
+            f'<div class="hero-label">{FLASK_SVG} Answer Quality</div>'
             '<div class="kpi-stack">'
             '<div class="kpi-stack-card">'
-            '<div class="kpi-row-label">Restaurant MRR</div>'
-            '<div class="kpi-row-value"><span class="purple">0.66</span></div>'
-            '<div class="kpi-row-sub">+28% from baseline</div></div>'
-            '<div class="kpi-stack-card">'
-            '<div class="kpi-row-label">Retail recall@10</div>'
-            '<div class="kpi-row-value"><span class="green">1.00</span></div>'
-            '<div class="kpi-row-sub">WMT &middot; TGT — zero degradation</div></div>'
-            '</div></div>',
-            unsafe_allow_html=True,
-        )
-        st.markdown(
-            '<div class="hero-card">'
-            f'<div class="hero-label">{FLASK_SVG} Faithfulness</div>'
-            '<div class="kpi-stack">'
-            '<div class="kpi-stack-card">'
-            '<div class="kpi-row-label">Restaurant (strict)</div>'
+            '<div class="kpi-row-label">Restaurant answers, source-backed</div>'
             '<div class="kpi-row-value"><span class="green">74.2%</span></div>'
             '<div class="kpi-row-sub">weighted 75.3%</div></div>'
             '<div class="kpi-stack-card">'
-            '<div class="kpi-row-label">Retail (strict)</div>'
+            '<div class="kpi-row-label">Retail answers, source-backed</div>'
             '<div class="kpi-row-value"><span class="green">69.7%</span></div>'
             '<div class="kpi-row-sub">weighted 80.3%</div></div>'
             '</div></div>',
             unsafe_allow_html=True,
         )
+        with st.expander("Technical details \u2013 retrieval metrics"):
+            st.markdown(
+                '<div class="kpi-stack">'
+                '<div class="kpi-stack-card">'
+                '<div class="kpi-row-label">Restaurant MRR</div>'
+                '<div class="kpi-row-value"><span class="accent">0.66</span></div>'
+                '<div class="kpi-row-sub">+28% from baseline</div></div>'
+                '<div class="kpi-stack-card">'
+                '<div class="kpi-row-label">Retail recall@10</div>'
+                '<div class="kpi-row-value"><span class="green">1.00</span></div>'
+                '<div class="kpi-row-sub">WMT &middot; TGT — zero degradation</div></div>'
+                '</div>',
+                unsafe_allow_html=True,
+            )
+            st.caption(
+                "Hybrid retrieval (BM25 + embeddings) with cross-encoder re-ranking, "
+                "evaluated per sector against a held-out question set."
+            )
 
     with right_col:
         st.markdown(
             '<div class="about-card">'
             '<div class="about-title">About</div>'
             '<div class="about-text">'
-            'Retrieves MD&A sections from SEC EDGAR filings and generates '
-            'sourced answers about financial variance drivers using a RAG pipeline '
-            'with cross-encoder re-ranking and configurable retrieval settings.'
+            'Turns SEC filings into plain-language, sourced answers about why a '
+            "company's numbers moved — every answer links back to the exact "
+            'filing text it came from.'
             '</div></div>',
             unsafe_allow_html=True,
         )
+        with st.expander("Technical details"):
+            st.caption(
+                "Hybrid retrieval (BM25 + embeddings) over indexed MD&A sections "
+                "from SEC EDGAR 10-K/10-Q filings, with cross-encoder re-ranking "
+                "and configurable top-k."
+            )
 
     st.stop()
 
@@ -291,21 +363,28 @@ with main_col:
 
     processing = st.session_state.get("processing", False)
 
-    EXAMPLE_QUESTIONS = [
-        "Why did Chipotle's labor costs change?",
-        "What drove Darden's revenue changes?",
-        "How did wage inflation affect Chipotle?",
-        "Why did CBRL's operating costs change?",
-        "How did Walmart's e-commerce sales change?",
-        "What drove Target's comparable sales?",
-        "How did Johnson & Johnson's pharmaceutical revenue perform?",
-        "What drove Exxon's upstream earnings changes?",
-    ]
+    EXAMPLE_QUESTIONS = {
+        "Revenue": [
+            "What drove Darden's revenue changes?",
+            "How did Walmart's e-commerce sales change?",
+            "What drove Target's comparable sales?",
+            "How did Johnson & Johnson's pharmaceutical revenue perform?",
+        ],
+        "Labor": [
+            "Why did Chipotle's labor costs change?",
+            "How did wage inflation affect Chipotle?",
+        ],
+        "Margin": [
+            "Why did CBRL's operating costs change?",
+            "What drove Exxon's upstream earnings changes?",
+        ],
+    }
 
-    st.markdown('<span class="hint">Try:</span>', unsafe_allow_html=True)
-    for row_idx in range(0, 8, 4):
-        cols = st.columns(4)
-        for i, q in enumerate(EXAMPLE_QUESTIONS[row_idx:row_idx + 4]):
+    st.markdown('<span class="hint">Try a question:</span>', unsafe_allow_html=True)
+    for category, questions in EXAMPLE_QUESTIONS.items():
+        st.markdown(f'<span class="category-label">{category}</span>', unsafe_allow_html=True)
+        cols = st.columns(len(questions))
+        for i, q in enumerate(questions):
             with cols[i]:
                 if st.button(q, key=f"ex_{q[:20]}", use_container_width=True, type="secondary",
                              disabled=processing):
@@ -491,8 +570,9 @@ with main_col:
                 f'<div class="empty-icon" aria-hidden="true">{EMPTY_SVG}</div>'
                 f'<div class="empty-title">Ask a question to get started</div>'
                 f'<div class="empty-desc">'
-                 'Query financial variance drivers from SEC EDGAR MD&A sections '
-                 'across Chipotle, Darden, Cracker Barrel, Walmart, and Target.'
+                 'Ask about revenue, labor, or margin drivers — sourced from SEC '
+                 'EDGAR filings for Chipotle, Darden, Cracker Barrel, Walmart, '
+                 'Target, Johnson & Johnson, and Exxon Mobil.'
                 f'</div></div>',
                 unsafe_allow_html=True,
             )
@@ -534,43 +614,52 @@ with right_col:
 
     st.markdown(
         '<div class="kpi-panel">'
-        '<div class="panel-title">Retrieval</div>'
+        '<div class="panel-title">Answer Quality</div>'
         '<div class="kpi-stack">'
         '<div class="kpi-stack-card">'
-        '<div class="kpi-row-label">Restaurant MRR</div>'
-        '<div class="kpi-row-value"><span class="purple">0.66</span></div>'
-        '<div class="kpi-row-sub">+28% from baseline</div></div>'
-        '<div class="kpi-stack-card">'
-        '<div class="kpi-row-label">Retail recall@10</div>'
-        '<div class="kpi-row-value"><span class="green">1.00</span></div>'
-        '<div class="kpi-row-sub">WMT &middot; TGT</div></div>'
-        '</div></div>',
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        '<div class="kpi-panel">'
-        '<div class="panel-title">Faithfulness</div>'
-        '<div class="kpi-stack">'
-        '<div class="kpi-stack-card">'
-        '<div class="kpi-row-label">Restaurant</div>'
-        '<div class="kpi-row-value"><span class="green">74.2%</span> <span class="kpi-row-sub">strict</span></div>'
+        '<div class="kpi-row-label">Restaurant, source-backed</div>'
+        '<div class="kpi-row-value"><span class="green">74.2%</span></div>'
         '<div class="kpi-row-sub">weighted 75.3%</div></div>'
         '<div class="kpi-stack-card">'
-        '<div class="kpi-row-label">Retail</div>'
-        '<div class="kpi-row-value"><span class="green">69.7%</span> <span class="kpi-row-sub">strict</span></div>'
+        '<div class="kpi-row-label">Retail, source-backed</div>'
+        '<div class="kpi-row-value"><span class="green">69.7%</span></div>'
         '<div class="kpi-row-sub">weighted 80.3%</div></div>'
         '</div></div>',
         unsafe_allow_html=True,
     )
 
+    with st.expander("Technical details \u2013 retrieval metrics"):
+        st.markdown(
+            '<div class="kpi-stack">'
+            '<div class="kpi-stack-card">'
+            '<div class="kpi-row-label">Restaurant MRR</div>'
+            '<div class="kpi-row-value"><span class="accent">0.66</span></div>'
+            '<div class="kpi-row-sub">+28% from baseline</div></div>'
+            '<div class="kpi-stack-card">'
+            '<div class="kpi-row-label">Retail recall@10</div>'
+            '<div class="kpi-row-value"><span class="green">1.00</span></div>'
+            '<div class="kpi-row-sub">WMT &middot; TGT</div></div>'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+        st.caption(
+            "Hybrid retrieval (BM25 + embeddings) with cross-encoder re-ranking, "
+            "evaluated per sector against a held-out question set."
+        )
+
     st.markdown(
         '<div class="about-card">'
         '<div class="about-title">About</div>'
         '<div class="about-text">'
-        'Retrieves MD&A sections from SEC EDGAR filings and generates '
-        'sourced answers about financial variance drivers using a RAG pipeline '
-        'with cross-encoder re-ranking and configurable retrieval settings.'
+        'Turns SEC filings into plain-language, sourced answers about why a '
+        "company's numbers moved — every answer links back to the exact "
+        'filing text it came from.'
         '</div></div>',
         unsafe_allow_html=True,
     )
+    with st.expander("Technical details"):
+        st.caption(
+            "Hybrid retrieval (BM25 + embeddings) over indexed MD&A sections "
+            "from SEC EDGAR 10-K/10-Q filings, with cross-encoder re-ranking "
+            "and configurable top-k."
+        )

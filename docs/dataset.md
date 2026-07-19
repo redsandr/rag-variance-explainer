@@ -4,10 +4,10 @@
 
 | Property | Value |
 |----------|-------|
-| Total chunks | 740 |
-| Total tokens | ~251k |
-| Total filings | 40 |
-| Filing types | 10-K (211), 10-Q (529) |
+| Total chunks | 1079 |
+| Total tokens | ~356k |
+| Total filings | 56 |
+| Filing types | 10-K (283), 10-Q (796) |
 | Date range | 2024–2026 (2+ years per company) |
 | Source | SEC EDGAR HTML |
 | Section | MD&A (Item 7 / Management's Discussion and Analysis) |
@@ -16,26 +16,30 @@
 
 | Ticker | Company | Sector | Chunks | Filings |
 |--------|---------|--------|-------:|--------:|
+| JNJ | Johnson & Johnson | Healthcare | 219 | 8 |
 | WMT | Walmart | Retail | 187 | 8 |
 | CBRL | Cracker Barrel | Restaurant | 177 | 8 |
 | DRI | Darden Restaurants | Restaurant | 159 | 8 |
 | TGT | Target | Retail | 121 | 8 |
+| XOM | ExxonMobil | Energy | 120 | 8 |
 | CMG | Chipotle | Restaurant | 96 | 8 |
 
 ## Composition by Sector
 
 | Sector | Chunks | Percentage |
 |--------|-------:|-----------:|
-| Restaurant | 432 | 58.4% |
-| Retail | 308 | 41.6% |
+| Restaurant | 432 | 40.0% |
+| Retail | 308 | 28.5% |
+| Healthcare | 219 | 20.3% |
+| Energy | 120 | 11.1% |
 
 ## Composition by Year
 
 | Year | Chunks |
 |------|-------:|
-| 2024 | 178 |
-| 2025 | 393 |
-| 2026 | 169 |
+| 2024 | 277 |
+| 2025 | 565 |
+| 2026 | 237 |
 
 ## Chunking Strategy
 
@@ -57,6 +61,7 @@
 40 ground-truth questions, balanced across sectors:
 - 20 restaurant (CMG, DRI, CBRL)
 - 20 retail (WMT, TGT)
+- Healthcare (JNJ) and Energy (XOM) indexed but eval questions focused on original 2-sector benchmark
 
 Each question has 1-3 golden chunk IDs from the index. Questions cover:
 - Labor cost variance

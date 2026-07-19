@@ -112,13 +112,23 @@ def fetch_filing_html(url: str) -> str:
 
 
 def _find_mda_start(text: str) -> re.Match[str]:
-    heading_pattern = re.compile(
-        r"Item\s+\d+[A]?\.\s*Management.{0,3}s\s+Discussion\s+and\s+Analysis",
+    item_pattern = re.compile(r"^[ \t]*Item\s+\d+[A]?\s*[\.\u2014\u2013\u2010\-]", re.IGNORECASE | re.MULTILINE)
+
+    # Try strict heading (period after number) first to avoid TOC cross-references
+    strict = re.compile(
+        r"Item\s+\d+[A]?\.\s*Management.{0,3}s\s+[Dd]iscussion\s+and\s+[Aa]nalysis",
         re.IGNORECASE,
     )
-    item_pattern = re.compile(r"^[ \t]*Item\s+\d+[A]?\.", re.IGNORECASE | re.MULTILINE)
+    # Flexible heading (em dash, en dash, hyphen) for filings that don't use period
+    flexible = re.compile(
+        r"Item\s+\d+[A]?\s*[\u2014\u2013\-]\s*Management.{0,3}s\s+[Dd]iscussion\s+and\s+[Aa]nalysis",
+        re.IGNORECASE,
+    )
 
-    candidates = list(heading_pattern.finditer(text))
+    strict_candidates = list(strict.finditer(text))
+    flex_candidates = list(flexible.finditer(text))
+
+    candidates = strict_candidates or flex_candidates
     if not candidates:
         raise ValueError("Could not locate MD&A heading in filing")
 
@@ -159,7 +169,7 @@ def _convert_tables_to_text(soup: BeautifulSoup) -> None:
 
 
 def _parse_item_num(item_text: str) -> float:
-    m = re.match(r"^[ \t]*Item\s+(\d+)[A-Z]?\.", item_text, re.IGNORECASE)
+    m = re.match(r"^[ \t]*Item\s+(\d+)[A-Z]?\s*[\.\u2014\u2013\u2010\-]", item_text, re.IGNORECASE)
     return float(m.group(1)) if m else 0
 
 
@@ -177,7 +187,7 @@ def extract_mda_section(html: str) -> str:
     start_match = _find_mda_start(text)
     mda_item_num = _parse_item_num(text[start_match.start():])
 
-    end_pattern = re.compile(r"^[ \t]*Item\s+\d+[A-Z]?\.", re.IGNORECASE | re.MULTILINE)
+    end_pattern = re.compile(r"^[ \t]*Item\s+\d+[A-Z]?\s*[\.\u2014\u2013\u2010\-]", re.IGNORECASE | re.MULTILINE)
     end_pos = len(text)
     for m in end_pattern.finditer(text, pos=start_match.end()):
         if _parse_item_num(m.group()) >= mda_item_num:
@@ -205,11 +215,18 @@ def get_mda_for_filing(cik: str, accession_number: str, primary_document: str) -
     return extract_mda_section(html)
 
 
+_CIK_OVERRIDES = {
+    "XOM": "0000034088",  # SEC ticker file maps XOM to holding co (2115436) with no filings
+}
+
 def get_cik(ticker: str) -> str:
+    ticker_upper = ticker.upper()
+    if ticker_upper in _CIK_OVERRIDES:
+        return _CIK_OVERRIDES[ticker_upper]
+
     response = _rate_limited_get("https://www.sec.gov/files/company_tickers.json")
     data = response.json()
 
-    ticker_upper = ticker.upper()
     for entry in data.values():
         if entry["ticker"] == ticker_upper:
             return str(entry["cik_str"]).zfill(10)

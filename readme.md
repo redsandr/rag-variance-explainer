@@ -52,7 +52,7 @@ flowchart TD
         SEC["SEC EDGAR\n10-K/10-Q filings"] --> FETCH["ingest.py\nMD&A extraction"]
         FETCH --> CHUNK["chunking.py\n500-token, structure-aware"]
         CHUNK --> EMBED["embedding.py\nnomic-embed-text-v1.5"]
-        EMBED --> DB["ChromaDB\n740+ chunks\n40+ filings"]
+        EMBED --> DB["ChromaDB\n1079 chunks\n56 filings"]
     end
 
     DENSE -.-> DB
@@ -67,7 +67,7 @@ flowchart TD
 | LLM (default) | `Qwen2.5-7B-Instruct Q4_K.M` | llama.cpp, RTX 5060, ~2-3s/gen |
 | Query expansion | Financial glossary | 35 synonym groups across 4 sectors |
 | Data source | SEC EDGAR | 10-K/10-Q, MD&A section only |
-| Index | **740+ chunks** | 40+ filings, ~2 years per company |
+| Index | **1079 chunks** | 56 filings, ~2 years per company |
 
 ### Benchmark Hardware
 
@@ -229,7 +229,7 @@ All parameters via env vars — no hardcoded magic numbers.
 
 **Quality & UI**
 - Faithfulness evaluation: strict **74.24%**, weighted **75.32%** — LLM-as-judge + Claude cross-validation
-- 32 pytest + ruff + mypy CI — strict linting and type checking
+- 40 pytest + ruff + mypy CI — strict linting and type checking
 - Streamlit dashboard: OLED dark mode, 2 views (Q&A + System Analytics), WCAG contrast
 
 ---
@@ -241,7 +241,7 @@ All parameters via env vars — no hardcoded magic numbers.
 ├── app.py                     # Streamlit dashboard
 ├── .streamlit/config.toml     # Dark theme config
 ├── Makefile                   # install / test / run / eval-*
-├── tests.py                   # 32 pytest tests (9 modules)
+├── tests.py                     # 40 pytest tests (9 modules)
 ├── .github/workflows/test.yml # CI pipeline
 ├── docs/                      # Extended documentation
 ├── src/

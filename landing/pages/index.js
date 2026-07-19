@@ -355,7 +355,7 @@ export default function Home() {
                 <path d="M12 2 L22 8 L22 16 L12 22 L2 16 L2 8 Z" />
               </svg>
             </div>
-            <span className="text-sm font-semibold tracking-tight">Variance Explainer</span>
+            <span className="text-sm font-semibold tracking-tight serif">Variance Explainer</span>
           </div>
           <div className="flex items-center gap-3">
             <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle dark mode">
@@ -394,14 +394,13 @@ export default function Home() {
                 <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--green)' }}></span>
                 7 companies &middot; 4 industries &middot; your data stays in-house
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold leading-[1.1] tracking-tight mb-5" style={{ color: 'var(--text)' }}>
-                Stop reading 300-page filings.
+              <h1 className="serif text-4xl md:text-5xl font-bold leading-[1.15] tracking-tight mb-5" style={{ color: 'var(--text)' }}>
+                Stop reading filings.
                 <br />
-                Ask <span style={{ color: 'var(--accent)' }}>why the number moved.</span>
+                Start <span style={{ color: 'var(--accent)' }}>understanding variance.</span>
               </h1>
               <p className="text-base leading-relaxed mb-8 max-w-md" style={{ color: 'var(--text-dim)' }}>
-                Ask a plain-language question about a 10-K, 10-Q, or MD&amp;A section, and get an answer grounded
-                in the filing — with the exact page cited, every time.
+                Ask why the number moved — in plain English, with the exact filing and page cited, every time.
               </p>
               <div className="flex items-center gap-3">
                 <a href="#demo" className="px-5 py-3 rounded-xl text-sm font-semibold btn-primary">
@@ -418,8 +417,8 @@ export default function Home() {
                   <div className="text-xs mt-0.5" style={{ color: 'var(--text-mute)' }}>time per variance question</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold tabular" style={{ color: 'var(--accent)' }}>100%</div>
-                  <div className="text-xs mt-0.5" style={{ color: 'var(--text-mute)' }}>right answer found, every industry tested</div>
+                  <div className="text-2xl font-bold tabular" style={{ color: 'var(--accent)' }}>52%</div>
+                  <div className="text-xs mt-0.5" style={{ color: 'var(--text-mute)' }}>right source in top-5, up from 33%</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold tabular">74%</div>
@@ -523,7 +522,7 @@ export default function Home() {
         {/* PROBLEM */}
         <section className="max-w-4xl mx-auto px-6 py-24 md:py-32">
           <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>The problem</div>
-          <p className="text-2xl md:text-3xl font-semibold leading-tight mb-6">
+          <p className="serif text-2xl md:text-3xl font-semibold leading-tight mb-6">
             Financial analysts spend hours reading MD&amp;A sections every quarter.
           </p>
           <p className="text-base leading-relaxed max-w-2xl" style={{ color: 'var(--text-dim)' }}>
@@ -537,11 +536,40 @@ export default function Home() {
           </p>
         </section>
 
+        {/* PROBLEM VS SOLUTION */}
+        <section className="max-w-6xl mx-auto px-6 pb-24 md:pb-32">
+          <div className="mb-14">
+            <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>The difference</div>
+            <p className="serif text-3xl md:text-4xl font-bold">Typical RAG vs. this pipeline.</p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-5">
+            <div className="rounded-2xl p-6 md:p-8 card" style={{ opacity: 0.72 }}>
+              <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--text-mute)' }}>Typical RAG</div>
+              <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--text-dim)' }}>
+                &quot;Labor costs increased due to various operational factors during the period.&quot;
+              </p>
+              <div className="text-xs font-medium" style={{ color: 'var(--text-mute)' }}>No source. No confidence.</div>
+            </div>
+            <div className="rounded-2xl p-6 md:p-8 card card-hover" style={{ borderColor: 'var(--accent)' }}>
+              <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>Our approach</div>
+              <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--text)' }}>
+                {DEMO_ANALYSES[0].answer}
+              </p>
+              <span
+                className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
+                style={{ background: 'var(--accent-soft)', color: 'var(--accent-dark)' }}
+              >
+                Cited from {DEMO_ANALYSES[0].citation}
+              </span>
+            </div>
+          </div>
+        </section>
+
         {/* SAMPLE ANALYSIS DEMO */}
         <section id="demo" className="max-w-6xl mx-auto px-6 py-24 md:py-32">
           <div className="mb-14 text-center">
             <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>Try it</div>
-            <p className="text-3xl md:text-4xl font-bold mb-4">Pick a question. See the answer.</p>
+            <p className="serif text-3xl md:text-4xl font-bold mb-4">Pick a question. See the answer.</p>
             <p className="text-base max-w-xl mx-auto" style={{ color: 'var(--text-dim)' }}>
               Sample output from real questions the tool was tested on — no install required.
             </p>
@@ -599,7 +627,7 @@ export default function Home() {
         <section id="how" ref={howRef} className="max-w-6xl mx-auto px-6 py-24 md:py-32">
           <div className="mb-14 text-center">
             <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>How it works</div>
-            <p className="text-3xl md:text-4xl font-bold">Ask. Retrieve. Answer.</p>
+            <p className="serif text-3xl md:text-4xl font-bold">Ask. Retrieve. Answer.</p>
           </div>
 
           <div className="rounded-2xl card p-4 sm:p-8 md:p-10">
@@ -656,7 +684,7 @@ export default function Home() {
         <section id="evidence" className="max-w-6xl mx-auto px-6 py-24 md:py-32">
           <div className="mb-14">
             <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>Evidence, not claims</div>
-            <p className="text-3xl md:text-4xl font-bold mb-4">Accuracy, tested and measured.</p>
+            <p className="serif text-3xl md:text-4xl font-bold mb-4">Accuracy, tested and measured.</p>
             <p className="text-base max-w-2xl" style={{ color: 'var(--text-dim)' }}>
               Tested against 40 real questions with known correct answers, before and after adding a relevance-ranking
               step. The hardest cases went from being missed entirely to found first.
@@ -767,7 +795,7 @@ export default function Home() {
         <section className="max-w-6xl mx-auto px-6 py-24 md:py-32">
           <div className="mb-14">
             <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>Use cases</div>
-            <p className="text-3xl md:text-4xl font-bold">Real questions, real answers.</p>
+            <p className="serif text-3xl md:text-4xl font-bold">Real questions, real answers.</p>
           </div>
           <div className="rounded-2xl overflow-hidden card hidden md:block">
             <table className="w-full text-left text-sm">
@@ -818,7 +846,7 @@ export default function Home() {
         <section id="features" className="max-w-6xl mx-auto px-6 py-24 md:py-32">
           <div className="mb-14">
             <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>Why financial teams use it</div>
-            <p className="text-3xl md:text-4xl font-bold">Built for accuracy, security, and trust.</p>
+            <p className="serif text-3xl md:text-4xl font-bold">Built for accuracy, security, and trust.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-4">
             {FEATURES.map((f) => (
@@ -834,7 +862,7 @@ export default function Home() {
         <section className="max-w-4xl mx-auto px-6 py-24 md:py-32">
           <div className="mb-14">
             <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>For engineers &amp; reviewers</div>
-            <p className="text-3xl md:text-4xl font-bold">Running in two minutes.</p>
+            <p className="serif text-3xl md:text-4xl font-bold">Running in two minutes.</p>
             <p className="text-base mt-3" style={{ color: 'var(--text-dim)' }}>Want to run it yourself or see exactly how it works under the hood? Here&apos;s the full setup.</p>
           </div>
           <div className="rounded-2xl overflow-hidden card">
@@ -873,7 +901,7 @@ export default function Home() {
         <section className="max-w-4xl mx-auto px-6 py-24 md:py-32">
           <div className="mb-14">
             <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>Roadmap</div>
-            <p className="text-3xl md:text-4xl font-bold">What&apos;s next.</p>
+            <p className="serif text-3xl md:text-4xl font-bold">What&apos;s next.</p>
           </div>
           <div className="grid gap-3">
             {ROADMAP.map((item) => (
