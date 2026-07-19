@@ -69,13 +69,41 @@ flowchart TD
 | Data source | SEC EDGAR | 10-K/10-Q, MD&A section only |
 | Index | **740+ chunks** | 40+ filings, ~2 years per company |
 
+### Benchmark Hardware
+
+| Component | Spec |
+|-----------|------|
+| GPU | NVIDIA RTX 5060 Laptop (6 GB VRAM) |
+| LLM | Qwen2.5-7B-Instruct Q4_K.M GGUF (~4.7 GB) |
+| Generator | llama.cpp, ~2-3 seconds per query |
+| RAM | 32 GB |
+| Storage | SSD |
+| OS | Windows 11 |
+
 ---
 
 ## Results
 
+### Retrieval — Method Benchmark
+
+40 ground-truth questions, 7 companies. Comparison of standalone retrieval methods:
+
+| Method | recall@1 | recall@3 | recall@5 | recall@10 | MRR |
+|--------|----------|----------|----------|-----------|-----|
+| BM25 Only (keyword) | 0.11 | 0.24 | 0.26 | 0.35 | 0.269 |
+| Dense Only (nomic-embed) | 0.06 | 0.18 | 0.29 | 0.51 | 0.272 |
+| Hybrid (dense + BM25) | 0.05 | 0.20 | 0.26 | 0.45 | 0.266 |
+| Hybrid + Cross-Encoder | 0.19 | 0.46 | 0.60 | 0.72 | 0.459 |
+| **Full Pipeline** | **0.23** | **0.49** | **0.65** | **0.75** | **0.486** |
+
+Key findings:
+- **BM25 alone fails** on financial text — recall@10=0.35, keyword matching insufficient for nuanced MD&A language
+- **Hybrid without expansion hurts** — RRF merge dilutes dense precision when query expansion is off (0.51 → 0.45)
+- **Cross-encoder is the largest single contributor** — recall@10 jumps from 0.45 → 0.72 (+0.27)
+
 ### Retrieval Recall@k — Ablation Study
 
-40 ground-truth questions across 7 companies, 4 sectors. Each row adds one pipeline component.
+Additive component breakdown on the same eval set.
 
 | Pipeline | recall@1 | recall@3 | recall@5 | recall@10 | MRR |
 |---|---|---|---|---|---|

@@ -51,7 +51,7 @@ Lo di sini sebagai **Engine Partner** — bukan sekadar coding assistant, tapi p
 | **Perusahaan** | **7** (CMG, DRI, CBRL, WMT, TGT, JNJ, XOM) — 4 sectors |
 | **Sectors** | Restaurant, Retail, Healthcare, Energy |
 | **Retail recall** | **WMT recall@10 = 1.00**, **TGT recall@10 = 1.00** — zero degradation |
-| **Tooling** | **32 pytest + ruff (0 errors) + mypy (0 errors)** — lint & typecheck in CI |
+| **Tooling** | **38 pytest + ruff (0 errors) + mypy (0 errors)** — lint & typecheck in CI + ablation study script |
 | **Target berikut** | Benchmarking GPT-4o/Claude/Gemini, deploy live demo, blog posts |
 | **Model** | Qwen2.5-7B-Instruct Q4_K.M (llama.cpp) — **non-VL** |
 | **Chunks** | **740+ chunks across 40+ filings** |
@@ -252,3 +252,13 @@ Project ini pake gstack workflow. Beberapa hal yang perlu diingat:
 - **Professional files**: CODE_OF_CONDUCT.md, SECURITY.md, 2 ISSUE_TEMPLATEs, tag v1.0.0
 - **Landing page**: Next.js 14 + Tailwind di `landing/`, deploy Vercel: https://rag-variance-explainer.vercel.app
 - **5-role decision**: Streamlit→Next.js migrasi ditunda (Phase 3 dulu), alternatif landing page terpisah sebagai kompromi
+
+#### Session 7 — README Restructure + Ablation Study (18 Jul 2026)
+- **5-role review**: Feedback review README dari recruiter lens — restructure, "Why This Exists", Mermaid diagram, ablation study, delta visualization
+- **READ ME**: Restructure flow: Hero/Why → Mermaid Architecture → Results (ablation + delta) → Quick Start → Features → Eval → Roadmap → Limitations. Tambah "Why This Project Exists" section
+- **Architecture**: ASCII → Mermaid flowchart (render otomatis di GitHub)
+- **Ablation**: `src/eval_ablation.py` — 6-config additive runner via subprocess. Cross-encoder dominant (+0.28 recall@10). Query expansion improves MRR, hurts recall@10 (broadened queries).
+- **Evaluation**: Delta visualization + hardest-case turnaround table
+- **New files**: `src/eval_ablation.py`, Makefile target `eval-ablation`
+- **CI**: ruff ✅, mypy ✅
+- **Belum**: Screenshot/GIF (user take sendiri), commit done

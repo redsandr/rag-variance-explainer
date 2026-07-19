@@ -24,6 +24,12 @@ eval-recall:
 eval-ablation:
 	python src/eval_ablation.py
 
+benchmark:
+	python src/benchmark_methods.py
+
+dataset-stats:
+	python src/dataset_stats.py
+
 eval-llm:
 	python src/eval_llm.py
 
