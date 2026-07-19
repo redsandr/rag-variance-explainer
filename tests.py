@@ -281,6 +281,42 @@ def test_rerank_single_candidate_preserves_it() -> None:
     assert "cross_encoder_score" in result[0]
 
 
+# --- LLM error handling tests ---
+
+
+def test_retry_decorator_succeeds_after_retry() -> None:
+    from src.llm import _retry
+
+    call_count = 0
+
+    @_retry(max_attempts=3, base_delay=0.01)
+    def flaky_fn():
+        nonlocal call_count
+        call_count += 1
+        if call_count < 3:
+            raise ValueError("transient error")
+        return "success"
+
+    assert flaky_fn() == "success"
+    assert call_count == 3
+
+
+def test_retry_decorator_exhausts_attempts() -> None:
+    from src.llm import _retry
+
+    call_count = 0
+
+    @_retry(max_attempts=3, base_delay=0.01)
+    def always_fails():
+        nonlocal call_count
+        call_count += 1
+        raise ValueError("permanent error")
+
+    with pytest.raises(ValueError, match="permanent error"):
+        always_fails()
+    assert call_count == 3
+
+
 # --- build_index tests ---
 
 
