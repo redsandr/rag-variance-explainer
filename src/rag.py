@@ -13,7 +13,14 @@ from logging_config import log_timer
 from post_process import verify_answer_llm
 from prompts import build_rag_system_prompt
 from retrieval import get_client, get_collection, query_multi
-from verifier import fallback_answer, parse_answer, validate_answer
+from verifier import (
+    aggregate_verdicts,
+    decompose_claims,
+    fallback_answer,
+    parse_answer,
+    validate_answer,
+    verify_claims_nli,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -100,11 +107,38 @@ def answer_question(
     structured_fallback = False
     structured_failure_reason: str | None = None
 
+    nli_verdicts: list[dict] | None = None
+    nli_summary: dict | None = None
+
     if config.structured_output_enabled:
         parsed = parse_answer(answer)
         if parsed is not None and parsed.can_answer:
             errors = validate_answer(parsed, results)
             if not errors:
+                if config.nli_enabled:
+                    try:
+                        sub_claims = decompose_claims(parsed.answer, llm)
+                        if sub_claims:
+                            from nli import NLIClient
+
+                            nli_client = NLIClient(
+                                model_name=config.nli_model,
+                                device=config.nli_device,
+                                threshold=config.nli_threshold,
+                            )
+                            nli_verdicts = verify_claims_nli(sub_claims, results, nli_client, config.nli_threshold)
+                            nli_summary = aggregate_verdicts(nli_verdicts)
+                            nli_client.unload()
+                            if nli_summary["overall"] == "fail":
+                                logger.warning(
+                                    "[NLI] %d/%d claims unsupported — answer may contain unsupported facts",
+                                    nli_summary["unsupported"],
+                                    nli_summary["total"],
+                                )
+                    except Exception:
+                        logger.exception("[NLI] verification skipped")
+                        nli_verdicts = None
+                        nli_summary = None
                 return {
                     "question": question,
                     "answer": parsed.answer,
@@ -113,6 +147,8 @@ def answer_question(
                     "structured": True,
                     "claims": [c.model_dump() for c in parsed.claims],
                     "confidence": parsed.confidence,
+                    "nli_verdicts": nli_verdicts,
+                    "nli_summary": nli_summary,
                 }
             else:
                 logger.warning("[StructuredOutput] quote validation failed: %s", errors)
@@ -140,6 +176,8 @@ def answer_question(
         "verification_errors": verification_errors,
         "structured_fallback": structured_fallback,
         "structured_failure_reason": structured_failure_reason,
+        "nli_verdicts": nli_verdicts,
+        "nli_summary": nli_summary,
     }
 
 

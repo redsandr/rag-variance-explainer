@@ -1,5 +1,6 @@
 """
 Pydantic schemas for structured RAG output + validation.
+Phase 2: claim decomposition + NLI verification.
 """
 
 import copy
@@ -142,4 +143,85 @@ def fallback_answer(raw: str, question: str, chunks: Sequence[dict]) -> dict:
         "verification_errors": [],
         "structured_fallback": True,
         "structured_failure_reason": "empty_response",
+    }
+
+
+# ── Phase 2: Claim Decomposition ──────────────────────────────────────────
+
+DECOMPOSITION_SYSTEM_PROMPT = """You are a claim decomposition assistant. Break financial answer text into atomic, single-fact claims.
+
+Rules:
+- Each claim must contain exactly ONE verifiable fact
+- Resolve pronouns to the actual metric name (e.g., "it" -> "revenue")
+- Keep numbers, percentages, dates exact — do NOT round or paraphrase
+- Preserve period context (e.g., "in Q3 2024")
+- Return ONLY valid JSON: {"claims": ["...", "..."]}
+
+Examples:
+Input: "Revenue increased 7.4% to $3.1 billion driven by menu price increases."
+Output: {"claims": ["Revenue increased 7.4%.", "Revenue was $3.1 billion.", "Revenue growth was driven by menu price increases."]}
+
+Input: "Comparable sales decreased 2.1% in Q3 2024."
+Output: {"claims": ["Comparable sales decreased 2.1% in Q3 2024."]}"""
+
+
+def decompose_claims(answer_text: str, llm) -> list[str]:
+    """Decompose an answer into atomic, single-fact claims using the LLM."""
+    if not answer_text or not answer_text.strip():
+        return []
+    try:
+        result = llm.generate(
+            answer_text,
+            system=DECOMPOSITION_SYSTEM_PROMPT,
+            max_tokens=500,
+            temperature=0.0,
+        )
+        cleaned = result.strip()
+        if cleaned.startswith("```"):
+            for fence in ("```json\n", "```\n", "```json", "```"):
+                if cleaned.startswith(fence):
+                    cleaned = cleaned[len(fence):]
+                    break
+            if cleaned.endswith("```"):
+                cleaned = cleaned[:-3]
+        data = json.loads(cleaned)
+        claims = data.get("claims", [])
+        if isinstance(claims, list) and all(isinstance(c, str) for c in claims):
+            return claims
+        return []
+    except Exception:
+        logger.exception("Claim decomposition failed")
+        return []
+
+
+def verify_claims_nli(
+    claims: list[str],
+    chunks: Sequence[dict],
+    nli_client,
+    threshold: float = 0.72,
+) -> list[dict]:
+    """Verify each atomic claim against top-N source chunks via NLI."""
+    if not claims or not chunks:
+        return []
+    chunk_texts = [c.get("text", "") for c in chunks[:3]]
+    return nli_client.verify_batch(claims, chunk_texts, threshold)
+
+
+def aggregate_verdicts(verdicts: list[dict]) -> dict:
+    """Aggregate per-claim NLI verdicts into overall assessment.
+
+    Returns dict with total/supported/unsupported counts and pass/fail.
+    """
+    if not verdicts:
+        return {"total": 0, "supported": 0, "unsupported": 0, "unsupported_ratio": 0.0, "overall": "pass"}
+    total = len(verdicts)
+    supported = sum(1 for v in verdicts if v.get("supported"))
+    unsupported = total - supported
+    ratio = unsupported / total if total > 0 else 0.0
+    return {
+        "total": total,
+        "supported": supported,
+        "unsupported": unsupported,
+        "unsupported_ratio": ratio,
+        "overall": "fail" if ratio > 0.5 else "pass",
     }

@@ -69,6 +69,11 @@ class RAGConfig:
     llm_max_tokens: int = int(os.getenv("RAG_LLM_MAX_TOKENS", "2048"))
     llm_temperature: float = float(os.getenv("RAG_LLM_TEMPERATURE", "0.1"))
 
+    nli_enabled: bool = os.getenv("RAG_NLI_ENABLED", "true").lower() == "true"
+    nli_threshold: float = float(os.getenv("RAG_NLI_THRESHOLD", "0.72"))
+    nli_model: str = os.getenv("RAG_NLI_MODEL", "MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli")
+    nli_device: str = os.getenv("RAG_NLI_DEVICE", "cpu")
+
     def __post_init__(self) -> None:
         _validate_positive_int("RAG_TOP_K", self.retrieval_top_k)
         _validate_float_range("RAG_MIN_RELEVANCE", self.retrieval_min_relevance, 0.0, 1.0)
@@ -81,6 +86,7 @@ class RAGConfig:
         _validate_positive_int("RAG_FILINGS_PER_COMPANY", self.build_filings_per_company)
         _validate_positive_int("RAG_LLM_MAX_TOKENS", self.llm_max_tokens)
         _validate_float_range("RAG_LLM_TEMPERATURE", self.llm_temperature, 0.0, 2.0)
+        _validate_float_range("RAG_NLI_THRESHOLD", self.nli_threshold, 0.0, 1.0)
 
 
 config = RAGConfig()
