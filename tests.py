@@ -784,3 +784,45 @@ def test_mcp_server_tool_rag_search_invalid_ticker() -> None:
     result = search(query="revenue growth", ticker="INVALID")
     assert "Error" in result
     assert "ticker" in result.lower()
+
+
+# --- MCP Resource tests ---
+
+
+def test_mcp_resources_registered() -> None:
+    from src.server import mcp
+    rm = mcp._resource_manager
+    uris = [str(r.uri) for r in rm.list_resources()]
+    templates = [str(t.uri_template) for t in rm.list_templates()]
+    all_uris = uris + templates
+    assert "rag://companies" in all_uris
+    assert "rag://stats" in all_uris
+    assert "rag://companies/{ticker}" in all_uris
+    assert "rag://companies/{ticker}/questions" in all_uris
+
+
+def test_mcp_resource_companies() -> None:
+    from src.server import companies_resource
+    import json
+    data = json.loads(companies_resource())
+    assert len(data) == 7
+    assert data[0]["ticker"] == "CBRL"
+    assert all("name" in c and "sector" in c for c in data)
+
+
+def test_mcp_resource_company_detail() -> None:
+    from src.server import company_resource
+    import json
+    data = json.loads(company_resource("CMG"))
+    assert data["ticker"] == "CMG"
+    assert data["name"] == "Chipotle Mexican Grill"
+    assert data["sector"] == "Restaurant"
+
+
+def test_mcp_resource_company_questions() -> None:
+    from src.server import company_questions_resource
+    import json
+    data = json.loads(company_questions_resource("CMG"))
+    assert data["ticker"] == "CMG"
+    assert len(data["questions"]) == 3
+    assert "revenue" in data["questions"][0].lower()

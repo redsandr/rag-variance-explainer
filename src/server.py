@@ -223,6 +223,79 @@ def list_questions(ticker: str | None = None) -> str:
     return "\n".join(lines)
 
 
+# ---- MCP Resources ----
+
+
+@mcp.resource(
+    "rag://companies",
+    annotations={"readOnlyHint": True, "idempotentHint": True},
+)
+def companies_resource() -> str:
+    """List all available companies with tickers, names, and sectors."""
+    import json
+    data = [
+        {"ticker": t, "name": TICKERS[t], "sector": SECTORS.get(t, "Unknown")}
+        for t in sorted(TICKERS)
+    ]
+    return json.dumps(data, indent=2)
+
+
+@mcp.resource(
+    "rag://companies/{ticker}",
+    annotations={"readOnlyHint": True, "idempotentHint": True},
+)
+def company_resource(ticker: str) -> str:
+    """Get details for a specific company by ticker."""
+    import json
+    t = ticker.upper()
+    if t not in TICKERS:
+        return json.dumps({"error": f"Unknown ticker '{t}'"}, indent=2)
+    data = {
+        "ticker": t,
+        "name": TICKERS[t],
+        "sector": SECTORS.get(t, "Unknown"),
+    }
+    return json.dumps(data, indent=2)
+
+
+@mcp.resource(
+    "rag://companies/{ticker}/questions",
+    annotations={"readOnlyHint": True, "idempotentHint": True},
+)
+def company_questions_resource(ticker: str) -> str:
+    """Get suggested questions for a specific company."""
+    import json
+    t = ticker.upper()
+    if t in _SUGGESTED_QUESTIONS:
+        return json.dumps({"ticker": t, "questions": _SUGGESTED_QUESTIONS[t]}, indent=2)
+    return json.dumps({"error": f"Unknown ticker '{t}'"}, indent=2)
+
+
+@mcp.resource(
+    "rag://stats",
+    annotations={"readOnlyHint": True, "idempotentHint": True},
+)
+def stats_resource() -> str:
+    """Get pipeline statistics: companies, sectors, total filings, chunks."""
+    import json
+    sectors = set(SECTORS.values())
+    data = {
+        "companies": len(TICKERS),
+        "sectors": len(sectors),
+        "sector_list": sorted(sectors),
+        "chunks": None,
+        "filings": None,
+    }
+    try:
+        from retrieval import get_client, get_collection
+        client = get_client()
+        collection = get_collection(client)
+        data["chunks"] = collection.count()
+    except Exception:
+        pass
+    return json.dumps(data, indent=2)
+
+
 # ---- CLI Entrypoint ----
 
 
