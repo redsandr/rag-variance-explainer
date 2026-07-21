@@ -57,6 +57,7 @@ omit = [
     "src/eval_*.py",
     "src/export_judge_prompts.py",
     "src/logging_config.py",
+    "src/nli.py",
 ]
 
 [tool.coverage.report]

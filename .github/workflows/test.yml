@@ -40,4 +40,4 @@ jobs:
         run: bandit -r src/ -c pyproject.toml
 
       - name: Run tests with coverage
-        run: pytest tests.py -v --cov=src --cov-fail-under=65
+        run: RAG_NLI_ENABLED=false pytest tests.py --cov=src --cov-fail-under=65

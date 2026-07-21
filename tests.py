@@ -1144,3 +1144,110 @@ def test_html_escape_escapes_special_chars() -> None:
     from app import _html_escape
     assert _html_escape("<script>alert('xss')</script>") == "&lt;script&gt;alert(&#x27;xss&#x27;)&lt;/script&gt;"
     assert _html_escape('"&') == "&quot;&amp;"
+
+
+# --- NLI / Claim Decomposition tests ---
+
+
+def test_decompose_claims_empty_text() -> None:
+    from src.verifier import decompose_claims
+    assert decompose_claims("", None) == []
+    assert decompose_claims("  ", None) == []
+
+
+def test_decompose_claims_llm_error() -> None:
+    from unittest.mock import MagicMock
+    from src.verifier import decompose_claims
+    mock_llm = MagicMock()
+    mock_llm.generate.side_effect = RuntimeError("LLM failed")
+    assert decompose_claims("Some answer.", mock_llm) == []
+
+
+def test_decompose_claims_parses_json() -> None:
+    from unittest.mock import MagicMock
+    from src.verifier import decompose_claims
+    mock_llm = MagicMock()
+    mock_llm.generate.return_value = '{"claims": ["Claim one.", "Claim two."]}'
+    result = decompose_claims("Some answer.", mock_llm)
+    assert result == ["Claim one.", "Claim two."]
+
+
+def test_decompose_claims_removes_markdown_fence() -> None:
+    from unittest.mock import MagicMock
+    from src.verifier import decompose_claims
+    mock_llm = MagicMock()
+    mock_llm.generate.return_value = "```json\n{\"claims\": [\"Claim one.\"]}\n```"
+    result = decompose_claims("Some answer.", mock_llm)
+    assert result == ["Claim one."]
+
+
+def test_decompose_claims_missing_claims_key() -> None:
+    from unittest.mock import MagicMock
+    from src.verifier import decompose_claims
+    mock_llm = MagicMock()
+    mock_llm.generate.return_value = '{"not_claims": []}'
+    assert decompose_claims("Some answer.", mock_llm) == []
+
+
+def test_decompose_claims_invalid_json() -> None:
+    from unittest.mock import MagicMock
+    from src.verifier import decompose_claims
+    mock_llm = MagicMock()
+    mock_llm.generate.return_value = "not json at all"
+    assert decompose_claims("Some answer.", mock_llm) == []
+
+
+def test_verify_claims_nli_empty_returns_empty() -> None:
+    from src.verifier import verify_claims_nli
+    assert verify_claims_nli([], [{"text": "chunk"}], None) == []
+    assert verify_claims_nli(["claim"], [], None) == []
+
+
+def test_verify_claims_nli_calls_client() -> None:
+    from unittest.mock import MagicMock
+    from src.verifier import verify_claims_nli
+    mock_nli = MagicMock()
+    mock_nli.verify_batch.return_value = [{"supported": True}]
+    result = verify_claims_nli(["claim"], [{"text": "chunk"}], mock_nli, 0.72)
+    assert result == [{"supported": True}]
+    mock_nli.verify_batch.assert_called_once_with(["claim"], ["chunk"], 0.72)
+
+
+def test_verify_claims_nli_uses_top3_chunks() -> None:
+    from unittest.mock import MagicMock
+    from src.verifier import verify_claims_nli
+    mock_nli = MagicMock()
+    mock_nli.verify_batch.return_value = [{"supported": True}]
+    chunks = [{"text": f"chunk{i}"} for i in range(5)]
+    verify_claims_nli(["claim"], chunks, mock_nli, 0.72)
+    mock_nli.verify_batch.assert_called_once_with(["claim"], ["chunk0", "chunk1", "chunk2"], 0.72)
+
+
+def test_aggregate_verdicts_empty() -> None:
+    from src.verifier import aggregate_verdicts
+    result = aggregate_verdicts([])
+    assert result["total"] == 0
+    assert result["overall"] == "pass"
+
+
+def test_aggregate_verdicts_all_supported() -> None:
+    from src.verifier import aggregate_verdicts
+    result = aggregate_verdicts([{"supported": True}, {"supported": True}])
+    assert result["total"] == 2
+    assert result["supported"] == 2
+    assert result["unsupported"] == 0
+    assert result["overall"] == "pass"
+
+
+def test_aggregate_verdicts_half_unsupported_still_pass() -> None:
+    from src.verifier import aggregate_verdicts
+    result = aggregate_verdicts([{"supported": True}, {"supported": False}])
+    assert result["unsupported_ratio"] == 0.5
+    assert result["overall"] == "pass"
+
+
+def test_aggregate_verdicts_majority_unsupported_fails() -> None:
+    from src.verifier import aggregate_verdicts
+    result = aggregate_verdicts([{"supported": True}, {"supported": False}, {"supported": False}])
+    assert result["unsupported_ratio"] == 2 / 3
+    assert result["overall"] == "fail"
