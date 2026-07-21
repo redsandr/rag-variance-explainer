@@ -76,24 +76,23 @@ class NLIClient:
         for chunk_text in chunk_texts:
             try:
                 results = self._pipeline(f"{claim} </s></s> {chunk_text}")
-                if isinstance(results, list) and len(results) > 0:
-                    scores = results[0] if isinstance(results[0], dict) else results
-                    if isinstance(scores, list):
-                        scores = scores[0]
-                    if isinstance(scores, dict):
-                        label, score = scores.get("label", "NEUTRAL"), scores.get("score", 0.0)
-                    else:
-                        label, score = "NEUTRAL", 0.0
+                items: list[dict] = []
+                if isinstance(results, list):
+                    if results and isinstance(results[0], list):
+                        items = results[0]
+                    elif results and isinstance(results[0], dict):
+                        items = results
                 elif isinstance(results, dict):
-                    label, score = results.get("label", "NEUTRAL"), results.get("score", 0.0)
-                else:
-                    label, score = "NEUTRAL", 0.0
+                    items = [results]
 
-                if label == "ENTAILMENT" and score > max_entailment:
-                    max_entailment = score
-                if score > best_score:
-                    best_score = score
-                    best_label = label
+                for item in items:
+                    label = item.get("label", "NEUTRAL")
+                    score = item.get("score", 0.0)
+                    if label.lower() == "entailment" and score > max_entailment:
+                        max_entailment = score
+                    if score > best_score:
+                        best_score = score
+                        best_label = label
             except Exception:
                 logger.warning("NLI inference error for claim: %s", claim[:80])
                 continue
