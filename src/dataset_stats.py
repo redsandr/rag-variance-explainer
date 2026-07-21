@@ -7,17 +7,8 @@ Usage:
 
 from collections import Counter, defaultdict
 
+from constants import SECTORS
 from retrieval import get_client, get_collection
-
-SECTOR_MAP = {
-    "CMG": "Restaurant",
-    "DRI": "Restaurant",
-    "CBRL": "Restaurant",
-    "WMT": "Retail",
-    "TGT": "Retail",
-    "JNJ": "Healthcare",
-    "XOM": "Energy",
-}
 
 
 def main() -> None:
@@ -48,7 +39,7 @@ def main() -> None:
 
     sector_count: Counter = Counter()
     for t, cnt in ticker_count.items():
-        sector_count[SECTOR_MAP.get(t, "Other")] += cnt
+        sector_count[SECTORS.get(t, "Other")] += cnt
 
     print(f"Total chunks: {total_chunks}")
     print(f"Total tokens (approx): {total_tokens}")

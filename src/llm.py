@@ -17,6 +17,8 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FuturesTimeout
 
+from logging_config import log_timer
+
 logger = logging.getLogger(__name__)
 
 _LLM_TIMEOUT = int(os.getenv("LLM_TIMEOUT", "120"))
@@ -163,7 +165,6 @@ class LLMClient:
         Applies a global semaphore to cap concurrent generations (default 1)
         and enforces a per-call timeout (default 120 s) to prevent hangs.
         """
-        from logging_config import log_timer
 
         acquired = _llm_semaphore.acquire(timeout=_LLM_TIMEOUT)
         if not acquired:

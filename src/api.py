@@ -14,23 +14,15 @@ import time
 from contextlib import asynccontextmanager
 
 try:
-    from fastapi import FastAPI, HTTPException, Query
+    from fastapi import Body, FastAPI, HTTPException
 except ImportError:
     raise RuntimeError("Missing 'fastapi'. Install: pip install fastapi uvicorn") from None
 
-from ingest import TICKERS
+from constants import SECTORS, TICKERS
+from rag import answer_question
+from retrieval import get_client, get_collection, query_multi
 
 logger = logging.getLogger(__name__)
-
-_SECTORS: dict[str, str] = {
-    "CMG": "Restaurant",
-    "DRI": "Restaurant",
-    "CBRL": "Restaurant",
-    "WMT": "Retail",
-    "TGT": "Retail",
-    "JNJ": "Healthcare",
-    "XOM": "Energy",
-}
 
 _VERSION = "1.0.0"
 
@@ -97,7 +89,7 @@ def health():
         "status": "ok",
         "llm_ready": _llm_ready,
         "companies": len(TICKERS),
-        "sectors": len(set(_SECTORS.values())),
+        "sectors": len(set(SECTORS.values())),
     }
 
 
@@ -108,24 +100,22 @@ def list_companies():
         companies.append({
             "ticker": ticker,
             "name": TICKERS[ticker],
-            "sector": _SECTORS.get(ticker, "Unknown"),
+            "sector": SECTORS.get(ticker, "Unknown"),
         })
     return {
         "companies": companies,
         "total": len(companies),
-        "sectors": sorted(set(_SECTORS.values())),
+        "sectors": sorted(set(SECTORS.values())),
     }
 
 
 @app.post("/search")
 def search(
-    query: str = Query(..., min_length=1, max_length=256, description="Search query"),
-    ticker: str | None = Query(None, description="Filter by ticker (optional)"),
-    top_k: int = Query(5, ge=1, le=20, description="Number of results"),
+    query: str = Body(..., min_length=1, max_length=256, description="Search query"),
+    ticker: str | None = Body(None, description="Filter by ticker (optional)"),
+    top_k: int = Body(5, ge=1, le=20, description="Number of results"),
 ):
     validated_ticker = _validate_ticker(ticker)
-
-    from retrieval import get_client, get_collection, query_multi
 
     start = time.perf_counter()
     try:
@@ -160,12 +150,10 @@ def search(
 
 @app.post("/answer")
 def answer(
-    question: str = Query(..., min_length=1, max_length=256, description="Financial question"),
-    ticker: str | None = Query(None, description="Filter by ticker (optional)"),
+    question: str = Body(..., min_length=1, max_length=256, description="Financial question"),
+    ticker: str | None = Body(None, description="Filter by ticker (optional)"),
 ):
     validated_ticker = _validate_ticker(ticker)
-
-    from rag import answer_question
 
     start = time.perf_counter()
     try:

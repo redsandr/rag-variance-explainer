@@ -4,6 +4,8 @@ from pathlib import Path
 import streamlit as st
 
 from config import config
+from constants import SECTORS
+from constants import TICKER_MAP as _TICKER_MAP
 from llm import LLMClient
 from rag import answer_question, sanitize_input
 from retrieval import get_client, get_collection
@@ -149,16 +151,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-
-SECTOR_MAP = {
-    "CMG": "Restaurant",
-    "DRI": "Restaurant",
-    "CBRL": "Restaurant",
-    "WMT": "Retail",
-    "TGT": "Retail",
-    "JNJ": "Healthcare",
-    "XOM": "Energy",
-}
 
 _RATE_LIMIT_SECONDS = 10
 
@@ -403,17 +395,6 @@ with main_col:
                     st.session_state._saved_ticker = st.session_state.get("ticker_filter", "All")
                     st.rerun()
 
-    ticker_map = {
-        "All": None,
-        "CMG (Chipotle)": "CMG",
-        "DRI (Darden)": "DRI",
-        "CBRL (Cracker Barrel)": "CBRL",
-        "WMT (Walmart)": "WMT",
-        "TGT (Target)": "TGT",
-        "JNJ (Johnson & Johnson)": "JNJ",
-        "XOM (Exxon Mobil)": "XOM",
-    }
-
     filter_col, topk_col = st.columns(2)
     with filter_col:
         ticker_filter = st.selectbox(
@@ -472,7 +453,7 @@ with main_col:
         elif _rate_limited() is None:
             pass
         else:
-            run_analysis(question, ticker_map[ticker_filter], top_k, compare)
+            run_analysis(question, _TICKER_MAP[ticker_filter], top_k, compare)
 
     elif ask and not question.strip():
         st.warning("Please enter a question.")
@@ -492,7 +473,7 @@ with main_col:
         return "\u25BC"
 
     def _sector_tag(ticker: str) -> str:
-        sector = SECTOR_MAP.get(ticker, "")
+        sector = SECTORS.get(ticker, "")
         css_class = sector.lower() if sector else ""
         return f'<span class="sector-tag {css_class}">{sector}</span>'
 

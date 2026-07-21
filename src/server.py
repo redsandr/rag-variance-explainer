@@ -17,18 +17,23 @@ Usage:
 import argparse
 import logging
 import sys
+from typing import Any
 
-from ingest import TICKERS
+from constants import SECTORS, TICKERS
 
 logger = logging.getLogger(__name__)
 
 try:
-    from mcp.server.fastmcp import FastMCP  # noqa: E402
+    from mcp.server.fastmcp import FastMCP
+    _MCP_AVAILABLE = True
 except ImportError:
-    print("Missing 'mcp' package. Install: pip install mcp", file=sys.stderr)
-    sys.exit(1)
+    _MCP_AVAILABLE = False
 
-mcp = FastMCP(
+mcp: Any
+
+if _MCP_AVAILABLE:
+    from mcp.server.fastmcp import FastMCP
+    mcp = FastMCP(
     "RAG Variance Explainer",
     instructions="""Financial RAG pipeline that answers questions about SEC filings
 (MD&A sections) from 7 companies across 4 sectors (Restaurant, Retail, Healthcare, Energy).
@@ -39,18 +44,14 @@ Tools:
 - rag.list_companies: list available tickers with company names and sectors
 - rag.list_questions: get suggested questions for a ticker or all companies
 """,
-)
-
-# --- industry sectors ---
-_SECTORS: dict[str, str] = {
-    "CMG": "Restaurant",
-    "DRI": "Restaurant",
-    "CBRL": "Restaurant",
-    "WMT": "Retail",
-    "TGT": "Retail",
-    "JNJ": "Healthcare",
-    "XOM": "Energy",
-}
+    )
+else:
+    class _PlaceholderMCP:
+        def __getattr__(self, name: str) -> Any:
+            return lambda *a, **kw: None
+        def tool(self, *a: Any, **kw: Any) -> Any:
+            return lambda f: f
+    mcp = _PlaceholderMCP()
 
 _SUGGESTED_QUESTIONS: dict[str, list[str]] = {
     "CMG": [
@@ -182,10 +183,10 @@ def list_companies() -> str:
     lines = ["## Available Companies\n", "| Ticker | Company | Sector |"]
     lines.append("|--------|---------|--------|")
     for ticker in sorted(TICKERS):
-        sector = _SECTORS.get(ticker, "Unknown")
+        sector = SECTORS.get(ticker, "Unknown")
         lines.append(f"| {ticker} | {TICKERS[ticker]} | {sector} |")
     lines.append("")
-    lines.append(f"**Total: {len(TICKERS)} companies across {len(set(_SECTORS.values()))} sectors**")
+    lines.append(f"**Total: {len(TICKERS)} companies across {len(set(SECTORS.values()))} sectors**")
     return "\n".join(lines)
 
 
@@ -226,6 +227,9 @@ def list_questions(ticker: str | None = None) -> str:
 
 
 def main() -> None:
+    if not _MCP_AVAILABLE:
+        print("Missing 'mcp' package. Install: pip install mcp", file=sys.stderr)
+        sys.exit(1)
     parser = argparse.ArgumentParser(description="RAG Variance Explainer MCP Server")
     parser.add_argument("--sse", action="store_true", help="Run with SSE transport (default: stdio)")
     parser.add_argument("--port", type=int, default=8000, help="Port for SSE transport (default: 8000)")

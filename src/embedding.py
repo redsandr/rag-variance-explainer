@@ -9,25 +9,35 @@ from sentence_transformers import SentenceTransformer
 
 logger = logging.getLogger(__name__)
 
-_MODEL_NAME = "nomic-ai/nomic-embed-text-v1.5"
-_FALLBACK_MODEL = "all-MiniLM-L6-v2"  # significantly smaller, loads when nomic fails
-_model = None  # lazy-loaded singleton — avoid reloading the model on every call
+_MODEL_NAME = "nomic-ai/nomic-embed-text-v1.5"   # 768-dim
+_FALLBACK_MODEL = "all-MiniLM-L6-v2"              # 384-dim — can NOT be used for upsert
+_MODEL = None  # lazy-loaded singleton
+
+_TARGET_DIM = 768
 
 
 def _get_model() -> SentenceTransformer:
-    global _model
-    if _model is None:
+    global _MODEL
+    if _MODEL is None:
         try:
-            _model = SentenceTransformer(_MODEL_NAME, trust_remote_code=True, device="cpu")
+            _MODEL = SentenceTransformer(_MODEL_NAME, trust_remote_code=True, device="cpu")
             logger.info("Loaded embedding model: %s", _MODEL_NAME)
         except Exception as e:
             logger.warning(
                 "Failed to load %s: %s. Falling back to %s.",
                 _MODEL_NAME, e, _FALLBACK_MODEL,
             )
-            _model = SentenceTransformer(_FALLBACK_MODEL, device="cpu")
+            fallback = SentenceTransformer(_FALLBACK_MODEL, device="cpu")
+            dim = fallback.get_sentence_embedding_dimension()
+            if dim != _TARGET_DIM:
+                raise RuntimeError(
+                    f"Embedding fallback model {_FALLBACK_MODEL} has dimension {dim}, "
+                    f"but ChromaDB collection requires {_TARGET_DIM}. "
+                    f"Load {_MODEL_NAME} manually or use a {_TARGET_DIM}-dim fallback."
+                ) from e
+            _MODEL = fallback
             logger.info("Loaded fallback embedding model: %s", _FALLBACK_MODEL)
-    return _model
+    return _MODEL
 
 
 def embed_documents(texts: list[str]) -> list[list[float]]:

@@ -7,7 +7,8 @@ import time
 def setup_logging(level: int = logging.INFO) -> None:
     logging.basicConfig(
         level=level,
-        format="%(message)s",
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        datefmt="%H:%M:%S",
         stream=sys.stdout,
     )
 

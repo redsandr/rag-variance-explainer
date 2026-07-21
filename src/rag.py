@@ -9,6 +9,7 @@ from collections.abc import Callable
 
 from config import config
 from llm import LLMClient
+from logging_config import log_timer
 from post_process import verify_answer_llm
 from prompts import SYSTEM_PROMPT_RAG
 from retrieval import get_client, get_collection, query_multi
@@ -48,7 +49,7 @@ def answer_question(
     top_k: int | None = None,
     min_relevance: float | None = None,
     llm: LLMClient | None = None,
-    on_progress: Callable | None = None,
+    on_progress: Callable[[str, str], None] | None = None,
 ) -> dict:
     """End-to-end RAG pipeline: retrieve, generate.
 
@@ -56,7 +57,6 @@ def answer_question(
     calls the LLM (with built-in self-verify rules), and returns the answer.
     Returns structured dict with 'question', 'answer', and 'sources'.
     """
-    from logging_config import log_timer
 
     if top_k is None:
         top_k = config.retrieval_top_k

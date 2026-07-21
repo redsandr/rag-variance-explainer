@@ -91,7 +91,8 @@ def build_judge_prompt(question: str, answer: str, sources: list[dict]) -> str:
         label = f"[{meta.get('ticker', '?')} {meta.get('form', '?')} filed {meta.get('filing_date', '?')}]"
         text = s.get("text", "")
         context_blocks.append(f"{label}\n{text}")
-    return f"Question: {question}\n\nSource chunks:\n{chr(10)+chr(10).join(context_blocks) if context_blocks else '(no sources)'}\n\n---\n\nAnswer:\n{answer}"
+    sep = "\n\n"
+    return f"Question: {question}\n\nSource chunks:\n{sep.join(context_blocks) if context_blocks else '(no sources)'}\n\n---\n\nAnswer:\n{answer}"
 
 
 def build_judge_prompt_compact(question: str, answer: str, sources: list[dict]) -> str:
@@ -103,4 +104,5 @@ def build_judge_prompt_compact(question: str, answer: str, sources: list[dict]) 
         if len(text) > 800:
             text = text[:800] + "..."
         context_blocks.append(f"{label}\n{text}")
-    return f"Question: {question}\n\nSource chunks:\n{chr(10)+chr(10).join(context_blocks) if context_blocks else '(no sources)'}\n\n---\n\nAnswer:\n{answer}"
+    sep = "\n\n"
+    return f"Question: {question}\n\nSource chunks:\n{sep.join(context_blocks) if context_blocks else '(no sources)'}\n\n---\n\nAnswer:\n{answer}"

@@ -6,15 +6,15 @@ import logging
 
 from chunking import chunk_document
 from config import config
+from constants import TICKERS
 from ingest import (
-    TICKERS,
     fetch_submissions,
     get_cik,
     get_mda_for_filing,
     list_10k_10q_filings,
 )
 from post_process import tag_chunk
-from retrieval import add_chunks, delete_chunks_for_filing, get_client, get_collection
+from retrieval import add_chunks, delete_chunks_for_filing, flush_bm25_cache, get_client, get_collection
 
 logger = logging.getLogger(__name__)
 
@@ -89,6 +89,9 @@ def build_index() -> None:
         logger.warning("Failed filings (review these before assuming full coverage):")
         for ticker, accession, form, filing_date, error in failures:
             logger.warning("  %s %s %s (%s): %s", ticker, form, filing_date, accession, error)
+
+    flush_bm25_cache()
+    logger.info("BM25 cache flushed — stale indexes cleared")
 
 
 if __name__ == "__main__":

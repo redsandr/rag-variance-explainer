@@ -79,16 +79,6 @@ def _rate_limited_get(url: str, max_retries: int = 5, base_delay: float = 5.0) -
         f"SEC request failed after {max_retries} attempts. Last error: {last_exception}"
     ) from last_exception
 
-TICKERS = {
-    "CMG": "Chipotle Mexican Grill",
-    "DRI": "Darden Restaurants",
-    "CBRL": "Cracker Barrel",
-    "WMT": "Walmart",
-    "TGT": "Target",
-    "JNJ": "Johnson & Johnson",
-    "XOM": "Exxon Mobil",
-}
-
 CANDIDATE_TAGS = [
     "Revenues",
     "RevenueFromContractWithCustomerExcludingAssessedTax",

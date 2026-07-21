@@ -12,6 +12,8 @@ import re
 import sys
 from pathlib import Path
 
+from src.constants import COMPANY_SHORT
+
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
@@ -49,9 +51,7 @@ def format_stats_block(stats: dict) -> str:
     ticker_list = ", ".join(
         f"{t} ({name})" if name else t
         for t in stats["tickers"]
-        for name in [{"CMG": "Chipotle", "DRI": "Darden", "CBRL": "Cracker Barrel",
-                       "WMT": "Walmart", "TGT": "Target", "JNJ": "Johnson & Johnson",
-                       "XOM": "Exxon Mobil"}.get(t, "")]
+        for name in [COMPANY_SHORT.get(t, "")]
     )
     return (
         f"| Index | **{stats['chunks']}+ chunks** from {stats['filings']} filings "
