@@ -1,3 +1,4 @@
+import json
 import re
 from collections.abc import Sequence
 
@@ -179,3 +180,49 @@ def tag_chunk(chunk_text: str, base_metadata: dict) -> dict:
         enriched["metric_confidence"] = 0
 
     return enriched
+
+
+VERIFY_NUMBERS_PROMPT = """You are a financial data verifier. Your job: compare the answer against the source chunks and list any factual errors.
+
+Rules:
+- Every number (dollar, percentage, date) in the answer must appear verbatim in at least one source chunk with the same meaning.
+- Check that numbers are not assigned to the wrong period (year/quarter).
+- Check that numbers are not assigned to the wrong ticker/company.
+- Check that direction (increased/decreased) matches the source.
+- If ALL numbers are correct, respond with: {"errors": []}
+- If errors exist, list each: {"errors": [{"value": "the wrong number", "correction": "what the source says", "source": "[TICKER Form DATE]"}]}
+
+Source chunks:
+{context}
+
+Answer to verify:
+{answer}
+"""
+
+
+def verify_answer_llm(answer: str, sources: Sequence[dict | str], llm_client) -> dict:
+    """Verify answer numbers against sources using LLM (no regex)."""
+    context_blocks = []
+    for s in sources:
+        if isinstance(s, dict):
+            meta = s.get("metadata", {})
+            label = f"[{meta.get('ticker', '?')} {meta.get('form', '?')} filed {meta.get('filing_date', '?')}]"
+            text = s.get("text", "")
+        else:
+            label = "[source]"
+            text = str(s)
+        context_blocks.append(f"{label}\n{text[:2000]}")
+    context = "\n\n---\n\n".join(context_blocks)
+
+    prompt = VERIFY_NUMBERS_PROMPT.format(context=context, answer=answer)
+    result = llm_client.generate(prompt, max_tokens=500, temperature=0.0)
+
+    try:
+        cleaned = result.strip()
+        if cleaned.startswith("```"):
+            cleaned = cleaned.split("\n", 1)[1].rsplit("```", 1)[0]
+        data = json.loads(cleaned)
+        errors = data.get("errors", [])
+        return {"errors": errors, "has_errors": len(errors) > 0}
+    except (json.JSONDecodeError, KeyError):
+        return {"errors": [], "has_errors": False}

@@ -38,7 +38,7 @@ Project 2/
 |--------|-------|
 | Retrieval MRR | **0.54** |
 | recall@10 | **0.81** |
-| Faithfulness (strict) | **59.29%** (cross-sector) / **74.24%** (restaurant) |
+| Faithfulness (strict) | **59.29%** (cross-sector) / **74.24%** (restaurant) — tuning in progress |
 | Faithfulness (weighted) | **73.45%** (cross-sector) / **75.32%** (restaurant) |
 | Judge parse errors | **0** ✅ |
 | Phase 2b — Code Lockdown | ✅ Complete |
@@ -48,6 +48,7 @@ Project 2/
 | Phase A.1 — MCP Server | ✅ Complete (`src/server.py`, FastMCP dual transport) |
 | Phase A.2 — REST API | ✅ Complete (`src/api.py`, FastAPI 5 endpoints) |
 | Phase A.3 — Agent Skills | ✅ Complete (opencode skill + Cursor rules + CLAUDE.md) |
+| Phase A.4 — Tuning Session | ✅ Complete (ablation re-run, error classification, 3 targeted fixes) |
 | Companies | **7** (CMG, DRI, CBRL, WMT, TGT, JNJ, XOM) — 4 sectors |
 | Chunks | **1079** dari **56** filings |
 | Tests | **47** pytest + ruff (0) + mypy (0) + bandit (0) |
@@ -80,6 +81,7 @@ Project 2/
 | 04 | [[_technical/04. Prompt Engineering & Evaluation Fixes\|Prompt Engineering]] | Iterasi 8: prompt fixes, LLM reset, 4 broken evals | ✅ |
 | 05 | [[_technical/05. Turn Weaknesses Into Strengths\|Weaknesses → Strengths]] | Rencana aksi: scaling, deployment, exposure, testing | 🟡 |
 | 06 | [[_technical/06. Professional Cleanup & Security Audit\|Cleanup & Security]] | Code quality fixes, git history sanitization, config sync | ✅ |
+| 10 | [[_technical/10. Tuning Report 19 Jul 2026\|Tuning Report]] | **NEW** — Ablation re-run, error classification, 3 fixes implementation | ✅ |
 
 ### Analysis (`_analysis/`)
 
@@ -97,6 +99,7 @@ Cari apa yang harus dikerjain? → _planning/07. Roadmap & Execution Plan
 Cari history eval?        → _technical/03. Faithfulness Eval
 Cari prompt fixes?        → _technical/04. Prompt Engineering
 Cari improvement plan?    → _analysis/09. Improvement Blueprint
+Cari tuning terbaru?      → _technical/10. Tuning Report 19 Jul 2026
 Bingung mulai dari mana?  → _Dashboard.md (ini)
 ```
 
@@ -113,8 +116,9 @@ Bingung mulai dari mana?  → _Dashboard.md (ini)
 | **Retail recall** | **WMT recall@10 = 1.00**, **TGT recall@10 = 1.00** — zero degradation |
 | **Overall recall** | **recall@10 = 0.81**, **MRR = 0.54** — 0 retrieval gaps |
 | **Code quality** | ruff (0) + mypy (0) + bandit (0) — **47** tests ✅ |
-| **Target berikut** | A.5 Blog Post (Medium) → A.6 Benchmark + Dataset (HF) |
+| **Target berikut** | A.5 Tuning eval re-run → Blog Post (Medium) → A.6 Benchmark + Dataset (HF) |
 | **Phase A complete** | MCP Server (`src/server.py`), REST API (`src/api.py`), Agent Skills (`.opencode/skills/`, `.cursor/rules/`, `CLAUDE.md`) |
+| **Tuning session** | Error classification done (22 Q with errors), 3 fixes implemented (omission prompt, LLM-based verify, citation format), awaiting eval re-run |
 
 ---
 
