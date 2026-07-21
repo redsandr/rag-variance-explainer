@@ -13,5 +13,6 @@ data/claude_evaluation.txt
 data/claude_all_questions.txt
 data/*.json
 AGENTS.md
+.coverage*
 
 .streamlit/secrets.toml
