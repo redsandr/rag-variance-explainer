@@ -294,7 +294,7 @@ def stats_resource() -> str:
         collection = get_collection(client)
         data["chunks"] = collection.count()
     except Exception:
-        pass
+        pass  # nosec — intentional: graceful degradation when ChromaDB unavailable
     return json.dumps(data, indent=2)
 
 
