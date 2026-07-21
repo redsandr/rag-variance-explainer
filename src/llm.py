@@ -166,6 +166,7 @@ class LLMClient:
         and enforces a per-call timeout (default 120 s) to prevent hangs.
         """
 
+        t_start = time.perf_counter()
         acquired = _llm_semaphore.acquire(timeout=_LLM_TIMEOUT)
         if not acquired:
             raise TimeoutError(
@@ -181,9 +182,11 @@ class LLMClient:
             else:
                 raise ValueError(f"Unknown backend: {self.backend}")
 
+            elapsed = time.perf_counter() - t_start
+            remaining = max(_LLM_TIMEOUT - elapsed, 1)
             with log_timer(logger, f"llm.{self.backend}"):
                 try:
-                    return future.result(timeout=_LLM_TIMEOUT)
+                    return future.result(timeout=remaining)
                 except FuturesTimeout:
                     raise TimeoutError(
                         f"LLM ({self.backend}) did not respond within {_LLM_TIMEOUT}s timeout."

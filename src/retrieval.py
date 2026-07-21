@@ -8,6 +8,7 @@ requires.
 """
 
 import logging
+import threading
 from typing import Any
 
 import chromadb
@@ -184,23 +185,26 @@ def _bm25_cache_key(ticker_filter: str | None) -> str:
 _BM25_CACHE: dict[str, tuple] = {}
 _BM25_MAX_CACHE = 8
 _BM25_CACHE_VERSION = 0
+_BM25_CACHE_LOCK = threading.Lock()
 
 
 def flush_bm25_cache() -> None:
     """Invalidate all cached BM25 indexes. Call after index rebuild."""
     global _BM25_CACHE_VERSION
-    _BM25_CACHE_VERSION += 1
-    _BM25_CACHE.clear()
+    with _BM25_CACHE_LOCK:
+        _BM25_CACHE_VERSION += 1
+        _BM25_CACHE.clear()
     logger.info("BM25 cache flushed (version %d)", _BM25_CACHE_VERSION)
 
 
 def _get_bm25_index(cache_key: str, collection: Any) -> tuple:
-    if cache_key in _BM25_CACHE:
-        cached_version, cached_entry = _BM25_CACHE[cache_key]
-        if cached_version == _BM25_CACHE_VERSION:
-            return cached_entry
-    if len(_BM25_CACHE) >= _BM25_MAX_CACHE:
-        _BM25_CACHE.pop(next(iter(_BM25_CACHE)))
+    with _BM25_CACHE_LOCK:
+        if cache_key in _BM25_CACHE:
+            cached_version, cached_entry = _BM25_CACHE[cache_key]
+            if cached_version == _BM25_CACHE_VERSION:
+                return cached_entry
+        if len(_BM25_CACHE) >= _BM25_MAX_CACHE:
+            _BM25_CACHE.pop(next(iter(_BM25_CACHE)))
     get_kw = {}
     if cache_key != "__ALL__":
         get_kw["where"] = {"ticker": cache_key}
@@ -209,7 +213,8 @@ def _get_bm25_index(cache_key: str, collection: Any) -> tuple:
     metas = all_docs["metadatas"]
     bm25 = build_bm25(texts)
     entry = (bm25, texts, metas)
-    _BM25_CACHE[cache_key] = (_BM25_CACHE_VERSION, entry)
+    with _BM25_CACHE_LOCK:
+        _BM25_CACHE[cache_key] = (_BM25_CACHE_VERSION, entry)
     return entry
 
 

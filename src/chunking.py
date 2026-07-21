@@ -15,11 +15,14 @@ Strategy:
 """
 
 
+import functools
+
 import tiktoken
 
 _ENCODING = tiktoken.get_encoding("cl100k_base")
 
 
+@functools.lru_cache(maxsize=1024)
 def _token_len(text: str) -> int:
     return len(_ENCODING.encode(text))
 

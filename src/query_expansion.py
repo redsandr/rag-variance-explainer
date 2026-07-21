@@ -37,18 +37,35 @@ FINANCIAL_SYNONYMS = {
     "promotion": ["promotion", "promotional", "markdown", "discount", "price investment", "everyday low price"],
 }
 
+_REVERSE_INDEX: dict[str, str] = {}
+for group_name, synonyms in FINANCIAL_SYNONYMS.items():
+    for syn in synonyms:
+        _REVERSE_INDEX[syn] = group_name
+
 
 def expand_query(query: str, n_extra_terms: int | None = None) -> str:
     if n_extra_terms is None:
         n_extra_terms = config.expansion_n_terms
 
     tokens = set(query.lower().split())
+    matched_groups = set()
+    for t in tokens:
+        group = _REVERSE_INDEX.get(t)
+        if group:
+            matched_groups.add(group)
+        else:
+            for g, _syns in FINANCIAL_SYNONYMS.items():
+                if g.startswith(t) or t.startswith(g):
+                    matched_groups.add(g)
+                    break
+
     extra = []
-    for word, syns in FINANCIAL_SYNONYMS.items():
-        if any(t.startswith(word) or word.startswith(t) for t in tokens):
-            for s in syns:
-                if s not in tokens and s not in extra:
-                    extra.append(s)
+    seen = tokens | set()
+    for group in matched_groups:
+        for s in FINANCIAL_SYNONYMS[group]:
+            if s not in seen:
+                extra.append(s)
+                seen.add(s)
     return query + " " + " ".join(extra[:n_extra_terms])
 
 

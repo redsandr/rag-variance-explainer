@@ -4,6 +4,7 @@ sentence-transformers
 """
 
 import logging
+import threading
 
 from sentence_transformers import SentenceTransformer
 
@@ -12,6 +13,7 @@ logger = logging.getLogger(__name__)
 _MODEL_NAME = "nomic-ai/nomic-embed-text-v1.5"   # 768-dim
 _FALLBACK_MODEL = "all-MiniLM-L6-v2"              # 384-dim — can NOT be used for upsert
 _MODEL = None  # lazy-loaded singleton
+_MODEL_LOCK = threading.Lock()
 
 _TARGET_DIM = 768
 
@@ -19,24 +21,26 @@ _TARGET_DIM = 768
 def _get_model() -> SentenceTransformer:
     global _MODEL
     if _MODEL is None:
-        try:
-            _MODEL = SentenceTransformer(_MODEL_NAME, trust_remote_code=True, device="cpu")
-            logger.info("Loaded embedding model: %s", _MODEL_NAME)
-        except Exception as e:
-            logger.warning(
-                "Failed to load %s: %s. Falling back to %s.",
-                _MODEL_NAME, e, _FALLBACK_MODEL,
-            )
-            fallback = SentenceTransformer(_FALLBACK_MODEL, device="cpu")
-            dim = fallback.get_sentence_embedding_dimension()
-            if dim != _TARGET_DIM:
-                raise RuntimeError(
-                    f"Embedding fallback model {_FALLBACK_MODEL} has dimension {dim}, "
-                    f"but ChromaDB collection requires {_TARGET_DIM}. "
-                    f"Load {_MODEL_NAME} manually or use a {_TARGET_DIM}-dim fallback."
-                ) from e
-            _MODEL = fallback
-            logger.info("Loaded fallback embedding model: %s", _FALLBACK_MODEL)
+        with _MODEL_LOCK:
+            if _MODEL is None:
+                try:
+                    _MODEL = SentenceTransformer(_MODEL_NAME, trust_remote_code=True, device="cpu")
+                    logger.info("Loaded embedding model: %s", _MODEL_NAME)
+                except Exception as e:
+                    logger.warning(
+                        "Failed to load %s: %s. Falling back to %s.",
+                        _MODEL_NAME, e, _FALLBACK_MODEL,
+                    )
+                    fallback = SentenceTransformer(_FALLBACK_MODEL, device="cpu")
+                    dim = fallback.get_sentence_embedding_dimension()
+                    if dim != _TARGET_DIM:
+                        raise RuntimeError(
+                            f"Embedding fallback model {_FALLBACK_MODEL} has dimension {dim}, "
+                            f"but ChromaDB collection requires {_TARGET_DIM}. "
+                            f"Load {_MODEL_NAME} manually or use a {_TARGET_DIM}-dim fallback."
+                        ) from e
+                    _MODEL = fallback
+                    logger.info("Loaded fallback embedding model: %s", _FALLBACK_MODEL)
     return _MODEL
 
 

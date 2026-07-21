@@ -131,7 +131,7 @@ def answer(
         result = answer_question(question, ticker_filter=ticker)
     except Exception as exc:
         logger.exception("rag.answer failed")
-        return f"Error generating answer: {exc}"
+        raise RuntimeError(f"Error generating answer: {exc}") from exc
 
     lines = [f"# {result['question']}", "", result["answer"], "", "## Sources"]
     for i, src in enumerate(result.get("sources", []), 1):
@@ -163,7 +163,7 @@ def search(
         results = query_multi(collection, query, top_k=top_k, ticker_filter=ticker)
     except Exception as exc:
         logger.exception("rag.search failed")
-        return f"Error searching: {exc}"
+        raise RuntimeError(f"Error searching: {exc}") from exc
 
     if not results:
         return "No relevant chunks found."
