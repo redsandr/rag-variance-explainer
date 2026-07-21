@@ -1017,6 +1017,8 @@ def test_mcp_resource_stats() -> None:
     assert data.get("companies") == 7
     assert data.get("sectors") == 4
     assert len(data.get("sector_list", [])) == 4
+    # chunks/filings may be None if ChromaDB unavailable (graceful degradation)
+    assert data.get("chunks") is None or isinstance(data.get("chunks"), int)
 
 
 def test_mcp_resource_company_detail_not_found() -> None:
