@@ -8,6 +8,8 @@ import threading
 
 from sentence_transformers import SentenceTransformer
 
+from logging_config import log_timer
+
 logger = logging.getLogger(__name__)
 
 _MODEL_NAME = "nomic-ai/nomic-embed-text-v1.5"   # 768-dim
@@ -49,8 +51,6 @@ def embed_documents(texts: list[str]) -> list[list[float]]:
     Embed a batch of document chunks for indexing (e.g. MD&A chunks
     going into ChromaDB). Applies the required "search_document:" prefix.
     """
-    from logging_config import log_timer
-
     model = _get_model()
     prefixed = [f"search_document: {t}" for t in texts]
     with log_timer(logger, f"embed.{len(texts)}docs"):
@@ -64,8 +64,6 @@ def embed_query(text: str) -> list[float]:
     "search_query:" prefix — NOT the same prefix as embed_documents,
     since nomic-embed-text treats these as distinct roles.
     """
-    from logging_config import log_timer
-
     model = _get_model()
     prefixed = f"search_query: {text}"
     with log_timer(logger, "embed.query"):

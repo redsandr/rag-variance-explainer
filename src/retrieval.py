@@ -17,10 +17,11 @@ from config import config
 from cross_encoder import rerank
 from embedding import embed_documents, embed_query
 from hybrid_search import _tokenize, bm25_scores, build_bm25, rrf_merge
+from logging_config import log_timer
+from post_process import _METRIC_TRIGGERS
 from query_expansion import expand_query
 
 logger = logging.getLogger(__name__)
-
 _COLLECTION_NAME = "mda_filings"
 
 
@@ -256,8 +257,6 @@ def query_multi(
     If *cross_encoder_enabled*, final reranking refines the ranking.
     Falls back gracefully if cross-encoder is unavailable.
     """
-    from logging_config import log_timer
-
     if top_k is None:
         top_k = config.retrieval_top_k
     if min_relevance is None:
@@ -304,8 +303,6 @@ METRIC_BOOST_CONFIG = {
 
 
 def _add_metric_boost(chunks: list[dict], query: str) -> None:
-    from post_process import _METRIC_TRIGGERS
-
     query_metric_hints = []
     for trigger in _METRIC_TRIGGERS:
         if trigger.lower() in query.lower():

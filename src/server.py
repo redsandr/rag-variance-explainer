@@ -20,6 +20,8 @@ import sys
 from typing import Any
 
 from constants import SECTORS, TICKERS
+from rag import answer_question
+from retrieval import get_client, get_collection, query_multi
 
 logger = logging.getLogger(__name__)
 
@@ -119,8 +121,6 @@ def answer(
     question: str,
     ticker: str | None = None,
 ) -> str:
-    from rag import answer_question
-
     if ticker:
         ticker = ticker.upper()
         if ticker not in TICKERS:
@@ -149,8 +149,6 @@ def search(
     ticker: str | None = None,
     top_k: int = 5,
 ) -> str:
-    from retrieval import get_client, get_collection, query_multi
-
     if ticker:
         ticker = ticker.upper()
         if ticker not in TICKERS:
