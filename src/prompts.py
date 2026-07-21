@@ -1,3 +1,5 @@
+from verifier import build_format_prompt, get_structured_schema
+
 SYSTEM_PROMPT_RAG = """# Role
 You are a financial variance analyst assistant. Your ONLY source of truth is the SEC filing excerpts in the Context section below. You have no external knowledge.
 
@@ -106,3 +108,11 @@ def build_judge_prompt_compact(question: str, answer: str, sources: list[dict]) 
         context_blocks.append(f"{label}\n{text}")
     sep = "\n\n"
     return f"Question: {question}\n\nSource chunks:\n{sep.join(context_blocks) if context_blocks else '(no sources)'}\n\n---\n\nAnswer:\n{answer}"
+
+
+def build_rag_system_prompt(structured: bool = True) -> str:
+    if not structured:
+        return SYSTEM_PROMPT_RAG
+    schema = get_structured_schema()
+    fmt = build_format_prompt(schema)
+    return SYSTEM_PROMPT_RAG + fmt

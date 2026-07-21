@@ -65,6 +65,7 @@ class RAGConfig:
     build_filings_per_company: int = int(os.getenv("RAG_FILINGS_PER_COMPANY", "8"))
 
     sec_user_agent: str = os.getenv("SEC_USER_AGENT", "RAG-Variance-Explainer (sebas@portfolio.dev)")
+    structured_output_enabled: bool = os.getenv("RAG_STRUCTURED_OUTPUT_ENABLED", "true").lower() == "true"
     llm_max_tokens: int = int(os.getenv("RAG_LLM_MAX_TOKENS", "2048"))
     llm_temperature: float = float(os.getenv("RAG_LLM_TEMPERATURE", "0.1"))
 

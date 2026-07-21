@@ -11,8 +11,9 @@ from config import config
 from llm import LLMClient
 from logging_config import log_timer
 from post_process import verify_answer_llm
-from prompts import SYSTEM_PROMPT_RAG
+from prompts import build_rag_system_prompt
 from retrieval import get_client, get_collection, query_multi
+from verifier import fallback_answer, parse_answer, validate_answer
 
 logger = logging.getLogger(__name__)
 
@@ -90,8 +91,36 @@ def answer_question(
 
     if llm is None:
         llm = LLMClient()
+
+    system_prompt = build_rag_system_prompt(structured=config.structured_output_enabled)
+
     with log_timer(logger, "rag.generate"):
-        answer = llm.generate(prompt, system=SYSTEM_PROMPT_RAG, max_tokens=config.llm_max_tokens, temperature=config.llm_temperature)
+        answer = llm.generate(prompt, system=system_prompt, max_tokens=config.llm_max_tokens, temperature=config.llm_temperature)
+
+    structured_fallback = False
+    structured_failure_reason: str | None = None
+
+    if config.structured_output_enabled:
+        parsed = parse_answer(answer)
+        if parsed is not None and parsed.can_answer:
+            errors = validate_answer(parsed, results)
+            if not errors:
+                return {
+                    "question": question,
+                    "answer": parsed.answer,
+                    "sources": results,
+                    "verification_errors": [],
+                    "structured": True,
+                    "claims": [c.model_dump() for c in parsed.claims],
+                    "confidence": parsed.confidence,
+                }
+            else:
+                logger.warning("[StructuredOutput] quote validation failed: %s", errors)
+        fallback_result = fallback_answer(answer, question, results)
+        structured_fallback = True
+        structured_failure_reason = fallback_result.get("structured_failure_reason", "unknown")
+        answer = fallback_result["answer"]
+
     verification_errors = []
     try:
         issues = verify_answer_llm(answer, results, llm)
@@ -109,6 +138,8 @@ def answer_question(
         "answer": answer,
         "sources": results,
         "verification_errors": verification_errors,
+        "structured_fallback": structured_fallback,
+        "structured_failure_reason": structured_failure_reason,
     }
 
 
