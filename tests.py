@@ -752,6 +752,74 @@ def test_verify_answer_llm_with_mock() -> None:
     assert result["has_errors"] is False
 
 
+def test_find_numbers_dollar_abbrev() -> None:
+    from src.post_process import _find_numbers
+    result = _find_numbers("Revenue hit $1.2B")
+    assert len(result) == 1
+    assert result[0]["label"] == "$1.2 billion"
+    assert not result[0]["is_percent"]
+
+
+def test_find_numbers_thousand_abbrev() -> None:
+    from src.post_process import _find_numbers
+    result = _find_numbers("Saved $500K in costs")
+    assert len(result) == 1
+    assert result[0]["label"] == "$500 thousand"
+
+
+def test_find_numbers_million_abbrev() -> None:
+    from src.post_process import _find_numbers
+    result = _find_numbers("Spent $3M on marketing")
+    assert len(result) == 1
+    assert result[0]["label"] == "$3 million"
+
+
+def test_find_numbers_abbrev_lowercase() -> None:
+    from src.post_process import _find_numbers
+    result = _find_numbers("Revenue was $1.2b")
+    assert len(result) == 1
+    assert result[0]["label"] == "$1.2 billion"
+
+
+def test_find_numbers_euro_full() -> None:
+    from src.post_process import _find_numbers
+    result = _find_numbers("Revenue was \u20ac500 million")
+    assert len(result) == 1
+    assert result[0]["label"] == "\u20ac500 million"
+
+
+def test_find_numbers_euro_abbrev() -> None:
+    from src.post_process import _find_numbers
+    result = _find_numbers("Debt of \u20ac1.2B")
+    assert len(result) == 1
+    assert result[0]["label"] == "\u20ac1.2 billion"
+
+
+def test_find_numbers_pound_abbrev() -> None:
+    from src.post_process import _find_numbers
+    result = _find_numbers("Cost \u00a3500K in savings")
+    assert len(result) == 1
+    assert result[0]["label"] == "\u00a3500 thousand"
+
+
+def test_find_numbers_basis_points() -> None:
+    from src.post_process import _find_numbers
+    result = _find_numbers("Spread tightened 50 bps")
+    assert len(result) == 1
+    assert result[0]["label"] == "50.0 bps"
+    assert not result[0]["is_percent"]
+
+
+def test_find_numbers_multiple_patterns() -> None:
+    from src.post_process import _find_numbers
+    result = _find_numbers("Revenue $1.2B, margin 7.4%, debt \u20ac500M")
+    assert len(result) == 3
+    assert result[0]["label"] == "$1.2 billion"
+    assert result[1]["label"] == "7.4%"
+    assert result[2]["label"] == "\u20ac500 million"
+    assert result[1]["is_percent"]
+
+
 # --- Retrieval pipeline tests ---
 
 

@@ -5,8 +5,12 @@ from collections.abc import Sequence
 from query_expansion import FINANCIAL_SYNONYMS
 
 _NUMBER_PATTERN = re.compile(
-    r'\$(\d{1,3}(?:,\d{3})*(?:\.\d+)?)\s*(billion|million|thousand)?'
-    r'|(\d+(?:\.\d+)?)%'
+    r'\$(\d+(?:\.\d+)?)([BMKbmk])\b'  # $1.2B, $500K, $3M
+    r'|\$(\d{1,3}(?:,\d{3})*(?:\.\d+)?)\s*(billion|million|thousand)?'  # $1.2 billion, $3,072
+    r'|(\d+(?:\.\d+)?)%'  # 7.4%
+    r'|[€£](\d+(?:\.\d+)?)([BMKbmk])\b'  # €1.2B, £500K
+    r'|[€£](\d{1,3}(?:,\d{3})*(?:\.\d+)?)\s*(billion|million|thousand)?'  # €500 million
+    r'|(\d+(?:\.\d+)?)\s*bps'  # 50 bps
 )
 
 _METRIC_TRIGGERS = {
@@ -19,25 +23,61 @@ _METRIC_TRIGGERS = {
 
 
 def _tokenize(text: str) -> list[str]:
-    return re.findall(r"[A-Za-z0-9$%.',-]+", text.lower())
+    return re.findall(r"[A-Za-z0-9$%.€£',-]+", text.lower())
+
+
+_UNIT_MAP = {"B": "billion", "M": "million", "K": "thousand"}
 
 
 def _find_numbers(text: str) -> list[dict]:
     results = []
     for m in _NUMBER_PATTERN.finditer(text):
         raw = m.group(0)
-        if m.group(3):
-            num = float(m.group(3))
+        g2 = m.group(2)
+        g3 = m.group(3)
+        g4 = m.group(4)
+        g5 = m.group(5)
+        g7 = m.group(7)
+        g8 = m.group(8)
+        g9 = m.group(9)
+        g10 = m.group(10)
+
+        if g2:  # dollar abbrev: $1.2B, $500K
+            num = float(m.group(1))
+            unit = _UNIT_MAP[g2.upper()]
+            label = f"${m.group(1)} {unit}"
+            is_pct = False
+        elif g3:  # dollar full or bare: $1.2 billion, $3,072
+            num = float(g3.replace(",", ""))
+            label = f"${g3} {g4}" if g4 else f"${g3}"
+            is_pct = False
+        elif g5:  # percent: 7.4%
+            num = float(g5)
             label = f"{num}%"
+            is_pct = True
+        elif g7:  # euro/pound abbrev: €1.2B, £500K
+            num = float(m.group(6))
+            unit = _UNIT_MAP[g7.upper()]
+            currency = raw[0]
+            label = f"{currency}{m.group(6)} {unit}"
+            is_pct = False
+        elif g8:  # euro/pound full or bare: €500 million, £500
+            num = float(g8.replace(",", ""))
+            currency = raw[0]
+            label = f"{currency}{g8} {g9}" if g9 else f"{currency}{g8}"
+            is_pct = False
+        elif g10:  # basis points: 50 bps
+            num = float(g10)
+            label = f"{num} bps"
+            is_pct = False
         else:
-            num = float(m.group(1).replace(",", ""))
-            unit = m.group(2) or ""
-            label = f"${m.group(1)}{' ' + unit if unit else ''}"
+            continue
+
         results.append({
             "raw": raw,
             "label": label,
             "value": num,
-            "is_percent": bool(m.group(3)),
+            "is_percent": is_pct,
             "start": m.start(),
             "end": m.end(),
         })
@@ -81,7 +121,7 @@ def verify_answer(answer: str, sources: Sequence[dict | str]) -> dict:
             })
 
     check_phrases = [
-        (r"increased from \$?(\d+(?:\.\d+)?)", r"to \$?(\d+(?:\.\d+)?)"),
+        (r"increased from [\$€£]?(\d+(?:\.\d+)?)", r"to [\$€£]?(\d+(?:\.\d+)?)"),
     ]
     for start_pat, end_pat in check_phrases:
         for m in re.finditer(start_pat, answer_lower):
