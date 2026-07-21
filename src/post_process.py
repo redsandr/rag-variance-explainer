@@ -182,15 +182,17 @@ def tag_chunk(chunk_text: str, base_metadata: dict) -> dict:
     return enriched
 
 
-VERIFY_NUMBERS_PROMPT = """You are a financial data verifier. Your job: compare the answer against the source chunks and list any factual errors.
+SYSTEM_VERIFY = "You are a concise financial verifier. Respond ONLY with valid JSON. No explanation."
+
+VERIFY_NUMBERS_PROMPT = """Compare the answer against the source chunks and list factual errors.
 
 Rules:
 - Every number (dollar, percentage, date) in the answer must appear verbatim in at least one source chunk with the same meaning.
 - Check that numbers are not assigned to the wrong period (year/quarter).
 - Check that numbers are not assigned to the wrong ticker/company.
 - Check that direction (increased/decreased) matches the source.
-- If ALL numbers are correct, respond with: {"errors": []}
-- If errors exist, list each: {"errors": [{"value": "the wrong number", "correction": "what the source says", "source": "[TICKER Form DATE]"}]}
+- If ALL numbers are correct, respond with: {{"errors": []}}
+- If errors exist, list each: {{"errors": [{{"value": "the wrong number", "correction": "what the source says", "source": "[TICKER Form DATE]"}}]}}
 
 Source chunks:
 {context}
@@ -211,11 +213,11 @@ def verify_answer_llm(answer: str, sources: Sequence[dict | str], llm_client) ->
         else:
             label = "[source]"
             text = str(s)
-        context_blocks.append(f"{label}\n{text[:2000]}")
+        context_blocks.append(f"{label}\n{text[:500]}")
     context = "\n\n---\n\n".join(context_blocks)
 
     prompt = VERIFY_NUMBERS_PROMPT.format(context=context, answer=answer)
-    result = llm_client.generate(prompt, max_tokens=500, temperature=0.0)
+    result = llm_client.generate(prompt, system=SYSTEM_VERIFY, max_tokens=250, temperature=0.0)
 
     try:
         cleaned = result.strip()

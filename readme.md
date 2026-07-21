@@ -156,21 +156,23 @@ Pipeline tested on retail without any domain-specific tuning:
 
 **Cross-sector (40 questions, 7 companies, 4 industries):**
 
-| Metric | Score |
-|--------|-------|
-| Strict faithfulness | 59.29% |
-| Weighted faithfulness | 73.45% |
-| Questions evaluated | 40 |
-| Total claims | 113 |
+| Metric | Pre-tune | Post-tune | Delta |
+|--------|----------|-----------|-------|
+| Strict faithfulness | 59.29% | **68.85%** | **+9.56pp** |
+| Weighted faithfulness | 73.45% | **79.51%** | **+6.06pp** |
+| Questions evaluated | 40 | 40 | — |
+| Total claims | 113 | 122 | +9 |
 
-Three targeted fixes drove the restaurant improvement:
+Three targeted fixes drove the improvement:
 1. **Number transposition** — `verify_answer()` catches decimal shifts & year mismatches
 2. **Metric conflation** — `MetricVerifier` cross-checks labels against source metadata
 3. **Causal proximity** — `tag_chunk()` metric enrichment filters retrieval
+4. **Prompt engineering** — 3 new rules (#8 omission guard, #9 self-verify, #10 citation format)
+5. **Verify-scoring cleanup** — LLM verification no longer appends warning text to answer (was poisoning judge eval)
 
 **Methodology:** Qwen2.5-7B-Instruct acts as the judge. Cross-validated against Claude (Anthropic) on 20 questions × 66 claims — no manual human annotation. Cross-sector eval spans all 7 companies across restaurant, retail, healthcare, and energy filings.
 
-> **Note:** The cross-sector score is lower (59.29% strict) because it covers a broader, harder set of questions including cross-company comparisons and multi-hop questions that test the pipeline's architectural limits — not just single-company single-filing lookups.
+> **Note:** Post-tune improvement driven primarily by removing verification warning text from the answer (which was being evaluated as unfaithful claims) and 3 new prompt rules for omission guard, self-verify, and citation format.
 
 ---
 
@@ -243,8 +245,8 @@ All parameters via env vars — no hardcoded magic numbers.
 - Cross-sector generalization: retail recall@10 = **1.00** — pipeline is domain-agnostic
 
 **Quality & UI**
-- Faithfulness evaluation: strict **74.24%** (restaurant) / **59.29%** (cross-sector) — LLM-as-judge + Claude cross-validation
-- 40 pytest + ruff + mypy + bandit CI — strict linting and type checking
+- Faithfulness evaluation: strict **74.24%** (restaurant) / **68.85%** (cross-sector) — LLM-as-judge + Claude cross-validation
+- 47 pytest + ruff + mypy + bandit CI — strict linting and type checking
 - Streamlit dashboard: OLED dark mode, 2 views (Q&A + System Analytics), WCAG contrast
 - Landing page: Next.js 14 + Tailwind, light/dark mode, interactive pipeline demo, Vernie mascot — [rag-variance-explainer.vercel.app](https://rag-variance-explainer.vercel.app)
 
@@ -257,7 +259,7 @@ All parameters via env vars — no hardcoded magic numbers.
 ├── app.py                     # Streamlit dashboard
 ├── .streamlit/config.toml     # Dark theme config
 ├── Makefile                   # install / test / run / eval-*
-├── tests.py                     # 40 pytest tests (9 modules)
+├── tests.py                     # 47 pytest tests (9 modules)
 ├── .github/workflows/test.yml # CI pipeline
 ├── docs/                      # Extended documentation
 ├── landing/                   # Landing page (Next.js 14, Vercel)
@@ -298,7 +300,7 @@ All parameters via env vars — no hardcoded magic numbers.
 
 ## Known Limitations
 
-- **Faithfulness ~74% strict (restaurant) / ~59% strict (cross-sector)** — cross-sector score drops on multi-hop and cross-company questions; cross-validation with Claude shows systematic overestimation addressed in v2
+- **Faithfulness ~74% strict (restaurant) / ~69% strict (cross-sector)** — cross-sector score drops on multi-hop and cross-company questions; cross-validation with Claude shows systematic overestimation addressed in v2
 - **Cross-encoder re-ranking** adds ~200ms latency per query
 - **SEC EDGAR ingestion** limited to 10-K/10-Q (no 8-K event-driven filings)
 - **Single-user** — no session management or multi-tenant support

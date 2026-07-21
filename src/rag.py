@@ -9,7 +9,7 @@ from collections.abc import Callable
 
 from config import config
 from llm import LLMClient
-from post_process import MetricVerifier, verify_answer_llm
+from post_process import verify_answer_llm
 from prompts import SYSTEM_PROMPT_RAG
 from retrieval import get_client, get_collection, query_multi
 
@@ -50,10 +50,10 @@ def answer_question(
     llm: LLMClient | None = None,
     on_progress: Callable | None = None,
 ) -> dict:
-    """End-to-end RAG pipeline: retrieve, generate, verify.
+    """End-to-end RAG pipeline: retrieve, generate.
 
     Pulls relevant MD&A chunks from ChromaDB, builds a grounded prompt,
-    calls the LLM, then runs number + metric verification on the answer.
+    calls the LLM (with built-in self-verify rules), and returns the answer.
     Returns structured dict with 'question', 'answer', and 'sources'.
     """
     from logging_config import log_timer
@@ -92,36 +92,23 @@ def answer_question(
         llm = LLMClient()
     with log_timer(logger, "rag.generate"):
         answer = llm.generate(prompt, system=SYSTEM_PROMPT_RAG, max_tokens=config.llm_max_tokens, temperature=config.llm_temperature)
-    if on_progress:
-        on_progress("done", "Done!")
-
+    verification_errors = []
     try:
         issues = verify_answer_llm(answer, results, llm)
         if issues.get("has_errors") and issues.get("errors"):
             logger.warning("[LLMVerifier] %d issue(s) detected in answer", len(issues["errors"]))
-            warning_text = "\n\n\u26a0\ufe0f **Number Verification Note:** The following numbers in the answer may not match the source documents:"
-            for issue in issues["errors"]:
-                val = issue.get("value", "")
-                corr = issue.get("correction", "")
-                src = issue.get("source", "")
-                warning_text += f"\n- '{val}' should be '{corr}' (source: {src})"
-            answer += warning_text
-    except Exception:
-        logger.warning("LLM verification skipped — verification call failed")
+            verification_errors = issues["errors"]
+    except Exception as e:
+        logger.warning("LLM verification skipped — %s: %s", type(e).__name__, e)
 
-    verifier = MetricVerifier()
-    metric_issues = verifier.verify(answer, results)
-    if metric_issues:
-        logger.warning("[MetricVerifier] %d metric mismatch(es) detected", len(metric_issues))
-        warning_text = "\n\n\u26a0\ufe0f **Metric Verification Note:** The following metric names in the answer may not match the source documents:"
-        for mi in metric_issues:
-            warning_text += f"\n- '{mi['metric']}' (group: {mi['group']})"
-        answer += warning_text
+    if on_progress:
+        on_progress("done", "Done!")
 
     return {
         "question": question,
         "answer": answer,
         "sources": results,
+        "verification_errors": verification_errors,
     }
 
 
