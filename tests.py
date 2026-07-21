@@ -697,3 +697,90 @@ def test_answer_question_handles_verification_failure_gracefully() -> None:
 
     assert len(result["verification_errors"]) == 1
     assert "Claim not found in source" in result["verification_errors"]
+
+
+# --- Post-process / verification tests ---
+
+
+def test_verify_answer_detects_hallucinated_number() -> None:
+    from src.post_process import verify_answer
+    sources = [{"text": "Revenue grew by 5% in Q3 2025.", "metadata": {"ticker": "CMG"}}]
+    result = verify_answer("Revenue grew by 10% due to higher traffic.", sources)
+    assert result["has_issues"]
+    assert any(i["type"] == "hallucinated_number" for i in result["issues"])
+
+
+def test_verify_answer_no_issues_with_exact_match() -> None:
+    from src.post_process import verify_answer
+    sources = [{"text": "Revenue grew by 5% in Q3.", "metadata": {"ticker": "CMG"}}]
+    result = verify_answer("Revenue grew by 5% in Q3.", sources)
+    assert not result["has_issues"]
+
+
+def test_verify_answer_empty_sources() -> None:
+    from src.post_process import verify_answer
+    result = verify_answer("Revenue grew by 10%.", [])
+    assert result["has_issues"]
+    assert len(result["issues"]) == 1
+
+
+def test_tag_chunk_adds_metadata() -> None:
+    from src.post_process import tag_chunk
+    text = "Revenue increased 5% to $1.2 billion"
+    base = {"ticker": "CMG", "form": "10-Q", "filing_date": "2026-03-31"}
+    tagged = tag_chunk(text, base)
+    assert tagged["ticker"] == "CMG"
+    assert tagged["metric"] is not None
+    assert "chunk_id" not in tagged
+
+
+def test_tag_chunk_general_metric() -> None:
+    from src.post_process import tag_chunk
+    text = "Forward-looking statements could be affected"
+    tagged = tag_chunk(text, {"ticker": "DRI"})
+    assert tagged["metric"] == "general"
+    assert tagged["metric_confidence"] == 0
+
+
+def test_verify_answer_llm_with_mock() -> None:
+    from unittest.mock import MagicMock
+    from src.post_process import verify_answer_llm
+    mock_llm = MagicMock()
+    mock_llm.generate.return_value = '{"has_errors": false, "errors": []}'
+    sources = [{"text": "Costs decreased.", "metadata": {"ticker": "DRI"}}]
+    result = verify_answer_llm("Costs decreased.", sources, mock_llm)
+    assert result["has_errors"] is False
+
+
+# --- Retrieval pipeline tests ---
+
+
+def test_query_multi_with_mocked_chromadb() -> None:
+    from unittest.mock import patch, MagicMock
+    from src.retrieval import query_multi
+
+    mock_result = {
+        "text": "Revenue grew 5%.",
+        "metadata": {"ticker": "CMG", "form": "10-Q", "filing_date": "2026-03-31"},
+        "relevance": 0.85,
+    }
+
+    with (
+        patch("src.retrieval._retrieve_dense", return_value=[mock_result]),
+        patch("src.retrieval._retrieve_bm25", return_value=[]),
+        patch("src.retrieval.rrf_merge", return_value=[mock_result]),
+        patch("src.retrieval.rerank", return_value=[mock_result]),
+        patch("src.retrieval._add_metric_boost"),
+    ):
+        results = query_multi(MagicMock(), "revenue growth", top_k=5)
+
+    assert len(results) > 0
+    assert results[0]["text"] == "Revenue grew 5%."
+    assert results[0]["metadata"]["ticker"] == "CMG"
+
+
+def test_mcp_server_tool_rag_search_invalid_ticker() -> None:
+    from src.server import search
+    result = search(query="revenue growth", ticker="INVALID")
+    assert "Error" in result
+    assert "ticker" in result.lower()
