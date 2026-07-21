@@ -826,3 +826,14 @@ def test_mcp_resource_company_questions() -> None:
     assert data["ticker"] == "CMG"
     assert len(data["questions"]) == 3
     assert "revenue" in data["questions"][0].lower()
+
+
+# --- HTML escape tests ---
+
+
+def test_html_escape_escapes_special_chars() -> None:
+    import importlib, app as _app_mod
+    importlib.reload(_app_mod)
+    from app import _html_escape
+    assert _html_escape("<script>alert('xss')</script>") == "&lt;script&gt;alert(&#x27;xss&#x27;)&lt;/script&gt;"
+    assert _html_escape('"&') == "&quot;&amp;"

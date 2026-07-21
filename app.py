@@ -10,6 +10,18 @@ from llm import LLMClient
 from rag import answer_question, sanitize_input
 from retrieval import get_client, get_collection
 
+_HTML_ESCAPE_TABLE = str.maketrans({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#x27;",
+})
+
+
+def _html_escape(text: str) -> str:
+    return text.translate(_HTML_ESCAPE_TABLE)
+
 st.set_page_config(
     page_title="RAG Variance Explainer",
     page_icon="\U0001f4ca",
@@ -503,7 +515,7 @@ with main_col:
                 f'<span class="date-tag">{meta["filing_date"]}</span>'
                 f'<span class="score-tag {score_cls}">{_score_icon(score)} {score:.2f}</span>'
                 f'</div>'
-                f'<div class="chunk-text">{text_preview}</div>'
+                f'<div class="chunk-text">{_html_escape(text_preview)}</div>'
                 f'</div>',
                 unsafe_allow_html=True,
             )
@@ -515,7 +527,7 @@ with main_col:
             f'<div class="answer-card">'
             f'<div class="answer-head"><h3>{label}</h3>'
             f'<span class="{badge_cls}">sourced</span></div>'
-            f'<div class="answer-body">{answer_text}</div>'
+            f'<div class="answer-body">{_html_escape(answer_text)}</div>'
             f'</div>',
             unsafe_allow_html=True,
         )
