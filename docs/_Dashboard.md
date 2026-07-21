@@ -59,6 +59,8 @@ Project 2/
 | CI | pytest --cov-fail-under=65 + mypy + ruff + bandit |
 | Coverage | **65%** (gate 65% ✅) |
 | Code quality | ruff (0) + mypy (0) + bandit (0) — pre-commit hooks |
+| Phase A — Surface Strategy | ✅ Complete (MCP + REST + Agent Skills) |
+| Phase B — Platform Evolution | 🟡 Planning — see [[_planning/07. Roadmap & Execution Plan]] |
 | Model | Qwen2.5-7B-Instruct Q4_K.M (llama.cpp, 120s timeout) |
 | Landing page | Next.js 14 + Tailwind, Vercel: [rag-variance-explainer.vercel.app](https://rag-variance-explainer.vercel.app) |
 
@@ -120,9 +122,10 @@ Bingung mulai dari mana?  → _Dashboard.md (ini)
 | **Retail recall** | **WMT recall@10 = 1.00**, **TGT recall@10 = 1.00** — zero degradation |
 | **Overall recall** | **recall@10 = 0.81**, **MRR = 0.54** — 0 retrieval gaps |
 | **Code quality** | ruff (0) + mypy (0) + bandit (0) — **111** tests ✅ |
-| **Target berikut** | Blog publish → MCP Server enhancements → Deploy live demo |
+| **Target berikut** | Sprint 1: Table-aware chunking + numeric verifier → Session management → Blog publish |
 | **Phase A complete** | MCP Server (`src/server.py`), REST API (`src/api.py`), Agent Skills (`.opencode/skills/`, `.cursor/rules/`, `CLAUDE.md`) |
-| **Phase 3 complete** | All 4 hardening items done (15-18): unsafe_allow_html audit, delayed imports, regex expansion, build index checkpointing |
+| **Phase 3 complete** | All 4 hardening items (15-18): unsafe_allow_html audit, delayed imports, regex expansion, build index checkpointing |
+| **Phase B planned** | See [[_planning/07. Roadmap & Execution Plan#Phase B — Platform Evolution]] |
 | **Coverage** | **65%** (gate 65% ✅) — 111 tests total |
 
 ---

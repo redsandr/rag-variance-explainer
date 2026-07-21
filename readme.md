@@ -300,17 +300,17 @@ All parameters via env vars — no hardcoded magic numbers.
 
 ## Known Limitations
 
-- **Faithfulness ~74% strict (restaurant) / ~69% strict (cross-sector)** — cross-sector score drops on multi-hop and cross-company questions; cross-validation with Claude shows systematic overestimation addressed in v2
+- **Faithfulness ~69% strict / ~79% weighted (cross-sector, seed=42)** — systematic prompt improvements needed; cross-company and arithmetic questions remain hardest
 - **Cross-encoder re-ranking** adds ~200ms latency per query
 - **SEC EDGAR ingestion** limited to 10-K/10-Q (no 8-K event-driven filings)
 - **Single-user** — no session management or multi-tenant support
-- **English only** — financial documents and queries in English
+- **English only** — currently supports only English financial documents
 
 ---
 
 ## CI
 
-GitHub Actions runs `pytest tests.py -v` on every push and PR (Ubuntu, Python 3.11). Also runs `ruff check`, `mypy src/`, `bandit -r src/`.
+GitHub Actions runs `pytest tests.py -v --cov=src --cov-fail-under=65` on every push and PR (Ubuntu, Python 3.11). Also runs `ruff check`, `mypy src/`, `bandit -r src/`. **111 tests, 65% coverage** ✅.
 
 ---
 
