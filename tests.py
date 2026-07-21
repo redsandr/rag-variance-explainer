@@ -694,6 +694,54 @@ def test_config_validation_rejects_non_positive_int() -> None:
         RAGConfig(retrieval_n_candidates=-1)
 
 
+# --- Embedding / fallback tests ---
+
+
+def test_embedding_fallback_raises_on_dim_mismatch() -> None:
+    from unittest.mock import patch, MagicMock
+    import src.embedding as emb
+    import pytest
+
+    emb._MODEL = None
+    mock_fallback = MagicMock()
+    mock_fallback.get_sentence_embedding_dimension.return_value = 384
+
+    def _fake_load(model_name, **kw):
+        if "nomic" in model_name:
+            raise OSError(f"cannot load {model_name}")
+        return mock_fallback
+
+    with patch("src.embedding.SentenceTransformer", side_effect=_fake_load):
+        with pytest.raises(RuntimeError, match="dimension"):
+            emb._get_model()
+    emb._MODEL = None
+
+
+def test_embedding_successful_load() -> None:
+    from unittest.mock import patch, MagicMock
+    import src.embedding as emb
+
+    emb._MODEL = None
+    mock_model = MagicMock()
+    mock_model.get_sentence_embedding_dimension.return_value = 768
+
+    with patch("src.embedding.SentenceTransformer", return_value=mock_model):
+        model = emb._get_model()
+        assert model is not None
+    emb._MODEL = None
+
+
+# --- .format() crash fix test ---
+
+
+def test_verify_prompt_handles_curly_braces() -> None:
+    from src.post_process import verify_answer
+    sources = [{"text": "Cost: {variable} in Q3."}]
+    result = verify_answer("Cost was 5%.", sources)
+    assert isinstance(result, dict)
+    assert "issues" in result
+
+
 # --- Integration tests ---
 
 
@@ -906,6 +954,85 @@ def test_find_numbers_multiple_patterns() -> None:
 # --- Retrieval pipeline tests ---
 
 
+def test_rrf_merge_empty_dense() -> None:
+    from src.hybrid_search import rrf_merge
+    result = rrf_merge([], [], top_k=5, k=60)
+    assert result == []
+
+
+def test_rrf_merge_deduplicates() -> None:
+    from src.hybrid_search import rrf_merge
+    item_a = {"text": "A"}
+    item_b = {"text": "B"}
+    result = rrf_merge([item_a, item_b], [item_b, item_a], top_k=5, k=60)
+    assert len(result) == 2
+    assert result[0]["text"] == "A"
+    assert result[1]["text"] == "B"
+
+
+def test_forward_looking_penalty_none() -> None:
+    from src.retrieval import _forward_looking_penalty
+    score = _forward_looking_penalty("Revenue grew 5% last quarter.")
+    assert score == 0.0
+
+
+def test_forward_looking_penalty_single() -> None:
+    from src.retrieval import _forward_looking_penalty
+    score = _forward_looking_penalty("This includes forward-looking statements.")
+    assert score < 0
+
+
+def test_forward_looking_penalty_double() -> None:
+    from src.retrieval import _forward_looking_penalty
+    score = _forward_looking_penalty(
+        "forward-looking statements. No assurance these results."
+    )
+    assert score < 0
+    assert score < _forward_looking_penalty("forward-looking statements.")
+
+
+def test_add_metric_boost_matches() -> None:
+    from src.retrieval import _add_metric_boost
+    chunks = [
+        {"metadata": {"metric": "revenue"}, "text": "Revenue grew."},
+        {"metadata": {"metric": "general"}, "text": "Other."},
+    ]
+    _add_metric_boost(chunks, "How was revenue?")
+    assert chunks[0].get("metric_boost", 0) > 0
+    assert chunks[1].get("metric_boost", 0) == 0.0
+
+
+def test_add_metric_boost_no_match() -> None:
+    from src.retrieval import _add_metric_boost
+    chunks = [{"metadata": {"metric": "revenue"}, "text": "Revenue grew."}]
+    _add_metric_boost(chunks, "How is the weather?")
+    assert chunks[0].get("metric_boost", 0) == 0.0
+
+
+def test_mcp_resource_stats() -> None:
+    from src.server import stats_resource
+    import json
+    data = json.loads(stats_resource())
+    assert isinstance(data, dict)
+    assert data.get("companies") == 7
+    assert data.get("sectors") == 4
+    assert len(data.get("sector_list", [])) == 4
+
+
+def test_mcp_resource_company_detail_not_found() -> None:
+    from src.server import company_resource
+    import json
+    result = json.loads(company_resource("INVALID"))
+    assert "error" in result
+
+
+def test_mcp_resource_company_questions_not_found() -> None:
+    from src.server import company_questions_resource
+    import json
+    result = json.loads(company_questions_resource("INVALID"))
+    assert "error" in result
+
+
 def test_query_multi_with_mocked_chromadb() -> None:
     from unittest.mock import patch, MagicMock
     from src.retrieval import query_multi
@@ -932,9 +1059,36 @@ def test_query_multi_with_mocked_chromadb() -> None:
 
 def test_mcp_server_tool_rag_search_invalid_ticker() -> None:
     from src.server import search
-    result = search(query="revenue growth", ticker="INVALID")
-    assert "Error" in result
-    assert "ticker" in result.lower()
+    from mcp.server.fastmcp.exceptions import ToolError
+    try:
+        search(query="revenue growth", ticker="INVALID")
+        assert False, "Expected ToolError"
+    except ToolError as e:
+        msg = str(e)
+        assert "Unknown ticker" in msg
+        assert "INVALID" in msg
+
+
+def test_mcp_server_tool_rag_answer_invalid_ticker() -> None:
+    from src.server import answer
+    from mcp.server.fastmcp.exceptions import ToolError
+    try:
+        answer(question="How was revenue?", ticker="INVALID")
+        assert False, "Expected ToolError"
+    except ToolError as e:
+        msg = str(e)
+        assert "Unknown ticker" in msg
+
+
+def test_mcp_server_tool_list_questions_invalid_ticker() -> None:
+    from src.server import list_questions
+    from mcp.server.fastmcp.exceptions import ToolError
+    try:
+        list_questions(ticker="INVALID")
+        assert False, "Expected ToolError"
+    except ToolError as e:
+        msg = str(e)
+        assert "Unknown ticker" in msg
 
 
 # --- MCP Resource tests ---

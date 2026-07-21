@@ -27,9 +27,13 @@ logger = logging.getLogger(__name__)
 
 try:
     from mcp.server.fastmcp import FastMCP
+    from mcp.server.fastmcp.exceptions import ToolError
     _MCP_AVAILABLE = True
 except ImportError:
     _MCP_AVAILABLE = False
+
+    class ToolError(RuntimeError):  # type: ignore[no-redef]
+        pass
 
 mcp: Any
 
@@ -125,13 +129,13 @@ def answer(
         ticker = ticker.upper()
         if ticker not in TICKERS:
             available = ", ".join(sorted(TICKERS))
-            return f"Error: ticker '{ticker}' not found. Available: {available}"
+            raise ToolError(f"Unknown ticker '{ticker}'. Available: {available}")
 
     try:
         result = answer_question(question, ticker_filter=ticker)
     except Exception as exc:
         logger.exception("rag.answer failed")
-        raise RuntimeError(f"Error generating answer: {exc}") from exc
+        raise ToolError(f"Error generating answer: {exc}") from exc
 
     lines = [f"# {result['question']}", "", result["answer"], "", "## Sources"]
     for i, src in enumerate(result.get("sources", []), 1):
@@ -153,7 +157,7 @@ def search(
         ticker = ticker.upper()
         if ticker not in TICKERS:
             available = ", ".join(sorted(TICKERS))
-            return f"Error: ticker '{ticker}' not found. Available: {available}"
+            raise ToolError(f"Unknown ticker '{ticker}'. Available: {available}")
 
     try:
         client = get_client()
@@ -212,7 +216,7 @@ def list_questions(ticker: str | None = None) -> str:
                 lines.append(f"- {q}")
             return "\n".join(lines)
         available = ", ".join(sorted(TICKERS)) + ", ALL"
-        return f"Error: ticker '{ticker}' not found. Available: {available}"
+        raise ToolError(f"Unknown ticker '{ticker}'. Available: {available}")
     qs = _GENERIC_QUESTIONS
     lines = ["## Suggested Questions (Cross-company)\n"]
     for i, q in enumerate(qs, 1):
