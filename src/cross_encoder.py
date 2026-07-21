@@ -44,7 +44,7 @@ def rerank(query: str, candidates: list[dict], top_k: int = 5) -> list[dict]:
 
     model = _get_model()
     pairs = [[query, c["text"]] for c in candidates]
-    scores = model.predict(pairs, batch_size=config.cross_encoder_batch_size, show_progress_bar=False)
+    scores = model.predict(pairs, batch_size=config.cross_encoder_batch_size, show_progress_bar=False)  # type: ignore[arg-type]
 
     for i, score in enumerate(scores):
         candidates[i]["cross_encoder_score"] = float(score)
