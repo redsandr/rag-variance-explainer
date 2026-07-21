@@ -1,8 +1,15 @@
 """
 End-to-end pipeline: fetch filings -> extract MD&A -> chunk -> embed & store.
+
+Supports incremental builds via a checkpoint file (.build_checkpoint.json).
+Run with --rebuild to start fresh.
 """
 
+import argparse
+import contextlib
+import json
 import logging
+import os
 
 from chunking import chunk_document
 from config import config
@@ -18,13 +25,40 @@ from retrieval import add_chunks, delete_chunks_for_filing, flush_bm25_cache, ge
 
 logger = logging.getLogger(__name__)
 
+_CHECKPOINT_FILE = ".build_checkpoint.json"
 
-def build_index() -> None:
+
+def _load_checkpoint() -> set[tuple[str, str]]:
+    try:
+        with open(_CHECKPOINT_FILE) as f:
+            data = json.load(f)
+        return {tuple(item) for item in data.get("processed", [])}
+    except (FileNotFoundError, json.JSONDecodeError):
+        return set()
+
+
+def _save_checkpoint(processed: set[tuple[str, str]]) -> None:
+    with open(_CHECKPOINT_FILE, "w") as f:
+        json.dump({"processed": sorted(list(processed))}, f)
+
+
+def _clear_checkpoint() -> None:
+    with contextlib.suppress(FileNotFoundError):
+        os.remove(_CHECKPOINT_FILE)
+
+
+def build_index(rebuild: bool = False) -> None:
+    if rebuild:
+        _clear_checkpoint()
+        logger.info("Rebuild requested — cleared checkpoint file")
+
     client = get_client()
     collection = get_collection(client)
 
+    processed = _load_checkpoint()
     total_chunks_indexed = 0
     failures = []
+    newly_processed = set(processed)
 
     for ticker in TICKERS:
         logger.info("=== %s ===", ticker)
@@ -44,6 +78,10 @@ def build_index() -> None:
             accession = filing["accessionNumber"]
             form = filing["form"]
             filing_date = filing["filingDate"]
+
+            if (ticker, accession) in processed:
+                logger.debug("  SKIP %s %s — already indexed", form, filing_date)
+                continue
 
             try:
                 mda_text = get_mda_for_filing(
@@ -75,6 +113,9 @@ def build_index() -> None:
                     metadatas=enriched_metadatas,
                 )
 
+                newly_processed.add((ticker, accession))
+                _save_checkpoint(newly_processed)
+
                 logger.info("  OK %s %s - %s chunks", form, filing_date, len(chunks))
                 total_chunks_indexed += len(chunks)
 
@@ -82,8 +123,11 @@ def build_index() -> None:
                 logger.error("  FAIL %s %s - FAILED: %s", form, filing_date, e)
                 failures.append((ticker, accession, form, filing_date, str(e)))
 
+    if newly_processed and not failures:
+        logger.info("=== Build complete — checkpoint file at %s ===", _CHECKPOINT_FILE)
+
     logger.info("%s", "=" * 50)
-    logger.info("Total chunks indexed: %s", total_chunks_indexed)
+    logger.info("Total chunks indexed (this run): %s", total_chunks_indexed)
     logger.info("Failures: %s", len(failures))
     if failures:
         logger.warning("Failed filings (review these before assuming full coverage):")
@@ -95,5 +139,9 @@ def build_index() -> None:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Build RAG index from SEC filings")
+    parser.add_argument("--rebuild", action="store_true", help="Clear checkpoint and rebuild from scratch")
+    args = parser.parse_args()
+
     logging.basicConfig(level=logging.INFO, format="%(message)s")
-    build_index()
+    build_index(rebuild=args.rebuild)

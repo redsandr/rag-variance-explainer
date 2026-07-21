@@ -359,6 +359,89 @@ def test_build_index_empty_db_handles_gracefully() -> None:
         bi.build_index()
 
 
+def test_checkpoint_load_missing_file(tmp_path) -> None:
+    import src.build_index as bi
+    orig = bi._CHECKPOINT_FILE
+    try:
+        bi._CHECKPOINT_FILE = str(tmp_path / "nope.json")
+        assert bi._load_checkpoint() == set()
+    finally:
+        bi._CHECKPOINT_FILE = orig
+
+
+def test_checkpoint_load_invalid_json(tmp_path) -> None:
+    import src.build_index as bi
+    path = tmp_path / "bad.json"
+    path.write_text("not json")
+    orig = bi._CHECKPOINT_FILE
+    try:
+        bi._CHECKPOINT_FILE = str(path)
+        assert bi._load_checkpoint() == set()
+    finally:
+        bi._CHECKPOINT_FILE = orig
+
+
+def test_checkpoint_roundtrip(tmp_path) -> None:
+    import src.build_index as bi
+    path = tmp_path / "ckpt.json"
+    orig = bi._CHECKPOINT_FILE
+    try:
+        bi._CHECKPOINT_FILE = str(path)
+        data = {("CMG", "acc-1"), ("DRI", "acc-2")}
+        bi._save_checkpoint(data)
+        assert bi._load_checkpoint() == data
+    finally:
+        bi._CHECKPOINT_FILE = orig
+
+
+def test_checkpoint_clear(tmp_path) -> None:
+    import src.build_index as bi
+    path = tmp_path / "ckpt.json"
+    path.write_text('{"processed": []}')
+    orig = bi._CHECKPOINT_FILE
+    try:
+        bi._CHECKPOINT_FILE = str(path)
+        assert path.exists()
+        bi._clear_checkpoint()
+        assert not path.exists()
+    finally:
+        bi._CHECKPOINT_FILE = orig
+
+
+def test_build_index_skips_processed_filing(tmp_path) -> None:
+    from unittest.mock import patch, MagicMock
+    import src.build_index as bi
+
+    path = tmp_path / "ckpt.json"
+    path.write_text('{"processed": [["CMG", "acc-1"]]}')
+    orig_ckpt = bi._CHECKPOINT_FILE
+
+    mock_filing = {
+        "accessionNumber": "acc-1",
+        "form": "10-K",
+        "filingDate": "2025-01-01",
+        "primaryDocument": "doc.htm",
+    }
+
+    try:
+        bi._CHECKPOINT_FILE = str(path)
+
+        with (
+            patch("src.build_index.get_client") as mock_client,
+            patch("src.build_index.get_collection") as mock_collection,
+            patch("src.build_index.TICKERS", {"CMG": "0001000"}),
+            patch("src.build_index.get_cik", return_value="0001000"),
+            patch("src.build_index.fetch_submissions", return_value=MagicMock()),
+            patch("src.build_index.list_10k_10q_filings", return_value=[mock_filing]),
+        ):
+            bi.build_index()
+
+        # checkpoint unchanged — no new entries added
+        assert bi._load_checkpoint() == {("CMG", "acc-1")}
+    finally:
+        bi._CHECKPOINT_FILE = orig_ckpt
+
+
 # --- API behavior tests ---
 
 def test_api_root_returns_service_info() -> None:
