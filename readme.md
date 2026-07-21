@@ -221,6 +221,7 @@ All parameters via env vars — no hardcoded magic numbers.
 | `RAG_TOP_K` | `5` | Final chunks returned to LLM |
 | `RAG_EXPANSION_N_TERMS` | `5` | Synonym count per query |
 | `RAG_FORWARD_LOOKING_PENALTY_ENABLED` | `true` | Penalize risk-factor chunks |
+| `RAG_STRUCTURED_OUTPUT_ENABLED` | `true` | Pydantic-grounded structured output + quote validation |
 | `RAG_LLM_MAX_TOKENS` | `2048` | Max generation tokens |
 | `RAG_LLM_TEMPERATURE` | `0.1` | Generation temperature |
 
@@ -229,7 +230,9 @@ All parameters via env vars — no hardcoded magic numbers.
 ## Features
 
 **Pipeline & Retrieval**
-- RAG pipeline: query expansion (35 synonym groups) → ChromaDB retrieval → cross-encoder re-ranking → grounded LLM generation
+- RAG pipeline: query expansion (35 synonym groups) → ChromaDB retrieval → cross-encoder re-ranking → **structured LLM generation** → **Pydantic-validated answer**
+- **Structured output** — Pydantic `StructuredAnswer` with atomic claims, verbatim source quotes, confidence score, and explicit refusal channel
+- **Quote validation** — every claim's `source_quote` checked verbatim against source chunks; invalid answers rejected and gracefully degraded
 - Cross-encoder re-ranking (`MiniLM-L-6-v2`) with hybrid scoring and configurable weight blend
 - BM25 LRU caching per ticker — 30-50% query latency improvement
 - Financial glossary: 35 synonym groups across restaurant, retail, healthcare, energy
@@ -246,7 +249,8 @@ All parameters via env vars — no hardcoded magic numbers.
 
 **Quality & UI**
 - Faithfulness evaluation: strict **74.24%** (restaurant) / **68.85%** (cross-sector) — LLM-as-judge + Claude cross-validation
-- 47 pytest + ruff + mypy + bandit CI — strict linting and type checking
+- **Structured output** — Pydantic-grounded answers with verbatim quote validation; falls back gracefully to free-text if schema validation fails
+- 111 pytest + ruff + mypy + bandit CI — strict linting and type checking
 - Streamlit dashboard: OLED dark mode, 2 views (Q&A + System Analytics), WCAG contrast
 - Landing page: Next.js 14 + Tailwind, light/dark mode, interactive pipeline demo, Vernie mascot — [rag-variance-explainer.vercel.app](https://rag-variance-explainer.vercel.app)
 
@@ -259,7 +263,7 @@ All parameters via env vars — no hardcoded magic numbers.
 ├── app.py                     # Streamlit dashboard
 ├── .streamlit/config.toml     # Dark theme config
 ├── Makefile                   # install / test / run / eval-*
-├── tests.py                     # 47 pytest tests (9 modules)
+├── tests.py                     # 111 pytest tests (all modules)
 ├── .github/workflows/test.yml # CI pipeline
 ├── docs/                      # Extended documentation
 ├── landing/                   # Landing page (Next.js 14, Vercel)
@@ -274,7 +278,7 @@ All parameters via env vars — no hardcoded magic numbers.
 │   ├── prompts.py             # RAG prompt + judge prompts
 │   ├── styles.css             # Dashboard stylesheet
 │   ├── logging_config.py      # Shared logging setup
-│   ├── ingest.py              # SEC EDGAR fetcher
+│   ├── verifier.py            # Pydantic structured output + quote validation
 │   ├── embedding.py           # nomic-embed wrapper
 │   ├── chunking.py            # Structure-aware chunking
 │   ├── build_index.py         # End-to-end index pipeline
@@ -290,6 +294,9 @@ All parameters via env vars — no hardcoded magic numbers.
 
 ## Roadmap
 
+- [x] **Structured output** — Pydantic-grounded answers with quote validation (Phase 1 ✅)
+- [ ] Claim decomposition + NLI per-claim verification (Phase 2)
+- [ ] Program-of-Thought arithmetic (Phase 3)
 - [ ] International filings (IFRS-based financials)
 - [ ] Multi-turn conversational memory
 - [ ] Docker deployment (single-command setup)
@@ -310,7 +317,7 @@ All parameters via env vars — no hardcoded magic numbers.
 
 ## CI
 
-GitHub Actions runs `pytest tests.py -v --cov=src --cov-fail-under=65` on every push and PR (Ubuntu, Python 3.11). Also runs `ruff check`, `mypy src/`, `bandit -r src/`. **111 tests, 65% coverage** ✅.
+GitHub Actions runs `pytest tests.py -v --cov=src --cov-fail-under=65` on every push and PR (Ubuntu, Python 3.11). Also runs `ruff check`, `mypy src/`, `bandit -r src/`. **111 tests, 65% coverage** ✅. Structured output linted and type-checked — ruff 0, mypy 0.
 
 ---
 
