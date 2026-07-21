@@ -95,16 +95,19 @@ def answer_question(
     if on_progress:
         on_progress("done", "Done!")
 
-    issues = verify_answer_llm(answer, results, llm)
-    if issues["has_errors"]:
-        logger.warning("[LLMVerifier] %d issue(s) detected in answer", len(issues["errors"]))
-        warning_text = "\n\n\u26a0\ufe0f **Number Verification Note:** The following numbers in the answer may not match the source documents:"
-        for issue in issues["errors"]:
-            val = issue.get("value", "")
-            corr = issue.get("correction", "")
-            src = issue.get("source", "")
-            warning_text += f"\n- '{val}' should be '{corr}' (source: {src})"
-        answer += warning_text
+    try:
+        issues = verify_answer_llm(answer, results, llm)
+        if issues.get("has_errors") and issues.get("errors"):
+            logger.warning("[LLMVerifier] %d issue(s) detected in answer", len(issues["errors"]))
+            warning_text = "\n\n\u26a0\ufe0f **Number Verification Note:** The following numbers in the answer may not match the source documents:"
+            for issue in issues["errors"]:
+                val = issue.get("value", "")
+                corr = issue.get("correction", "")
+                src = issue.get("source", "")
+                warning_text += f"\n- '{val}' should be '{corr}' (source: {src})"
+            answer += warning_text
+    except Exception:
+        logger.warning("LLM verification skipped — verification call failed")
 
     verifier = MetricVerifier()
     metric_issues = verifier.verify(answer, results)

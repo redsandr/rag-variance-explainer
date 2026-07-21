@@ -222,7 +222,11 @@ def verify_answer_llm(answer: str, sources: Sequence[dict | str], llm_client) ->
         if cleaned.startswith("```"):
             cleaned = cleaned.split("\n", 1)[1].rsplit("```", 1)[0]
         data = json.loads(cleaned)
+        if not isinstance(data, dict):
+            return {"errors": [], "has_errors": False}
         errors = data.get("errors", [])
+        if not isinstance(errors, list):
+            return {"errors": [], "has_errors": False}
         return {"errors": errors, "has_errors": len(errors) > 0}
-    except (json.JSONDecodeError, KeyError):
+    except (json.JSONDecodeError, KeyError, AttributeError, TypeError):
         return {"errors": [], "has_errors": False}
