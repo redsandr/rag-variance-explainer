@@ -359,8 +359,7 @@ def test_build_index_empty_db_handles_gracefully() -> None:
         bi.build_index()
 
 
-# --- API tests ---
-
+# --- API behavior tests ---
 
 def test_api_root_returns_service_info() -> None:
     from src.api import app
@@ -388,3 +387,131 @@ def test_api_health_endpoint() -> None:
             assert "GET" in route.methods
             return
     raise AssertionError("GET /health route not found")
+
+
+def test_api_search_returns_results() -> None:
+    from unittest.mock import patch, MagicMock
+    from src.api import app
+    from fastapi.testclient import TestClient
+
+    client = TestClient(app)
+    mock_result = {
+        "text": "Marketing expense decreased due to lower ad spend.",
+        "metadata": {"ticker": "DRI", "form": "10-Q", "filing_date": "2026-03-27"},
+        "hybrid_score": 0.87,
+    }
+    with (
+        patch("src.api.get_client"),
+        patch("src.api.get_collection"),
+        patch("src.api.query_multi", return_value=[mock_result]),
+    ):
+        resp = client.post("/search", json={"query": "marketing costs", "top_k": 3})
+
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["query"] == "marketing costs"
+    assert len(data["results"]) == 1
+    assert data["results"][0]["ticker"] == "DRI"
+    assert "elapsed_seconds" in data
+
+
+def test_api_search_validates_ticker() -> None:
+    from unittest.mock import patch
+    from src.api import app
+    from fastapi.testclient import TestClient
+
+    client = TestClient(app)
+    with (
+        patch("src.api.get_client"),
+        patch("src.api.get_collection"),
+        patch("src.api.query_multi"),
+    ):
+        resp = client.post("/search", json={"query": "test", "ticker": "INVALID"})
+
+    assert resp.status_code == 404
+    assert "Unknown ticker" in resp.json()["detail"]
+
+
+def test_api_answer_returns_answer() -> None:
+    from unittest.mock import patch, MagicMock
+    from src.api import app
+    from fastapi.testclient import TestClient
+
+    client = TestClient(app)
+    mock_result = {
+        "question": "Why did marketing costs change?",
+        "answer": "Marketing costs decreased due to lower ad spend.",
+        "sources": [
+            {
+                "text": "Marketing expense decreased.",
+                "metadata": {"ticker": "DRI", "form": "10-Q", "filing_date": "2026-03-27"},
+                "hybrid_score": 0.87,
+            }
+        ],
+        "verification_errors": [],
+    }
+    with patch("src.api.answer_question", return_value=mock_result):
+        resp = client.post("/answer", json={"question": "Why did marketing costs change?"})
+
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["question"] == "Why did marketing costs change?"
+    assert data["answer"] == mock_result["answer"]
+    assert data["source_count"] == 1
+    assert "elapsed_seconds" in data
+
+
+def test_api_answer_rejects_empty_question() -> None:
+    from src.api import app
+    from fastapi.testclient import TestClient
+
+    client = TestClient(app)
+    resp = client.post("/answer", json={"question": ""})
+    assert resp.status_code == 422
+
+
+def test_api_answer_handles_llm_failure() -> None:
+    from unittest.mock import patch
+    from src.api import app
+    from fastapi.testclient import TestClient
+
+    client = TestClient(app)
+    with patch("src.api.answer_question", side_effect=RuntimeError("LLM unavailable")):
+        resp = client.post("/answer", json={"question": "Why did costs change?"})
+
+    assert resp.status_code == 500
+    assert "LLM unavailable" in resp.json()["detail"]
+
+
+def test_api_search_empty_query_rejected() -> None:
+    from src.api import app
+    from fastapi.testclient import TestClient
+
+    client = TestClient(app)
+    resp = client.post("/search", json={"query": ""})
+    assert resp.status_code == 422
+
+
+def test_api_companies_get_returns_list() -> None:
+    from unittest.mock import patch
+    from src.api import app
+    from fastapi.testclient import TestClient
+
+    client = TestClient(app)
+    resp = client.get("/companies")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "companies" in data
+    assert len(data["companies"]) == 7
+    assert data["companies"][0]["ticker"] == "CBRL"
+    assert "sector" in data["companies"][0]
+
+
+def test_api_health_returns_ok() -> None:
+    from src.api import app
+    from fastapi.testclient import TestClient
+
+    client = TestClient(app)
+    resp = client.get("/health")
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "ok"
