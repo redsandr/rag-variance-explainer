@@ -49,11 +49,15 @@ Project 2/
 | Phase A.2 — REST API | ✅ Complete (`src/api.py`, FastAPI 5 endpoints) |
 | Phase A.3 — Agent Skills | ✅ Complete (opencode skill + Cursor rules + CLAUDE.md) |
 | Phase A.4 — Tuning Session | ✅ Complete (ablation re-run, error classification, 3 targeted fixes) |
+| Phase 3.15 — unsafe_allow_html audit | ✅ Complete (2/23 dangerous uses escaped) |
+| Phase 3.16 — Delayed imports → module level | ✅ Complete (6 hot-path imports moved) |
+| Phase 3.17 — Regex expansion | ✅ Complete ($1.2B, €, £, bps, etc.) |
+| Phase 3.18 — Build index checkpointing | ✅ Complete (--rebuild, auto-resume) |
 | Companies | **7** (CMG, DRI, CBRL, WMT, TGT, JNJ, XOM) — 4 sectors |
 | Chunks | **1079** dari **56** filings |
-| Tests | **47** pytest + ruff (0) + mypy (0) + bandit (0) |
-| CI | pytest --cov-fail-under=30 + mypy + ruff + bandit |
-| Coverage | ~44% |
+| Tests | **96** pytest + ruff (0) + mypy (0) + bandit (0) |
+| CI | pytest --cov-fail-under=55 + mypy + ruff + bandit |
+| Coverage | **62%** |
 | Code quality | ruff (0) + mypy (0) + bandit (0) — pre-commit hooks |
 | Model | Qwen2.5-7B-Instruct Q4_K.M (llama.cpp, 120s timeout) |
 | Landing page | Next.js 14 + Tailwind, Vercel: [rag-variance-explainer.vercel.app](https://rag-variance-explainer.vercel.app) |
@@ -116,9 +120,10 @@ Bingung mulai dari mana?  → _Dashboard.md (ini)
 | **Retail recall** | **WMT recall@10 = 1.00**, **TGT recall@10 = 1.00** — zero degradation |
 | **Overall recall** | **recall@10 = 0.81**, **MRR = 0.54** — 0 retrieval gaps |
 | **Code quality** | ruff (0) + mypy (0) + bandit (0) — **47** tests ✅ |
-| **Target berikut** | A.5 Tuning eval re-run → Blog Post (Medium) → A.6 Benchmark + Dataset (HF) |
+| **Target berikut** | Push coverage gate 65% → Update & publish blog post |
 | **Phase A complete** | MCP Server (`src/server.py`), REST API (`src/api.py`), Agent Skills (`.opencode/skills/`, `.cursor/rules/`, `CLAUDE.md`) |
-| **Tuning session** | Error classification done (22 Q with errors), 3 fixes implemented (omission prompt, LLM-based verify, citation format), awaiting eval re-run |
+| **Phase 3 complete** | All 4 hardening items done (15-18): unsafe_allow_html audit, delayed imports, regex expansion, build index checkpointing |
+| **Coverage** | **62%** (gate 55% ✅) — 96 tests total |
 
 ---
 
