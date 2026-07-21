@@ -55,9 +55,9 @@ Project 2/
 | Phase 3.18 — Build index checkpointing | ✅ Complete (--rebuild, auto-resume) |
 | Companies | **7** (CMG, DRI, CBRL, WMT, TGT, JNJ, XOM) — 4 sectors |
 | Chunks | **1079** dari **56** filings |
-| Tests | **96** pytest + ruff (0) + mypy (0) + bandit (0) |
-| CI | pytest --cov-fail-under=55 + mypy + ruff + bandit |
-| Coverage | **62%** |
+| Tests | **111** pytest + ruff (0) + mypy (0) + bandit (0) |
+| CI | pytest --cov-fail-under=65 + mypy + ruff + bandit |
+| Coverage | **65%** (gate 65% ✅) |
 | Code quality | ruff (0) + mypy (0) + bandit (0) — pre-commit hooks |
 | Model | Qwen2.5-7B-Instruct Q4_K.M (llama.cpp, 120s timeout) |
 | Landing page | Next.js 14 + Tailwind, Vercel: [rag-variance-explainer.vercel.app](https://rag-variance-explainer.vercel.app) |
@@ -119,11 +119,11 @@ Bingung mulai dari mana?  → _Dashboard.md (ini)
 | **Perusahaan** | **7** (CMG, DRI, CBRL, WMT, TGT, JNJ, XOM) — 4 sectors |
 | **Retail recall** | **WMT recall@10 = 1.00**, **TGT recall@10 = 1.00** — zero degradation |
 | **Overall recall** | **recall@10 = 0.81**, **MRR = 0.54** — 0 retrieval gaps |
-| **Code quality** | ruff (0) + mypy (0) + bandit (0) — **47** tests ✅ |
-| **Target berikut** | Push coverage gate 65% → Update & publish blog post |
+| **Code quality** | ruff (0) + mypy (0) + bandit (0) — **111** tests ✅ |
+| **Target berikut** | Blog publish → MCP Server enhancements → Deploy live demo |
 | **Phase A complete** | MCP Server (`src/server.py`), REST API (`src/api.py`), Agent Skills (`.opencode/skills/`, `.cursor/rules/`, `CLAUDE.md`) |
 | **Phase 3 complete** | All 4 hardening items done (15-18): unsafe_allow_html audit, delayed imports, regex expansion, build index checkpointing |
-| **Coverage** | **62%** (gate 55% ✅) — 96 tests total |
+| **Coverage** | **65%** (gate 65% ✅) — 111 tests total |
 
 ---
 
