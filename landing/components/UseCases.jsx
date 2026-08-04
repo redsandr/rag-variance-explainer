@@ -1,54 +1,35 @@
 import { USE_CASES } from '../data/constants';
 
+const SPANS = ['lg:col-span-8', 'lg:col-span-4', 'lg:col-span-4', 'lg:col-span-4', 'lg:col-span-4'];
+
 export default function UseCases() {
   return (
-    <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20 sm:py-24 md:py-32">
-      <div className="mb-10 sm:mb-14">
-        <div className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>Use cases</div>
-        <p className="serif text-2xl sm:text-3xl md:text-4xl font-bold">Real questions, real answers.</p>
-      </div>
+    <section className="px-5 sm:px-7 py-24 md:py-28">
+      <div className="w-full max-w-[1180px] mx-auto">
+        <div className="section-head">
+          <span className="sec-num">09</span>
+          <span className="sec-label">Financial Variance Analysis Examples</span>
+          <span className="sec-line"></span>
+        </div>
+        <h2 className="text-[clamp(2rem,5.4vw,4.2rem)] font-semibold tracking-[-0.035em] leading-[1.02] m-0 mb-10">Real questions, real answers.</h2>
 
-      <div className="rounded-2xl overflow-hidden card hidden md:block">
-        <table className="w-full text-left text-sm">
-          <thead>
-            <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--surface-alt)' }}>
-              <th className="px-6 py-4 font-medium" style={{ color: 'var(--text-dim)' }}>Question</th>
-              <th className="px-6 py-4 font-medium" style={{ color: 'var(--text-dim)' }}>Answer includes</th>
-              <th className="px-6 py-4 font-medium" style={{ color: 'var(--text-dim)' }}>Source</th>
-            </tr>
-          </thead>
-          <tbody>
-            {USE_CASES.map((uc) => (
-              <tr key={uc.q} style={{ borderBottom: '1px solid var(--border)' }} className="hover:brightness-95 transition-all">
-                <td className="px-6 py-4 font-medium">{uc.q}</td>
-                <td className="px-6 py-4" style={{ color: 'var(--text-dim)' }}>{uc.a}</td>
-                <td className="px-6 py-4">
-                  <span
-                    className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
-                    style={{ background: 'var(--accent-soft)', color: 'var(--accent-light)' }}
-                  >
-                    {uc.src}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="space-y-3 md:hidden">
-        {USE_CASES.map((uc) => (
-          <div key={uc.q} className="rounded-xl p-4 card">
-            <div className="text-sm font-medium mb-2">{uc.q}</div>
-            <div className="text-sm mb-3" style={{ color: 'var(--text-dim)' }}>{uc.a}</div>
-            <span
-              className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
-              style={{ background: 'var(--accent-soft)', color: 'var(--accent-light)' }}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          {USE_CASES.map((uc, i) => (
+            <div
+              key={uc.q}
+              className={`flex flex-col justify-between min-h-[190px] p-6 rounded-2xl ${SPANS[i % SPANS.length]}`}
+              style={{ background: 'var(--bg-soft)', border: '1px solid var(--border)', transition: 'border-color 0.2s, transform 0.2s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.transform = 'translateY(0)'; }}
             >
-              {uc.src}
-            </span>
-          </div>
-        ))}
+              <div className="text-[17px] font-semibold tracking-[-0.01em] leading-snug">{uc.q}</div>
+              <div>
+                <div className="mt-auto pt-4 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-dim)' }}>{uc.a}</div>
+                <div className="mt-3.5 mono text-[10.5px] tracking-[0.05em]" style={{ color: 'var(--accent)' }}>{uc.src}</div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

@@ -1,36 +1,34 @@
-import Vernie from './Vernie';
 import HeroBackground from './HeroBackground';
 
 export default function HeroSection() {
   return (
-    <section className="relative flex items-center px-4 sm:px-6 pt-28 sm:pt-32 pb-10 sm:pb-24 overflow-hidden">
+    <section id="top" className="relative flex flex-col items-center px-5 sm:px-7 pt-28 sm:pt-36 pb-16 overflow-hidden">
+      <div className="ghost-outline" aria-hidden="true">Variance explained</div>
       <HeroBackground />
-      <div className="mx-auto max-w-4xl w-full relative z-10 text-center">
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-3 mb-5 sm:mb-6">
-          <Vernie pose="waving" size={32} />
-          <div
-            className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[10px] sm:text-xs font-medium text-center"
-            style={{ background: 'var(--accent-soft)', color: 'var(--accent-light)' }}
-          >
-            <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ background: 'var(--accent)' }}></span>
-            7 companies &middot; 4 industries &middot; your data stays in-house
-          </div>
+      <div className="w-full max-w-[1180px] relative z-10">
+        <div className="eyebrow">
+          <span className="dot"></span>
+          <span><b>AI Financial Variance Analysis from SEC Filings</b></span>
         </div>
-        <h1 className="serif text-2xl sm:text-5xl md:text-6xl font-bold leading-[1.1] tracking-tight mb-3 sm:mb-6" style={{ color: 'var(--text)' }}>
-          Stop reading filings.
-          <br />
-          Start <span style={{ color: 'var(--accent)' }}>understanding variance.</span>
+        <h1 className="hero-title">
+          Ask why <span className="gold-text">revenue, margin,<br />labor cost</span> changed.
         </h1>
-        <p className="text-sm sm:text-lg md:text-xl leading-relaxed mb-6 sm:mb-9 max-w-2xl mx-auto" style={{ color: 'var(--text-dim)' }}>
-          Ask why the number moved — in plain English, with the exact page cited, every time.
+        <p className="hero-sub">
+          Get grounded answers with page-level citations from SEC 10-K and 10-Q filings in seconds.
+          Stop searching PDFs. Start explaining variance.
         </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
-          <a href="#demo" className="w-full sm:w-auto px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl text-xs sm:text-sm font-semibold btn-primary text-center">
-            Try a sample analysis
+        <div className="hero-cta">
+          <a href="#demo" className="btn btn-gold">Try a sample analysis</a>
+          <a href="https://github.com/redsandr/rag-variance-explainer" className="btn btn-ghost">
+            View on GitHub <span className="arr">↗</span>
           </a>
-          <a href="https://github.com/redsandr/rag-variance-explainer" className="w-full sm:w-auto px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl text-xs sm:text-sm font-medium btn-secondary text-center">
-            View on GitHub
-          </a>
+        </div>
+        <div className="hero-trust">
+          <div className="trust-item"><span>Grounded in <b>SEC filings</b></span></div>
+          <div className="trust-item"><span>Every answer <b>cited</b></span></div>
+          <div className="trust-item"><span>Runs <b>fully offline</b></span></div>
+          <div className="trust-item"><span><b>7</b> companies</span></div>
+          <div className="trust-item"><span><b>4</b> industries</span></div>
         </div>
       </div>
     </section>

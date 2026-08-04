@@ -8,7 +8,12 @@ export default function Document() {
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="alternate icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <meta name="theme-color" content="#0a0a0f" />
+        <meta name="theme-color" content="#f8f7f2" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{k=localStorage.getItem('theme');if(k==='dark')document.documentElement.classList.add('dark')}catch(e){}`,
+          }}
+        />
       </Head>
       <body>
         <Main />

@@ -1,4 +1,4 @@
-export default function HeroBackground() {
+﻿export default function HeroBackground() {
   return (
     <div
       aria-hidden="true"
@@ -21,7 +21,7 @@ export default function HeroBackground() {
         }}
       />
 
-      {/* Large gold glow — top left */}
+      {/* Large gold glow - top left */}
       <div
         style={{
           position: 'absolute',
@@ -33,7 +33,7 @@ export default function HeroBackground() {
         }}
       />
 
-      {/* Large gold glow — bottom right */}
+      {/* Large gold glow - bottom right */}
       <div
         style={{
           position: 'absolute',
@@ -45,7 +45,7 @@ export default function HeroBackground() {
         }}
       />
 
-      {/* Subtle decorative ring — top right */}
+      {/* Subtle decorative ring - top right */}
       <div
         style={{
           position: 'absolute',
@@ -58,7 +58,7 @@ export default function HeroBackground() {
         }}
       />
 
-      {/* Subtle decorative ring — bottom left */}
+      {/* Subtle decorative ring - bottom left */}
       <div
         style={{
           position: 'absolute',

@@ -123,12 +123,11 @@ export const USE_CASES = [
 ];
 
 export const FEATURES = [
-  { t: 'Ask like you would a colleague', d: "No filing jargon required. Ask in plain English and get an answer scoped to what you actually meant." },
-  { t: 'Every claim cited to a page', d: 'Each answer points back to the exact filing and page, so you can verify it before it goes in a report.' },
-  { t: 'Pulls directly from SEC filings', d: 'Reads straight from 10-Ks and 10-Qs across 7 companies — no manual searching through PDFs.' },
-  { t: 'Works across sectors, not just one', d: 'Tested on restaurant, retail, healthcare, and energy filings, with no drop in accuracy between them.' },
-  { t: 'Checked against the source', d: "Roughly 3 in 4 answers verified as fully accurate against the original filing text, with ongoing work to push that higher." },
-  { t: 'Your filings stay yours', d: 'Runs fully offline on your own machine, or connects to a cloud provider if you prefer — your data, your choice.' },
+  { t: 'Explains financial variance', d: 'Digs past the headline number to the drivers - price, volume, mix, wage inflation, FX - so you can explain why any metric moved.' },
+  { t: 'Searches SEC filings', d: 'Reads straight from 10-K and 10-Q filings across 7 companies - no more manual searching through PDFs.' },
+  { t: 'Finds supporting evidence', d: 'Retrieves the exact MD&A passage that backs each claim, ranked for relevance before anything is written.' },
+  { t: 'Cites every answer', d: 'Each claim points to the filing and page, so you can verify it before it goes in a report or a deck.' },
+  { t: 'Works across industries', d: 'Indexed on restaurant, retail, healthcare, and energy filings with no drop in retrieval accuracy between them.' },
 ];
 
 export const ROADMAP = [
