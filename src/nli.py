@@ -41,7 +41,9 @@ class NLIClient:
                 device=self._device,
                 max_length=512,
             )
-            id2label = getattr(self._model.model.config, "id2label", None)
+            transformer_model = self._model.model
+            model_config = getattr(transformer_model, "config", None)
+            id2label = getattr(model_config, "id2label", None)
             if id2label:
                 self._label_mapping = tuple(id2label[i] for i in sorted(id2label))
             else:
