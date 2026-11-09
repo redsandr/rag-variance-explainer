@@ -61,17 +61,19 @@ class RAGConfig:
     cross_encoder_batch_size: int = int(os.getenv("RAG_CROSS_ENCODER_BATCH_SIZE", "32"))
     cross_encoder_weight: float = float(os.getenv("RAG_CROSS_ENCODER_WEIGHT", "0.7"))
 
+    embedding_device: str = os.getenv("EMBEDDING_DEVICE", "cpu")
+
     db_path: str = os.getenv("CHROMA_DB_PATH", "./chroma_db")
     build_filings_per_company: int = int(os.getenv("RAG_FILINGS_PER_COMPANY", "8"))
 
-    sec_user_agent: str = os.getenv("SEC_USER_AGENT", "RAG-Variance-Explainer (sebas@portfolio.dev)")
+    sec_user_agent: str = os.getenv("SEC_USER_AGENT", "")
     structured_output_enabled: bool = os.getenv("RAG_STRUCTURED_OUTPUT_ENABLED", "true").lower() == "true"
     llm_max_tokens: int = int(os.getenv("RAG_LLM_MAX_TOKENS", "2048"))
     llm_temperature: float = float(os.getenv("RAG_LLM_TEMPERATURE", "0.1"))
 
-    nli_enabled: bool = os.getenv("RAG_NLI_ENABLED", "true").lower() == "true"
-    nli_threshold: float = float(os.getenv("RAG_NLI_THRESHOLD", "0.72"))
-    nli_model: str = os.getenv("RAG_NLI_MODEL", "MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli")
+    nli_enabled: bool = os.getenv("RAG_NLI_ENABLED", "false").lower() == "true"
+    nli_threshold: float = float(os.getenv("RAG_NLI_THRESHOLD", "0.40"))
+    nli_model: str = os.getenv("RAG_NLI_MODEL", "cross-encoder/nli-deberta-v3-large")
     nli_device: str = os.getenv("RAG_NLI_DEVICE", "cpu")
 
     def __post_init__(self) -> None:

@@ -220,7 +220,7 @@ def test_sanitize_input_strips_control_chars() -> None:
 
 
 def test_sanitize_input_truncates_long() -> None:
-    from src.rag import sanitize_input, MAX_QUESTION_LENGTH
+    from src.rag import MAX_QUESTION_LENGTH, sanitize_input
     long = "x" * (MAX_QUESTION_LENGTH + 100)
     assert len(sanitize_input(long)) == MAX_QUESTION_LENGTH
 
@@ -269,11 +269,12 @@ def test_rerank_empty_candidates_returns_empty() -> None:
 
 def test_rerank_single_candidate_preserves_it() -> None:
     from unittest.mock import patch
+
     from src.cross_encoder import rerank
 
     candidate = {"text": "Revenue increased 10%", "metadata": {"ticker": "CMG"}, "relevance": 0.9}
-    with patch("src.cross_encoder._get_model") as mock_get_model:
-        mock_model = mock_get_model.return_value
+    with patch("src.cross_encoder._cross_encoder_model") as mock_instance:
+        mock_model = mock_instance.get_model.return_value
         mock_model.predict.return_value = [0.95]
         result = rerank("revenue", [candidate], top_k=5)
     assert len(result) == 1
@@ -348,12 +349,14 @@ def test_mcp_list_companies_returns_all_tickers() -> None:
 
 def test_build_index_empty_db_handles_gracefully() -> None:
     from unittest.mock import patch
+
     import src.build_index as bi
 
     with (
-        patch("src.build_index.get_client") as mock_client,
+        patch("src.build_index.get_client"),
         patch("src.build_index.get_collection") as mock_collection,
         patch("src.build_index.TICKERS", {}),
+        patch.object(bi.config, "sec_user_agent", "Test Agent test@example.com"),
     ):
         mock_collection.return_value.count.return_value = 0
         bi.build_index()
@@ -409,7 +412,8 @@ def test_checkpoint_clear(tmp_path) -> None:
 
 
 def test_build_index_skips_processed_filing(tmp_path) -> None:
-    from unittest.mock import patch, MagicMock
+    from unittest.mock import MagicMock, patch
+
     import src.build_index as bi
 
     path = tmp_path / "ckpt.json"
@@ -427,12 +431,13 @@ def test_build_index_skips_processed_filing(tmp_path) -> None:
         bi._CHECKPOINT_FILE = str(path)
 
         with (
-            patch("src.build_index.get_client") as mock_client,
-            patch("src.build_index.get_collection") as mock_collection,
+            patch("src.build_index.get_client"),
+            patch("src.build_index.get_collection"),
             patch("src.build_index.TICKERS", {"CMG": "0001000"}),
             patch("src.build_index.get_cik", return_value="0001000"),
             patch("src.build_index.fetch_submissions", return_value=MagicMock()),
             patch("src.build_index.list_10k_10q_filings", return_value=[mock_filing]),
+            patch.object(bi.config, "sec_user_agent", "Test Agent test@example.com"),
         ):
             bi.build_index()
 
@@ -442,12 +447,62 @@ def test_build_index_skips_processed_filing(tmp_path) -> None:
         bi._CHECKPOINT_FILE = orig_ckpt
 
 
+def test_add_chunks_keeps_existing_data_when_upsert_fails() -> None:
+    from unittest.mock import MagicMock, patch
+
+    from src.retrieval import add_chunks
+
+    collection = MagicMock()
+    collection.get.return_value = {"ids": ["CMG_acc-1_0", "CMG_acc-1_1"]}
+    collection.upsert.side_effect = RuntimeError("storage failed")
+
+    with patch("src.retrieval.embed_documents", return_value=[[0.1, 0.2]]):
+        with pytest.raises(RuntimeError, match="storage failed"):
+            add_chunks(collection, ["new text"], "CMG", "acc-1", "10-K", "2025-01-01")
+
+    collection.delete.assert_not_called()
+
+
+def test_add_chunks_removes_stale_chunks_after_upsert() -> None:
+    from unittest.mock import MagicMock, patch
+
+    from src.retrieval import add_chunks
+
+    collection = MagicMock()
+    collection.get.return_value = {"ids": ["CMG_acc-1_0", "CMG_acc-1_1"]}
+
+    with patch("src.retrieval.embed_documents", return_value=[[0.1, 0.2]]):
+        add_chunks(collection, ["new text"], "CMG", "acc-1", "10-K", "2025-01-01")
+
+    collection.upsert.assert_called_once()
+    collection.delete.assert_called_once_with(ids=["CMG_acc-1_1"])
+
+
+def test_build_index_reports_partial_failure(tmp_path) -> None:
+    from unittest.mock import patch
+
+    import src.build_index as bi
+
+    with (
+        patch.object(bi, "_CHECKPOINT_FILE", str(tmp_path / "checkpoint.json")),
+        patch.object(bi.config, "sec_user_agent", "Test Agent test@example.com"),
+        patch("src.build_index.TICKERS", {"CMG": "Chipotle"}),
+        patch("src.build_index.get_client"),
+        patch("src.build_index.get_collection"),
+        patch("src.build_index.get_cik", side_effect=RuntimeError("SEC unavailable")),
+        patch("src.build_index.flush_bm25_cache") as flush_cache,
+    ):
+        with pytest.raises(RuntimeError, match="Index build incomplete: 1 filing"):
+            bi.build_index()
+
+    flush_cache.assert_called_once()
+
+
 # --- API behavior tests ---
 
 def test_api_root_returns_service_info() -> None:
     from src.api import app
 
-    client = app.__class__
     assert app.title == "RAG Variance Explainer API"
     assert app.version == "1.0.0"
 
@@ -473,9 +528,11 @@ def test_api_health_endpoint() -> None:
 
 
 def test_api_search_returns_results() -> None:
-    from unittest.mock import patch, MagicMock
-    from src.api import app
+    from unittest.mock import patch
+
     from fastapi.testclient import TestClient
+
+    from src.api import app
 
     client = TestClient(app)
     mock_result = {
@@ -500,8 +557,10 @@ def test_api_search_returns_results() -> None:
 
 def test_api_search_validates_ticker() -> None:
     from unittest.mock import patch
-    from src.api import app
+
     from fastapi.testclient import TestClient
+
+    from src.api import app
 
     client = TestClient(app)
     with (
@@ -516,9 +575,11 @@ def test_api_search_validates_ticker() -> None:
 
 
 def test_api_answer_returns_answer() -> None:
-    from unittest.mock import patch, MagicMock
-    from src.api import app
+    from unittest.mock import patch
+
     from fastapi.testclient import TestClient
+
+    from src.api import app
 
     client = TestClient(app)
     mock_result = {
@@ -545,8 +606,9 @@ def test_api_answer_returns_answer() -> None:
 
 
 def test_api_answer_rejects_empty_question() -> None:
-    from src.api import app
     from fastapi.testclient import TestClient
+
+    from src.api import app
 
     client = TestClient(app)
     resp = client.post("/answer", json={"question": ""})
@@ -555,8 +617,10 @@ def test_api_answer_rejects_empty_question() -> None:
 
 def test_api_answer_handles_llm_failure() -> None:
     from unittest.mock import patch
-    from src.api import app
+
     from fastapi.testclient import TestClient
+
+    from src.api import app
 
     client = TestClient(app)
     with patch("src.api.answer_question", side_effect=RuntimeError("LLM unavailable")):
@@ -567,8 +631,9 @@ def test_api_answer_handles_llm_failure() -> None:
 
 
 def test_api_search_empty_query_rejected() -> None:
-    from src.api import app
     from fastapi.testclient import TestClient
+
+    from src.api import app
 
     client = TestClient(app)
     resp = client.post("/search", json={"query": ""})
@@ -576,9 +641,9 @@ def test_api_search_empty_query_rejected() -> None:
 
 
 def test_api_companies_get_returns_list() -> None:
-    from unittest.mock import patch
-    from src.api import app
     from fastapi.testclient import TestClient
+
+    from src.api import app
 
     client = TestClient(app)
     resp = client.get("/companies")
@@ -591,8 +656,9 @@ def test_api_companies_get_returns_list() -> None:
 
 
 def test_api_health_returns_ok() -> None:
-    from src.api import app
     from fastapi.testclient import TestClient
+
+    from src.api import app
 
     client = TestClient(app)
     resp = client.get("/health")
@@ -677,8 +743,9 @@ def test_chunking_respects_token_budget() -> None:
 
 
 def test_config_validation_rejects_out_of_range() -> None:
-    from src.config import RAGConfig
     import pytest
+
+    from src.config import RAGConfig
     with pytest.raises(ValueError, match="outside valid range"):
         RAGConfig(keyword_boost_weight=999.0)
     with pytest.raises(ValueError, match="outside valid range"):
@@ -686,49 +753,45 @@ def test_config_validation_rejects_out_of_range() -> None:
 
 
 def test_config_validation_rejects_non_positive_int() -> None:
-    from src.config import RAGConfig
     import pytest
+
+    from src.config import RAGConfig
     with pytest.raises(ValueError, match="must be >= 1"):
         RAGConfig(retrieval_top_k=0)
     with pytest.raises(ValueError, match="must be >= 1"):
         RAGConfig(retrieval_n_candidates=-1)
 
 
-# --- Embedding / fallback tests ---
+def test_embedding_rejects_wrong_dimension() -> None:
+    from unittest.mock import MagicMock, patch
 
-
-def test_embedding_fallback_raises_on_dim_mismatch() -> None:
-    from unittest.mock import patch, MagicMock
-    import src.embedding as emb
     import pytest
 
-    emb._MODEL = None
-    mock_fallback = MagicMock()
-    mock_fallback.get_sentence_embedding_dimension.return_value = 384
+    import src.embedding as emb
 
-    def _fake_load(model_name, **kw):
-        if "nomic" in model_name:
-            raise OSError(f"cannot load {model_name}")
-        return mock_fallback
+    emb._embedding_model._model = None
+    mock_model = MagicMock()
+    mock_model.get_sentence_embedding_dimension.return_value = 384
 
-    with patch("src.embedding.SentenceTransformer", side_effect=_fake_load):
+    with patch("src.embedding.SentenceTransformer", return_value=mock_model):
         with pytest.raises(RuntimeError, match="dimension"):
-            emb._get_model()
-    emb._MODEL = None
+            emb._embedding_model.get_model()
+    assert emb._embedding_model._model is None
 
 
 def test_embedding_successful_load() -> None:
-    from unittest.mock import patch, MagicMock
+    from unittest.mock import MagicMock, patch
+
     import src.embedding as emb
 
-    emb._MODEL = None
+    emb._embedding_model._model = None
     mock_model = MagicMock()
     mock_model.get_sentence_embedding_dimension.return_value = 768
 
     with patch("src.embedding.SentenceTransformer", return_value=mock_model):
-        model = emb._get_model()
+        model = emb._embedding_model.get_model()
         assert model is not None
-    emb._MODEL = None
+    emb._embedding_model._model = None
 
 
 # --- .format() crash fix test ---
@@ -746,7 +809,8 @@ def test_verify_prompt_handles_curly_braces() -> None:
 
 
 def test_answer_question_full_pipeline() -> None:
-    from unittest.mock import patch, MagicMock
+    from unittest.mock import MagicMock, patch
+
     from src.rag import answer_question
 
     mock_results = [
@@ -761,13 +825,19 @@ def test_answer_question_full_pipeline() -> None:
         }
     ]
     mock_llm = MagicMock()
-    mock_llm.generate.return_value = "Marketing costs decreased by 5% due to lower ad spend."
+    mock_llm.generate.return_value = (
+        '{"answer":"Marketing costs decreased due to lower ad spend.",'
+        '"claims":[{"statement":"Marketing costs decreased due to lower ad spend.",'
+        '"source_chunk_index":0,"source_quote":"Marketing expense decreased due to lower ad spend."}],'
+        '"can_answer":true,"confidence":0.8}'
+    )
 
     with (
         patch("src.rag.get_client"),
         patch("src.rag.get_collection"),
         patch("src.rag.query_multi", return_value=mock_results),
         patch("src.rag.verify_answer_llm", return_value={"has_errors": False, "errors": []}),
+        patch("src.rag.config.nli_enabled", False),
     ):
         result = answer_question("Why did marketing costs change?", llm=mock_llm)
 
@@ -777,8 +847,28 @@ def test_answer_question_full_pipeline() -> None:
     assert result["sources"][0]["metadata"]["ticker"] == "DRI"
 
 
+def test_answer_question_refuses_without_retrieved_sources() -> None:
+    from unittest.mock import MagicMock, patch
+
+    from src.rag import answer_question
+
+    mock_llm = MagicMock()
+    with (
+        patch("src.rag.get_client"),
+        patch("src.rag.get_collection"),
+        patch("src.rag.query_multi", return_value=[]),
+    ):
+        result = answer_question("Why did costs change?", llm=mock_llm)
+
+    assert result["sources"] == []
+    assert result["confidence"] == 0.0
+    assert "cannot answer" in result["answer"]
+    mock_llm.generate.assert_not_called()
+
+
 def test_answer_question_passes_ticker_filter() -> None:
-    from unittest.mock import patch, MagicMock
+    from unittest.mock import MagicMock, patch
+
     from src.rag import answer_question
 
     mock_results = [
@@ -808,7 +898,8 @@ def test_answer_question_passes_ticker_filter() -> None:
 
 
 def test_answer_question_handles_verification_failure_gracefully() -> None:
-    from unittest.mock import patch, MagicMock
+    from unittest.mock import MagicMock, patch
+
     from src.rag import answer_question
 
     mock_llm = MagicMock()
@@ -875,6 +966,7 @@ def test_tag_chunk_general_metric() -> None:
 
 def test_verify_answer_llm_with_mock() -> None:
     from unittest.mock import MagicMock
+
     from src.post_process import verify_answer_llm
     mock_llm = MagicMock()
     mock_llm.generate.return_value = '{"has_errors": false, "errors": []}'
@@ -1010,8 +1102,9 @@ def test_add_metric_boost_no_match() -> None:
 
 
 def test_mcp_resource_stats() -> None:
-    from src.server import stats_resource
     import json
+
+    from src.server import stats_resource
     data = json.loads(stats_resource())
     assert isinstance(data, dict)
     assert data.get("companies") == 7
@@ -1022,21 +1115,24 @@ def test_mcp_resource_stats() -> None:
 
 
 def test_mcp_resource_company_detail_not_found() -> None:
-    from src.server import company_resource
     import json
+
+    from src.server import company_resource
     result = json.loads(company_resource("INVALID"))
     assert "error" in result
 
 
 def test_mcp_resource_company_questions_not_found() -> None:
-    from src.server import company_questions_resource
     import json
+
+    from src.server import company_questions_resource
     result = json.loads(company_questions_resource("INVALID"))
     assert "error" in result
 
 
 def test_query_multi_with_mocked_chromadb() -> None:
-    from unittest.mock import patch, MagicMock
+    from unittest.mock import MagicMock, patch
+
     from src.retrieval import query_multi
 
     mock_result = {
@@ -1060,37 +1156,31 @@ def test_query_multi_with_mocked_chromadb() -> None:
 
 
 def test_mcp_server_tool_rag_search_invalid_ticker() -> None:
-    from src.server import search
     from mcp.server.fastmcp.exceptions import ToolError
-    try:
+
+    from src.server import search
+    with pytest.raises(ToolError) as error:
         search(query="revenue growth", ticker="INVALID")
-        assert False, "Expected ToolError"
-    except ToolError as e:
-        msg = str(e)
-        assert "Unknown ticker" in msg
-        assert "INVALID" in msg
+    assert "Unknown ticker" in str(error.value)
+    assert "INVALID" in str(error.value)
 
 
 def test_mcp_server_tool_rag_answer_invalid_ticker() -> None:
-    from src.server import answer
     from mcp.server.fastmcp.exceptions import ToolError
-    try:
+
+    from src.server import answer
+    with pytest.raises(ToolError) as error:
         answer(question="How was revenue?", ticker="INVALID")
-        assert False, "Expected ToolError"
-    except ToolError as e:
-        msg = str(e)
-        assert "Unknown ticker" in msg
+    assert "Unknown ticker" in str(error.value)
 
 
 def test_mcp_server_tool_list_questions_invalid_ticker() -> None:
-    from src.server import list_questions
     from mcp.server.fastmcp.exceptions import ToolError
-    try:
+
+    from src.server import list_questions
+    with pytest.raises(ToolError) as error:
         list_questions(ticker="INVALID")
-        assert False, "Expected ToolError"
-    except ToolError as e:
-        msg = str(e)
-        assert "Unknown ticker" in msg
+    assert "Unknown ticker" in str(error.value)
 
 
 # --- MCP Resource tests ---
@@ -1109,8 +1199,9 @@ def test_mcp_resources_registered() -> None:
 
 
 def test_mcp_resource_companies() -> None:
-    from src.server import companies_resource
     import json
+
+    from src.server import companies_resource
     data = json.loads(companies_resource())
     assert len(data) == 7
     assert data[0]["ticker"] == "CBRL"
@@ -1118,8 +1209,9 @@ def test_mcp_resource_companies() -> None:
 
 
 def test_mcp_resource_company_detail() -> None:
-    from src.server import company_resource
     import json
+
+    from src.server import company_resource
     data = json.loads(company_resource("CMG"))
     assert data["ticker"] == "CMG"
     assert data["name"] == "Chipotle Mexican Grill"
@@ -1127,8 +1219,9 @@ def test_mcp_resource_company_detail() -> None:
 
 
 def test_mcp_resource_company_questions() -> None:
-    from src.server import company_questions_resource
     import json
+
+    from src.server import company_questions_resource
     data = json.loads(company_questions_resource("CMG"))
     assert data["ticker"] == "CMG"
     assert len(data["questions"]) == 3
@@ -1139,7 +1232,9 @@ def test_mcp_resource_company_questions() -> None:
 
 
 def test_html_escape_escapes_special_chars() -> None:
-    import importlib, app as _app_mod
+    import importlib
+
+    import app as _app_mod
     importlib.reload(_app_mod)
     from app import _html_escape
     assert _html_escape("<script>alert('xss')</script>") == "&lt;script&gt;alert(&#x27;xss&#x27;)&lt;/script&gt;"
@@ -1157,14 +1252,16 @@ def test_decompose_claims_empty_text() -> None:
 
 def test_decompose_claims_llm_error() -> None:
     from unittest.mock import MagicMock
+
     from src.verifier import decompose_claims
     mock_llm = MagicMock()
-    mock_llm.generate.side_effect = RuntimeError("LLM failed")
+    mock_llm.generate.side_effect = ValueError("LLM failed")
     assert decompose_claims("Some answer.", mock_llm) == []
 
 
 def test_decompose_claims_parses_json() -> None:
     from unittest.mock import MagicMock
+
     from src.verifier import decompose_claims
     mock_llm = MagicMock()
     mock_llm.generate.return_value = '{"claims": ["Claim one.", "Claim two."]}'
@@ -1174,6 +1271,7 @@ def test_decompose_claims_parses_json() -> None:
 
 def test_decompose_claims_removes_markdown_fence() -> None:
     from unittest.mock import MagicMock
+
     from src.verifier import decompose_claims
     mock_llm = MagicMock()
     mock_llm.generate.return_value = "```json\n{\"claims\": [\"Claim one.\"]}\n```"
@@ -1183,6 +1281,7 @@ def test_decompose_claims_removes_markdown_fence() -> None:
 
 def test_decompose_claims_missing_claims_key() -> None:
     from unittest.mock import MagicMock
+
     from src.verifier import decompose_claims
     mock_llm = MagicMock()
     mock_llm.generate.return_value = '{"not_claims": []}'
@@ -1191,6 +1290,7 @@ def test_decompose_claims_missing_claims_key() -> None:
 
 def test_decompose_claims_invalid_json() -> None:
     from unittest.mock import MagicMock
+
     from src.verifier import decompose_claims
     mock_llm = MagicMock()
     mock_llm.generate.return_value = "not json at all"
@@ -1205,6 +1305,7 @@ def test_verify_claims_nli_empty_returns_empty() -> None:
 
 def test_verify_claims_nli_calls_client() -> None:
     from unittest.mock import MagicMock
+
     from src.verifier import verify_claims_nli
     mock_nli = MagicMock()
     mock_nli.verify_batch.return_value = [{"supported": True}]
@@ -1215,6 +1316,7 @@ def test_verify_claims_nli_calls_client() -> None:
 
 def test_verify_claims_nli_uses_top3_chunks() -> None:
     from unittest.mock import MagicMock
+
     from src.verifier import verify_claims_nli
     mock_nli = MagicMock()
     mock_nli.verify_batch.return_value = [{"supported": True}]
@@ -1251,3 +1353,26 @@ def test_aggregate_verdicts_majority_unsupported_fails() -> None:
     result = aggregate_verdicts([{"supported": True}, {"supported": False}, {"supported": False}])
     assert result["unsupported_ratio"] == 2 / 3
     assert result["overall"] == "fail"
+
+
+def test_fallback_answer_refuses_unparsed_model_text() -> None:
+    from src.verifier import fallback_answer
+
+    result = fallback_answer("Revenue rose 400% because of pricing.", "Why did revenue change?", [])
+    assert result["answer"] == "I cannot answer this question based on the available SEC filing excerpts."
+    assert result["structured_failure_reason"] == "parse_error"
+    assert result["verification_errors"] == []
+
+
+def test_fallback_answer_marks_empty_response() -> None:
+    from src.verifier import fallback_answer
+
+    result = fallback_answer("  ", "Why did revenue change?", [])
+    assert result["structured_failure_reason"] == "empty_response"
+
+
+def test_claimed_answer_requires_at_least_one_source_claim() -> None:
+    from src.verifier import StructuredAnswer, validate_answer
+
+    answer = StructuredAnswer(answer="Revenue increased.", claims=[], can_answer=True, confidence=0.8)
+    assert validate_answer(answer, []) == ["Answer contains no source-backed claims"]

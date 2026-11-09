@@ -7,28 +7,36 @@ from config import config
 
 logger = logging.getLogger(__name__)
 
-_model = None
-_model_lock = threading.Lock()
+
+class CrossEncoderModel:
+    """Thread-safe singleton wrapper for cross-encoder model."""
+    _instance: "CrossEncoderModel | None" = None
+    _lock = threading.Lock()
+    _load_lock = threading.Lock()
+    _model: CrossEncoder | None
+
+    def __new__(cls) -> "CrossEncoderModel":
+        if cls._instance is None:
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = super().__new__(cls)
+                    cls._instance._model = None
+        return cls._instance
+
+    def get_model(self) -> CrossEncoder:
+        model = self._model
+        if model is not None:
+            return model
+        with self._load_lock:
+            model = self._model
+            if model is None:
+                logger.info("Loading cross-encoder: %s (device=%s)", config.cross_encoder_model, config.cross_encoder_device)
+                model = CrossEncoder(config.cross_encoder_model, device=config.cross_encoder_device)
+                self._model = model
+        return model
 
 
-def _get_model() -> CrossEncoder:
-    global _model
-    if _model is None:
-        with _model_lock:
-            if _model is None:
-                logger.info(
-                    "Loading cross-encoder: %s (device=%s)",
-                    config.cross_encoder_model, config.cross_encoder_device,
-                )
-                try:
-                    _model = CrossEncoder(config.cross_encoder_model, device=config.cross_encoder_device)
-                except Exception as e:
-                    logger.error(
-                        "Failed to load cross-encoder '%s' on device '%s': %s",
-                        config.cross_encoder_model, config.cross_encoder_device, e,
-                    )
-                    raise
-    return _model
+_cross_encoder_model = CrossEncoderModel()
 
 
 def rerank(query: str, candidates: list[dict], top_k: int = 5) -> list[dict]:
@@ -42,7 +50,7 @@ def rerank(query: str, candidates: list[dict], top_k: int = 5) -> list[dict]:
     if not candidates:
         return []
 
-    model = _get_model()
+    model = _cross_encoder_model.get_model()
     pairs = [[query, c["text"]] for c in candidates]
     scores = model.predict(pairs, batch_size=config.cross_encoder_batch_size, show_progress_bar=False)  # type: ignore[arg-type]
 

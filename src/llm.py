@@ -155,7 +155,14 @@ class LLMClient:
         self._model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
     @_retry(max_attempts=3, base_delay=2.0)
-    def generate(self, prompt: str, system: str | None = None, max_tokens: int = 500, temperature: float | None = None) -> str:
+    def generate(
+        self,
+        prompt: str,
+        system: str | None = None,
+        max_tokens: int = 500,
+        temperature: float | None = None,
+        response_format: dict | None = None,
+    ) -> str:
         """Generate a completion for *prompt*, routed to the active backend.
 
         Automatically retries on transient failures (network timeout, API
@@ -174,7 +181,7 @@ class LLMClient:
             )
         try:
             if self.backend == "llama_cpp":
-                future = _executor.submit(self._generate_llama_cpp, prompt, system, max_tokens, temperature)
+                future = _executor.submit(self._generate_llama_cpp, prompt, system, max_tokens, temperature, response_format)
             elif self.backend == "anthropic":
                 future = _executor.submit(self._generate_anthropic, prompt, system, max_tokens)
             elif self.backend == "openai":
@@ -194,7 +201,14 @@ class LLMClient:
         finally:
             _llm_semaphore.release()
 
-    def _generate_llama_cpp(self, prompt: str, system: str | None, max_tokens: int, temperature: float | None = None) -> str:
+    def _generate_llama_cpp(
+        self,
+        prompt: str,
+        system: str | None,
+        max_tokens: int,
+        temperature: float | None = None,
+        response_format: dict | None = None,
+    ) -> str:
         messages = []
         if system:
             messages.append({"role": "system", "content": system})
@@ -202,6 +216,8 @@ class LLMClient:
         kwargs = {"messages": messages, "max_tokens": max_tokens}
         if temperature is not None:
             kwargs["temperature"] = temperature
+        if response_format is not None:
+            kwargs["response_format"] = response_format
         output = self._llm.create_chat_completion(**kwargs)
         return output["choices"][0]["message"]["content"].strip()
 

@@ -6,7 +6,7 @@ Exposes the RAG pipeline as MCP tools consumable by AI agents
 
 Transport:
   stdio (default) — for local MCP clients
-  --sse           — Streamable HTTP for remote clients
+  --sse           — SSE transport on loopback by default
 
 Usage:
   python src/server.py                          # stdio

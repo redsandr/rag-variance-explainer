@@ -1,17 +1,16 @@
 .PHONY: install test lint typecheck run eval-recall eval-llm eval-faithfulness clean
 
 install:
-	pip install -r requirements.txt
-	pip install ruff mypy
+	python -m pip install -e ".[dev]"
 
 test:
 	pytest tests.py -v
 
 lint:
-	ruff check src/ app.py
+	ruff check src/ app.py conftest.py tests.py
 
 typecheck:
-	mypy src/config.py src/chunking.py src/post_process.py src/rag.py src/llm.py src/embedding.py --no-strict-optional --ignore-missing-imports
+	mypy src/ conftest.py
 
 check: test lint typecheck
 

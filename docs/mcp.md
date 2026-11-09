@@ -38,7 +38,7 @@ make mcp-sse   # SSE on :8765
     "rag-variance-explainer": {
       "command": "python",
       "args": ["src/server.py"],
-      "cwd": "C:\\Users\\Lenovo\\Documents\\Portofolio 2 App\\rag variance explainer"
+      "cwd": "C:\\path\\to\\rag-variance-explainer"
     }
   }
 }
@@ -62,7 +62,7 @@ In `cline_mcp_settings.json`:
     "rag-variance-explainer": {
       "command": "python",
       "args": ["src/server.py"],
-      "cwd": "C:\\Users\\Lenovo\\Documents\\Portofolio 2 App\\rag variance explainer"
+      "cwd": "C:\\path\\to\\rag-variance-explainer"
     }
   }
 }
@@ -77,7 +77,7 @@ Add to `windsurf.json`:
     "rag-variance-explainer": {
       "command": "python",
       "args": ["src/server.py"],
-      "cwd": "C:\\Users\\Lenovo\\Documents\\Portofolio 2 App\\rag variance explainer"
+      "cwd": "C:\\path\\to\\rag-variance-explainer"
     }
   }
 }
@@ -89,10 +89,6 @@ Add to `windsurf.json`:
 # SSE endpoint
 curl -N http://localhost:8765/sse
 
-# Streamable HTTP (JSON-RPC)
-curl -X POST http://localhost:8765/mcp \
-  -H "Content-Type: application/json" \
-  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
 ```
 
 ## Architecture
@@ -118,6 +114,6 @@ curl -X POST http://localhost:8765/mcp \
 ## Notes
 
 - The server loads the LLM on first tool call (lazy init via `LLMClient()`)
-- No embedding model is loaded — ChromaDB queries use existing vectors
+- Search loads the embedding model to encode each query; the index stores document vectors
 - Cross-encoder re-ranking is enabled (CPU or CUDA based on config)
 - Timeout: 120s per generation (configurable via `LLM_TIMEOUT` env var)

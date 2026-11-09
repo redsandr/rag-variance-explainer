@@ -21,7 +21,7 @@ from ingest import (
     list_10k_10q_filings,
 )
 from post_process import tag_chunk
-from retrieval import add_chunks, delete_chunks_for_filing, flush_bm25_cache, get_client, get_collection
+from retrieval import add_chunks, flush_bm25_cache, get_client, get_collection
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +48,8 @@ def _clear_checkpoint() -> None:
 
 
 def build_index(rebuild: bool = False) -> None:
+    if not config.sec_user_agent.strip():
+        raise ValueError("Set SEC_USER_AGENT in .env to your name and contact email before building the index.")
     if rebuild:
         _clear_checkpoint()
         logger.info("Rebuild requested — cleared checkpoint file")
@@ -88,8 +90,6 @@ def build_index(rebuild: bool = False) -> None:
                     cik, accession, filing["primaryDocument"]
                 )
                 chunks = chunk_document(mda_text, chunk_size=500, chunk_overlap=50)
-
-                delete_chunks_for_filing(collection, ticker, accession)
 
                 enriched_metadatas = []
                 for i, chunk in enumerate(chunks):
@@ -136,6 +136,8 @@ def build_index(rebuild: bool = False) -> None:
 
     flush_bm25_cache()
     logger.info("BM25 cache flushed — stale indexes cleared")
+    if failures:
+        raise RuntimeError(f"Index build incomplete: {len(failures)} filing(s) failed. Review the build log and rerun to resume.")
 
 
 if __name__ == "__main__":
@@ -144,4 +146,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(message)s")
-    build_index(rebuild=args.rebuild)
+    try:
+        build_index(rebuild=args.rebuild)
+    except ValueError as error:
+        parser.error(str(error))

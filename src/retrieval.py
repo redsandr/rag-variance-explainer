@@ -43,13 +43,6 @@ def get_collection(client: Any) -> Any:
     )
 
 
-def delete_chunks_for_filing(collection: Any, ticker: str, accession_number: str) -> None:
-    """Delete all chunks for a given ticker + filing to avoid orphaning."""
-    existing = collection.get(where={"$and": [{"ticker": ticker}, {"accession_number": accession_number}]})
-    if existing and existing["ids"]:
-        collection.delete(ids=existing["ids"])
-
-
 def add_chunks(
     collection: Any,
     chunks: list[str],
@@ -71,10 +64,11 @@ def add_chunks(
     If metadatas is provided, use it directly instead of building default.
     """
     if not chunks:
-        return
+        raise ValueError(f"No MD&A chunks extracted for {ticker} {accession_number}")
 
     embeddings = embed_documents(chunks)
     ids = [f"{ticker}_{accession_number}_{i}" for i in range(len(chunks))]
+    existing = collection.get(where={"$and": [{"ticker": ticker}, {"accession_number": accession_number}]})
     if metadatas is None:
         metadatas = [
             {
@@ -93,6 +87,9 @@ def add_chunks(
         documents=chunks,
         metadatas=metadatas,
     )
+    stale_ids = set(existing["ids"]) - set(ids)
+    if stale_ids:
+        collection.delete(ids=sorted(stale_ids))
 
 
 def query(

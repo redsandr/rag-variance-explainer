@@ -89,60 +89,39 @@ def parse_answer(raw: str) -> StructuredAnswer | None:
         return None
 
 
-def validate_answer(answer: StructuredAnswer, chunks: Sequence[dict]) -> list[str]:
-    """Check every source_quote exists verbatim in its referenced chunk.
+def _normalize(text: str) -> str:
+    import re
+    return re.sub(r'\s+', ' ', text.lower().strip())
 
+
+def validate_answer(answer: StructuredAnswer, chunks: Sequence[dict]) -> list[str]:
+    """Check every source_quote can be found (fuzzy) in its referenced chunk.
+
+    Uses normalized matching to tolerate minor casing / spacing diffs.
     Returns a list of error messages (empty = all valid).
     """
     errors: list[str] = []
+    if answer.can_answer and not answer.claims:
+        errors.append("Answer contains no source-backed claims")
     for i, claim in enumerate(answer.claims):
         idx = claim.source_chunk_index
         if idx < 0 or idx >= len(chunks):
             errors.append(f"Claim {i}: source_chunk_index {idx} out of range (0-{len(chunks)-1})")
             continue
         chunk_text = chunks[idx].get("text", "")
-        if claim.source_quote not in chunk_text:
-            errors.append(f"Claim {i}: quote not found verbatim in chunk {idx}")
+        if _normalize(claim.source_quote) not in _normalize(chunk_text):
+            errors.append(f"Claim {i}: quote not found (fuzzy) in chunk {idx}")
     return errors
 
 
 def fallback_answer(raw: str, question: str, chunks: Sequence[dict]) -> dict:
-    """Build a safe fallback dict when structured parsing fails.
-
-    Tries partial recovery first, then raw text, then graceful refusal.
-    """
-    answer_text = raw.strip() if raw and raw.strip() else None
-    try:
-        data = json.loads(answer_text or "{}")
-        if isinstance(data, dict) and data.get("answer"):
-            return {
-                "question": question,
-                "answer": str(data["answer"]),
-                "sources": chunks,
-                "verification_errors": [],
-                "structured_fallback": True,
-                "structured_failure_reason": "schema_mismatch",
-            }
-    except Exception:
-        pass
-
-    if answer_text:
-        return {
-            "question": question,
-            "answer": answer_text,
-            "sources": chunks,
-            "verification_errors": [],
-            "structured_fallback": True,
-            "structured_failure_reason": "parse_error",
-        }
-
     return {
         "question": question,
         "answer": "I cannot answer this question based on the available SEC filing excerpts.",
         "sources": chunks,
         "verification_errors": [],
         "structured_fallback": True,
-        "structured_failure_reason": "empty_response",
+        "structured_failure_reason": "parse_error" if raw and raw.strip() else "empty_response",
     }
 
 
@@ -189,8 +168,8 @@ def decompose_claims(answer_text: str, llm) -> list[str]:
         if isinstance(claims, list) and all(isinstance(c, str) for c in claims):
             return claims
         return []
-    except Exception:
-        logger.exception("Claim decomposition failed")
+    except (json.JSONDecodeError, KeyError, TypeError, ValueError) as e:
+        logger.exception("Claim decomposition failed: %s", e)
         return []
 
 

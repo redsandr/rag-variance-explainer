@@ -19,12 +19,15 @@ import functools
 
 import tiktoken
 
-_ENCODING = tiktoken.get_encoding("cl100k_base")
+
+@functools.lru_cache(maxsize=1)
+def _encoding() -> tiktoken.Encoding:
+    return tiktoken.get_encoding("cl100k_base")
 
 
 @functools.lru_cache(maxsize=1024)
 def _token_len(text: str) -> int:
-    return len(_ENCODING.encode(text))
+    return len(_encoding().encode(text))
 
 
 def _recursive_split(text: str, chunk_size: int) -> list[str]:
@@ -43,9 +46,9 @@ def _recursive_split(text: str, chunk_size: int) -> list[str]:
                 segments.append(line)
                 continue
 
-            tokens = _ENCODING.encode(line)
+            tokens = _encoding().encode(line)
             for i in range(0, len(tokens), chunk_size):
-                segments.append(_ENCODING.decode(tokens[i:i + chunk_size]))
+                segments.append(_encoding().decode(tokens[i:i + chunk_size]))
 
     return segments
 
@@ -95,9 +98,9 @@ def chunk_document(
 
     if chunk_overlap > 0 and len(chunks) > 1:
         for i in range(1, len(chunks)):
-            prev_tokens = _ENCODING.encode(chunks[i - 1])
+            prev_tokens = _encoding().encode(chunks[i - 1])
             if len(prev_tokens) > chunk_overlap:
-                overlap = _ENCODING.decode(prev_tokens[-chunk_overlap:])
+                overlap = _encoding().decode(prev_tokens[-chunk_overlap:])
                 chunks[i] = overlap + "\n\n" + chunks[i]
 
     return chunks

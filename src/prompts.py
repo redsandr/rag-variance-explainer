@@ -115,4 +115,11 @@ def build_rag_system_prompt(structured: bool = True) -> str:
         return SYSTEM_PROMPT_RAG
     schema = get_structured_schema()
     fmt = build_format_prompt(schema)
-    return SYSTEM_PROMPT_RAG + fmt
+    override = (
+        "\n\n# Structured Output Override — The constraints above about formatting (bullets, citations) "
+        "are OVERRIDDEN by the JSON schema below. Put ALL content in the JSON fields. "
+        "Use the `claims` array for each atomic fact with its source quote and chunk index. "
+        "The `answer` field should be a concise 1-3 sentence summary. "
+        "Do NOT use markdown, bullet points, or [TICKER] tags inside the JSON values."
+    )
+    return SYSTEM_PROMPT_RAG + override + fmt

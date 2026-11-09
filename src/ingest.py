@@ -9,6 +9,7 @@ your actual name/email before running anything.
 import logging
 import os
 import re
+import threading
 import time
 from typing import cast
 
@@ -22,6 +23,10 @@ from config import config
 logger = logging.getLogger(__name__)
 
 HEADERS = {"User-Agent": config.sec_user_agent}
+
+_CIK_CACHE: dict[str, str] = {}
+_CIK_CACHE_LOADED = False
+_CIK_CACHE_LOCK = threading.Lock()
 
 _SESSION = requests.Session()
 _SESSION.headers.update(HEADERS)
@@ -46,6 +51,8 @@ def _rate_limited_get(url: str, max_retries: int = 5, base_delay: float = 5.0) -
       (timeout, DNS, reset) with exponential backoff, up to *max_retries*.
     - Applies 30 s connection / 60 s read timeout to prevent hangs.
     """
+    if not config.sec_user_agent.strip():
+        raise RuntimeError("Set SEC_USER_AGENT in .env to your name and contact email before downloading SEC filings.")
     global _LAST_REQUEST_TIME
     last_exception = None
     for attempt in range(1, max_retries + 1):
@@ -210,18 +217,23 @@ _CIK_OVERRIDES = {
 }
 
 def get_cik(ticker: str) -> str:
+    global _CIK_CACHE, _CIK_CACHE_LOADED
     ticker_upper = ticker.upper()
     if ticker_upper in _CIK_OVERRIDES:
         return _CIK_OVERRIDES[ticker_upper]
 
-    response = _rate_limited_get("https://www.sec.gov/files/company_tickers.json")
-    data = response.json()
+    with _CIK_CACHE_LOCK:
+        if not _CIK_CACHE_LOADED:
+            response = _rate_limited_get("https://www.sec.gov/files/company_tickers.json")
+            data = response.json()
+            _CIK_CACHE = {entry["ticker"]: str(entry["cik_str"]).zfill(10) for entry in data.values()}
+            _CIK_CACHE_LOADED = True
+            logger.info("Loaded ticker-to-CIK mapping: %d entries", len(_CIK_CACHE))
 
-    for entry in data.values():
-        if entry["ticker"] == ticker_upper:
-            return str(entry["cik_str"]).zfill(10)
+    if ticker_upper not in _CIK_CACHE:
+        raise ValueError(f"Ticker {ticker} not found in SEC ticker file")
 
-    raise ValueError(f"Ticker {ticker} not found in SEC ticker file")
+    return _CIK_CACHE[ticker_upper]
 
 def fetch_companyfacts(cik: str) -> dict:
     """Fetch all XBRL-tagged facts for a company."""

@@ -8,42 +8,47 @@ import threading
 
 from sentence_transformers import SentenceTransformer
 
+from config import config
 from logging_config import log_timer
 
 logger = logging.getLogger(__name__)
 
 _MODEL_NAME = "nomic-ai/nomic-embed-text-v1.5"   # 768-dim
-_FALLBACK_MODEL = "all-MiniLM-L6-v2"              # 384-dim — can NOT be used for upsert
-_MODEL = None  # lazy-loaded singleton
-_MODEL_LOCK = threading.Lock()
-
 _TARGET_DIM = 768
 
 
-def _get_model() -> SentenceTransformer:
-    global _MODEL
-    if _MODEL is None:
-        with _MODEL_LOCK:
-            if _MODEL is None:
-                try:
-                    _MODEL = SentenceTransformer(_MODEL_NAME, trust_remote_code=True, device="cpu")
-                    logger.info("Loaded embedding model: %s", _MODEL_NAME)
-                except Exception as e:
-                    logger.warning(
-                        "Failed to load %s: %s. Falling back to %s.",
-                        _MODEL_NAME, e, _FALLBACK_MODEL,
-                    )
-                    fallback = SentenceTransformer(_FALLBACK_MODEL, device="cpu")
-                    dim = fallback.get_sentence_embedding_dimension()
-                    if dim != _TARGET_DIM:
-                        raise RuntimeError(
-                            f"Embedding fallback model {_FALLBACK_MODEL} has dimension {dim}, "
-                            f"but ChromaDB collection requires {_TARGET_DIM}. "
-                            f"Load {_MODEL_NAME} manually or use a {_TARGET_DIM}-dim fallback."
-                        ) from e
-                    _MODEL = fallback
-                    logger.info("Loaded fallback embedding model: %s", _FALLBACK_MODEL)
-    return _MODEL
+class EmbeddingModel:
+    """Thread-safe singleton wrapper for nomic-embed model."""
+    _instance: "EmbeddingModel | None" = None
+    _lock = threading.Lock()
+    _load_lock = threading.Lock()
+    _model: SentenceTransformer | None
+
+    def __new__(cls) -> "EmbeddingModel":
+        if cls._instance is None:
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = super().__new__(cls)
+                    cls._instance._model = None
+        return cls._instance
+
+    def get_model(self) -> SentenceTransformer:
+        model = self._model
+        if model is not None:
+            return model
+        with self._load_lock:
+            model = self._model
+            if model is None:
+                model = SentenceTransformer(_MODEL_NAME, trust_remote_code=True, device=config.embedding_device)
+                logger.info("Loaded embedding model: %s on %s", _MODEL_NAME, config.embedding_device)
+                dim = model.get_sentence_embedding_dimension()
+                if dim != _TARGET_DIM:
+                    raise RuntimeError(f"Embedding model {_MODEL_NAME} has dimension {dim}; expected {_TARGET_DIM}.")
+                self._model = model
+        return model
+
+
+_embedding_model = EmbeddingModel()
 
 
 def embed_documents(texts: list[str]) -> list[list[float]]:
@@ -51,7 +56,7 @@ def embed_documents(texts: list[str]) -> list[list[float]]:
     Embed a batch of document chunks for indexing (e.g. MD&A chunks
     going into ChromaDB). Applies the required "search_document:" prefix.
     """
-    model = _get_model()
+    model = _embedding_model.get_model()
     prefixed = [f"search_document: {t}" for t in texts]
     with log_timer(logger, f"embed.{len(texts)}docs"):
         embeddings = model.encode(prefixed, normalize_embeddings=True)
@@ -64,7 +69,7 @@ def embed_query(text: str) -> list[float]:
     "search_query:" prefix — NOT the same prefix as embed_documents,
     since nomic-embed-text treats these as distinct roles.
     """
-    model = _get_model()
+    model = _embedding_model.get_model()
     prefixed = f"search_query: {text}"
     with log_timer(logger, "embed.query"):
         embedding = model.encode([prefixed], normalize_embeddings=True)

@@ -6,6 +6,7 @@ a grounded answer via the swappable LLMClient.
 import logging
 import re
 from collections.abc import Callable
+from typing import Any
 
 from config import config
 from llm import LLMClient
@@ -15,8 +16,8 @@ from prompts import build_rag_system_prompt
 from retrieval import get_client, get_collection, query_multi
 from verifier import (
     aggregate_verdicts,
-    decompose_claims,
     fallback_answer,
+    get_structured_schema,
     parse_answer,
     validate_answer,
     verify_claims_nli,
@@ -57,6 +58,8 @@ def answer_question(
     top_k: int | None = None,
     min_relevance: float | None = None,
     llm: LLMClient | None = None,
+    nli_client: Any | None = None,
+    retrieval_client: Any | None = None,
     on_progress: Callable[[str, str], None] | None = None,
 ) -> dict:
     """End-to-end RAG pipeline: retrieve, generate.
@@ -64,6 +67,16 @@ def answer_question(
     Pulls relevant MD&A chunks from ChromaDB, builds a grounded prompt,
     calls the LLM (with built-in self-verify rules), and returns the answer.
     Returns structured dict with 'question', 'answer', and 'sources'.
+
+    Args:
+        question: User question
+        ticker_filter: Optional ticker to filter results
+        top_k: Number of chunks to retrieve
+        min_relevance: Minimum relevance threshold
+        llm: Optional LLMClient instance (for testing)
+        nli_client: Optional NLIClient instance (for testing)
+        retrieval_client: Optional ChromaDB client (for testing)
+        on_progress: Optional callback for progress updates
     """
 
     if top_k is None:
@@ -74,8 +87,11 @@ def answer_question(
     if on_progress:
         on_progress("retrieval", "Retrieving relevant SEC filing chunks...")
 
-    client = get_client()
-    collection = get_collection(client)
+    if retrieval_client is None:
+        client = get_client()
+        collection = get_collection(client)
+    else:
+        collection = retrieval_client
 
     with log_timer(logger, "rag.retrieval"):
         results = query_multi(
@@ -85,6 +101,21 @@ def answer_question(
             min_relevance=min_relevance,
             ticker_filter=ticker_filter,
         )
+
+    if not results:
+        if on_progress:
+            on_progress("done", "No relevant filing excerpts found.")
+        return {
+            "question": question,
+            "answer": "I cannot answer this question based on the available SEC filing excerpts.",
+            "sources": [],
+            "verification_errors": [],
+            "structured": True,
+            "claims": [],
+            "confidence": 0.0,
+            "nli_verdicts": None,
+            "nli_summary": None,
+        }
 
     context = build_context(results)
     prompt = (
@@ -101,9 +132,6 @@ def answer_question(
 
     system_prompt = build_rag_system_prompt(structured=config.structured_output_enabled)
 
-    with log_timer(logger, "rag.generate"):
-        answer = llm.generate(prompt, system=system_prompt, max_tokens=config.llm_max_tokens, temperature=config.llm_temperature)
-
     structured_fallback = False
     structured_failure_reason: str | None = None
 
@@ -111,47 +139,70 @@ def answer_question(
     nli_summary: dict | None = None
 
     if config.structured_output_enabled:
+        schema = get_structured_schema()
+        response_format = {"type": "json_object", "schema": schema}
+        with log_timer(logger, "rag.generate"):
+            answer = llm.generate(
+                prompt,
+                system=system_prompt,
+                max_tokens=config.llm_max_tokens,
+                temperature=config.llm_temperature,
+                response_format=response_format,
+            )
+
         parsed = parse_answer(answer)
         if parsed is not None and parsed.can_answer:
-            errors = validate_answer(parsed, results)
-            if not errors:
-                if config.nli_enabled:
-                    try:
-                        sub_claims = decompose_claims(parsed.answer, llm)
-                        if sub_claims:
-                            from nli import NLIClient
+            quote_errors = validate_answer(parsed, results)
+            if quote_errors:
+                logger.warning("[StructuredOutput] quote validation (%d errors): %s", len(quote_errors), quote_errors)
+                return {
+                    "question": question,
+                    "answer": "I cannot verify the generated claims against the retrieved SEC filing excerpts, so I will not present them as sourced findings.",
+                    "sources": results,
+                    "verification_errors": quote_errors,
+                    "structured": True,
+                    "claims": [],
+                    "confidence": 0.0,
+                    "nli_verdicts": None,
+                    "nli_summary": None,
+                }
 
+            if config.nli_enabled:
+                try:
+                    sub_claims = [c.statement for c in parsed.claims]
+                    if sub_claims:
+                        if nli_client is None:
+                            from nli import NLIClient
                             nli_client = NLIClient(
                                 model_name=config.nli_model,
                                 device=config.nli_device,
                                 threshold=config.nli_threshold,
                             )
-                            nli_verdicts = verify_claims_nli(sub_claims, results, nli_client, config.nli_threshold)
-                            nli_summary = aggregate_verdicts(nli_verdicts)
-                            nli_client.unload()
-                            if nli_summary["overall"] == "fail":
-                                logger.warning(
-                                    "[NLI] %d/%d claims unsupported — answer may contain unsupported facts",
-                                    nli_summary["unsupported"],
-                                    nli_summary["total"],
-                                )
-                    except Exception:
-                        logger.exception("[NLI] verification skipped")
-                        nli_verdicts = None
-                        nli_summary = None
-                return {
-                    "question": question,
-                    "answer": parsed.answer,
-                    "sources": results,
-                    "verification_errors": [],
-                    "structured": True,
-                    "claims": [c.model_dump() for c in parsed.claims],
-                    "confidence": parsed.confidence,
-                    "nli_verdicts": nli_verdicts,
-                    "nli_summary": nli_summary,
-                }
-            else:
-                logger.warning("[StructuredOutput] quote validation failed: %s", errors)
+                        nli_verdicts = verify_claims_nli(sub_claims, results, nli_client, config.nli_threshold)
+                        nli_summary = aggregate_verdicts(nli_verdicts)
+                        if nli_summary["overall"] == "fail":
+                            logger.warning(
+                                "[NLI] %d/%d claims unsupported — answer may contain unsupported facts",
+                                nli_summary["unsupported"],
+                                nli_summary["total"],
+                            )
+                except Exception:
+                    logger.exception("[NLI] verification skipped")
+                    nli_verdicts = None
+                    nli_summary = None
+
+            return {
+                "question": question,
+                "answer": parsed.answer,
+                "sources": results,
+                "verification_errors": quote_errors,
+                "structured": True,
+                "claims": [c.model_dump() for c in parsed.claims],
+                "confidence": parsed.confidence,
+                "nli_verdicts": nli_verdicts,
+                "nli_summary": nli_summary,
+            }
+
         fallback_result = fallback_answer(answer, question, results)
         structured_fallback = True
         structured_failure_reason = fallback_result.get("structured_failure_reason", "unknown")

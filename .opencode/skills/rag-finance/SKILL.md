@@ -1,56 +1,18 @@
-# Skill: RAG Financial Variance Explainer
+---
+name: rag-finance
+description: Use the locally installed RAG Variance Explainer MCP server to search SEC MD&A and answer questions about its seven supported companies. Requires this repository, a built index, and an LLM backend for answers.
+---
 
-Query SEC filings (MD&A sections) across 7 companies, 4 sectors using a
-local RAG pipeline. No API keys needed — runs entirely on-device via llama.cpp.
+# RAG finance
 
-## Available Tools (MCP)
+Follow [the README](../../../readme.md) to install the repository, build the SEC index, choose an LLM backend, and connect `python src/server.py` as a stdio MCP server. This skill does not install the application or include its data and models.
 
-| Tool | What it does |
-|------|-------------|
-| `rag.answer(question, ticker?)` | Answer with citations from SEC filings |
-| `rag.search(query, ticker?, top_k?)` | Return raw chunks with relevance scores |
-| `rag.list_companies()` | List all 7 tickers with names + sectors |
-| `rag.list_questions(ticker?)` | Get suggested questions per company |
+## Answer a question
 
-## Companies Supported
+1. Call `rag.list_companies` to confirm the requested ticker is covered. The default set is CMG, DRI, CBRL, WMT, TGT, JNJ, and XOM.
+2. Call `rag.answer` with the user's question and ticker. Use `rag.search` when you need to inspect retrieved passages or the answer lacks enough support.
+3. Report the cited filing and date. Preserve any refusal or uncertainty. A matching quote confirms source text, while causal and numerical claims still need inspection of the filing.
 
-| Ticker | Company | Sector |
-|--------|---------|--------|
-| CMG | Chipotle Mexican Grill | Restaurant |
-| DRI | Darden Restaurants | Restaurant |
-| CBRL | Cracker Barrel | Restaurant |
-| WMT | Walmart | Retail |
-| TGT | Target | Retail |
-| JNJ | Johnson & Johnson | Healthcare |
-| XOM | Exxon Mobil | Energy |
+For comparisons, query each company separately and retain each company's sources. Use `rag.list_questions` only for examples of supported question wording; it does not prove that the current index contains the answer.
 
-## Workflows
-
-### Analyze a company metric
-
-When user asks about a specific financial metric (revenue, costs, margins):
-
-1. Call `rag.list_questions(ticker)` to check available context
-2. Call `rag.answer(question, ticker)` for sourced answer
-3. Present answer with citations; note the source filing and date
-
-### Cross-company comparison
-
-When user asks to compare metrics across companies:
-
-1. Call `rag.list_companies()` to confirm which tickers are available
-2. For each relevant ticker, call `rag.answer(question, ticker)`
-3. Present comparison table with per-company answers
-
-### Raw data exploration
-
-When user wants to see source chunks without LLM interpretation:
-
-1. Call `rag.search(query, ticker, top_k=10)` for raw chunks
-2. Present chunks with scores and source metadata
-
-## Notes
-
-- LLM loads lazily on first `rag.answer` call (~5-15s cold start)
-- 120s timeout per generation (configurable via `LLM_TIMEOUT`)
-- Works entirely offline — no API calls to external services
+The server covers English MD&A sections from the filings selected during local indexing. Downloads require internet access; a local LLM can answer without sending retrieved passages to a cloud API. OpenAI and Anthropic backends send passages to their APIs. See [GitHub readiness](../../../docs/14.%20GitHub%20Readiness.md) for current limits.
