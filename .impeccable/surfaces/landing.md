@@ -4,13 +4,13 @@ Mode: Persuade. Audience: independent financial analysts and small research team
 
 ## Direction contract
 
-THESIS: The first viewport introduces the research question and an explorable evidence trail, not a fabricated result or performance chart.
+THESIS: The first viewport asks a specific research question, then an automatic terminal story demonstrates where an analyst must stop. No fabricated result or performance chart is used.
 
 OWN-WORLD: Dark charcoal is the default; pale gold marks meaningful interaction, with a visitor-selectable paper mode. The evidence band and workpaper keep the analysis grounded.
 
-STORY: The visitor follows four research boundaries, sees the pending demo state, explores three method steps, and can read the project source.
+STORY: The visitor watches four timed research boundaries, sees the pending demo state, explores the method, then finds local installation instructions and questions answered.
 
-FIRST VIEWPORT: A broad two-line headline and gold demo action share the space with a small filing-orbit diagram. Immediately below is a dark selectable evidence trail; on phone it becomes two columns under the hero. The workpaper is next and stacks on phone.
+FIRST VIEWPORT: A floating rounded navigation sits above the restored large question headline. A small illustrative prompt types beneath it. Below, a four-chapter sequence joins a dark process terminal and can advance on its own or be paused, replayed and selected. The workpaper follows and stacks on phone.
 
 FORM: A research journey organized around an analyst's workpaper and its evidence boundary. The original dark-gold identity remains the default; the light-gold V3 concept supplies a secondary theme and section structure. seed:f165129efc3ec3d1.
 

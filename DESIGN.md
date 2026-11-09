@@ -7,13 +7,13 @@ Dark by default. Warm gold signals the path through a research question, a retri
 ## Visual system
 
 - Dark ground `#121310`, raised research surface `#1b1d18`, pale text `#f6f3e9`, gold `#ead2a0`, quiet rules `#41443c`.
-- Light mode uses paper `#f6f4ed`, ink `#1d201a`, and darker gold `#ae8750`. Evidence-trail and policy bands remain dark in both themes.
-- A broad two-line headline and a restrained orbital filing diagram open the page. The evidence trail is a horizontal selectable sequence on desktop and a two-column choice on phone.
-- Research workpaper, method explorer, policy band, and closing statement create distinct scale and density. The pending status is visibly separate from an approved answer.
+- Light mode uses paper `#f5f2e9`, ink `#20231d`, and darker gold `#976c33`. A cool-tinted process band contrasts with a warm, illuminated hero; the terminal and evidence-policy band remain dark in both themes.
+- A broad question headline restores the earlier site's typographic presence. A visible illustrative question types beneath it. The floating navigation keeps the local demo, method, installation and FAQ within reach.
+- A research terminal sits beside a four-stage process chapter on desktop and below the stage controls on phone. Workpaper, method explorer, policy band, install guide, FAQ and closing statement create distinct scale and density. The pending status is visibly separate from an approved answer.
 
 ## Interaction and responsive behavior
 
-The theme button switches between dark and light and saves a preference locally. On screens up to 780 px the navigation becomes a hamburger menu with working section and external links. Escape closes the menu and returns focus to its trigger. Evidence-trail and method buttons expose their selected state and announce updated explanatory content. Motion is brief and purposeful; the reduced-motion preference removes spatial transitions and looping effects.
+The theme button switches between dark and light and saves a preference locally. On screens up to 1100 px the navigation becomes a hamburger menu with working section and external links. Escape closes the menu and returns focus to its trigger. The evidence sequence advances once while visible, types an illustrative command at each stage and stops at the unverified filing review. Visitors can pause, replay or select a stage. Motion pauses offscreen or when the tab is hidden. Reduced motion keeps every stage manually selectable without automatic progression or spatial movement. Installation platform tabs and FAQ disclosure rows provide quieter interaction below.
 
 ## Evidence rule
 
