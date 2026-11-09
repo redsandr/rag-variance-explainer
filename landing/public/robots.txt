@@ -1,5 +1,2 @@
 User-agent: *
 Allow: /
-
-# TODO: ganti YOUR-DOMAIN.example dengan domain asli sebelum deploy
-Sitemap: https://YOUR-DOMAIN.example/sitemap.xml

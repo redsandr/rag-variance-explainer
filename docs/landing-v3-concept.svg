@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1000" viewBox="0 0 1440 1000" role="img" aria-label="V3 light gold landing design concept with an interactive evidence trail">
+  <defs><linearGradient id="paper" x2="1" y2="1"><stop stop-color="#f7f5ef"/><stop offset="1" stop-color="#efebe0"/></linearGradient><linearGradient id="gold" x2="1" y2="1"><stop stop-color="#e8d4a8"/><stop offset="1" stop-color="#b99c65"/></linearGradient><radialGradient id="shine"><stop stop-color="#d8bc7d" stop-opacity=".27"/><stop offset="1" stop-color="#d8bc7d" stop-opacity="0"/></radialGradient></defs>
+  <rect width="1440" height="1000" fill="url(#paper)"/><ellipse cx="1200" cy="250" rx="430" ry="360" fill="url(#shine)"/>
+  <path d="M56 82H1384M56 766H1384" stroke="#d7d0bf"/>
+  <rect x="56" y="27" width="34" height="34" rx="9" fill="#bca370"/><text x="64" y="51" fill="#151612" font-size="20" font-family="Arial">◇</text>
+  <text x="104" y="52" fill="#191b18" font-size="19" font-weight="700" font-family="Arial">Variance Explainer</text>
+  <text x="952" y="51" fill="#4e5149" font-size="14" font-family="Arial">The method</text><text x="1060" y="51" fill="#4e5149" font-size="14" font-family="Arial">Evidence policy</text><text x="1194" y="51" fill="#4e5149" font-size="14" font-family="Arial">GitHub ↗</text>
+  <rect x="1292" y="21" width="92" height="44" rx="8" fill="#181a16"/><text x="1306" y="48" fill="#f3e5c0" font-size="12" font-weight="700" font-family="Arial">View demo</text>
+  <text x="56" y="151" fill="#8f7449" font-size="12" font-family="Arial" letter-spacing="3">RESEARCH THE CHANGE. VERIFY THE CAUSE.</text>
+  <text x="56" y="257" fill="#191b18" font-size="72" font-weight="700" font-family="Arial">Ask why it changed.</text>
+  <text x="56" y="334" fill="#b39661" font-size="72" font-weight="700" font-family="Arial">Follow the evidence.</text>
+  <text x="56" y="389" fill="#4c514a" font-size="19" font-family="Arial">Investigate changes in SEC filings through retrieved MD&amp;A passages.</text>
+  <text x="56" y="418" fill="#4c514a" font-size="19" font-family="Arial">If the filing does not establish a cause, the answer remains open.</text>
+  <rect x="56" y="458" width="272" height="58" rx="9" fill="url(#gold)"/><text x="79" y="494" fill="#181915" font-size="16" font-weight="700" font-family="Arial">Explore the demo status →</text>
+  <text x="347" y="493" fill="#6d6d62" font-size="14" font-family="Arial">A reviewed example is being prepared.</text>
+  <rect x="56" y="577" width="1328" height="162" rx="17" fill="#171916"/>
+  <text x="85" y="611" fill="#c9b783" font-size="11" font-family="Arial" letter-spacing="2">THE EVIDENCE TRAIL</text>
+  <text x="86" y="652" fill="#f5f2e9" font-size="23" font-weight="700" font-family="Arial">One question. Every step visible.</text>
+  <path d="M616 659H1294" stroke="#9f895c" stroke-width="2" stroke-dasharray="7 8"/>
+  <circle cx="635" cy="659" r="8" fill="#d1b97e"/><circle cx="850" cy="659" r="8" fill="#d1b97e"/><circle cx="1063" cy="659" r="8" fill="#d1b97e"/><circle cx="1284" cy="659" r="8" fill="#594f39" stroke="#d1b97e"/>
+  <text x="616" y="698" fill="#e4dfd4" font-size="13" font-family="Arial">Question</text><text x="823" y="698" fill="#e4dfd4" font-size="13" font-family="Arial">Passage</text><text x="1033" y="698" fill="#e4dfd4" font-size="13" font-family="Arial">Quote check</text><text x="1230" y="698" fill="#e4dfd4" font-size="13" font-family="Arial">Filing review</text>
+  <rect x="56" y="792" width="1328" height="208" fill="#1f201b"/>
+  <text x="84" y="840" fill="#c8b27c" font-size="12" font-family="Arial" letter-spacing="2">DEMO / SOURCE REVIEW</text>
+  <text x="84" y="900" fill="#f7f4ec" font-size="37" font-family="Arial">No reviewed analysis published yet.</text>
+  <text x="86" y="937" fill="#bcb8aa" font-size="16" font-family="Arial">The workflow is explorable. A claimed cause waits for review against the original SEC filing.</text>
+  <rect x="1170" y="822" width="172" height="38" rx="19" fill="#514935"/><text x="1189" y="847" fill="#f2dfb2" font-size="12" font-weight="700" font-family="Arial">PENDING REVIEW</text>
+</svg>
