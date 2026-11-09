@@ -7,9 +7,9 @@ Dark by default. Warm gold signals the path through a research question, a retri
 ## Visual system
 
 - Dark ground `#121310`, raised research surface `#1b1d18`, pale text `#f6f3e9`, gold `#ead2a0`, quiet rules `#41443c`.
-- Light mode uses paper `#f5f2e9`, ink `#20231d`, and darker gold `#976c33`. A cool-tinted process band contrasts with a warm, illuminated hero; the terminal and evidence-policy band remain dark in both themes.
+- Light mode uses paper `#f5f2e9`, ink `#20231d`, and darker gold `#976c33`. The research scene uses pale sage, and the console, installation code, evidence policy, and review badge all use light-theme surfaces and ink.
 - A broad question headline restores the earlier site's typographic presence. A visible illustrative question types beneath it. The floating navigation keeps the local demo, method, installation and FAQ within reach.
-- A research terminal sits beside a four-stage process chapter on desktop and below the stage controls on phone. Workpaper, method explorer, policy band, install guide, FAQ and closing statement create distinct scale and density. The pending status is visibly separate from an approved answer.
+- A full-width research scene changes its central visual at each stage. The illustrative terminal is a narrow console beneath the scene, not a second static panel. Workpaper, method explorer, policy band, install guide, FAQ and closing statement retain the research context. The pending status is visibly separate from an approved answer.
 
 ## Interaction and responsive behavior
 

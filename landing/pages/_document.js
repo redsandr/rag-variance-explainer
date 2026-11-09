@@ -2,8 +2,9 @@ import { Html, Head, Main, NextScript } from 'next/document';
 
 export default function Document() {
   return (
-    <Html lang="en">
+    <Html lang="en" suppressHydrationWarning>
       <Head>
+        <script dangerouslySetInnerHTML={{ __html: 'try{if(localStorage.getItem("variance-theme")==="light")document.documentElement.dataset.theme="light"}catch(e){}' }} />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="alternate icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
