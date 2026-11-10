@@ -2,6 +2,8 @@
 
 A local research application for asking why financial metrics changed in SEC 10-K and 10-Q filings. It downloads MD&A text, builds a ChromaDB index, retrieves relevant passages, and asks an LLM to answer with source quotes. The current dataset covers seven US companies across restaurant, retail, healthcare, and energy. You can use the Streamlit UI, REST API, or MCP server on your own machine.
 
+For the intended analyst decision workflow, planned news and private financial-PDF sources, and the evidence gates before publishing, see the [active product roadmap](docs/product-roadmap.md). Those extensions are **not** implemented by this local SEC prototype.
+
 This is a research prototype. A source quote match confirms that the quoted text exists in a retrieved passage. It does not independently prove a causal explanation, a computed number, or investment suitability. Review the cited filing before relying on an answer.
 
 ## Run locally
@@ -31,6 +33,9 @@ cp .env.example .env
 Edit `.env` and set `SEC_USER_AGENT` to your name and contact email, for example `SEC_USER_AGENT=Jane Doe jane@example.com`. Choose one LLM backend:
 
 - **Local:** Install `python -m pip install -e ".[local]"`, keep `LLM_BACKEND=llama_cpp`, download a compatible GGUF model, and set `LLAMA_CPP_MODEL_PATH` to its absolute path. CPU inference is the default (`LLAMA_CPP_N_GPU_LAYERS=0`, `LLAMA_CPP_N_BATCH=32`, `LLAMA_CPP_N_CTX=8192`). Only enable GPU layers after confirming a compatible GPU build and sufficient VRAM. The model is not included. On Windows, `llama-cpp-python` may need a compatible prebuilt wheel or a working C++ toolchain. If a model exists but fails to load, check available virtual memory and page-file capacity before downloading it again. Reduce `LLAMA_CPP_N_CTX` or `LLAMA_CPP_N_BATCH` when memory is tight.
+- **Local Docker CUDA:** Run `llama-server` from `ghcr.io/ggml-org/llama.cpp:server-cuda` with GPU access and a GGUF bind-mounted read-only. Bind host port `127.0.0.1:8080` and confirm `http://127.0.0.1:8080/v1/models` responds. Install the OpenAI-compatible client with `python -m pip install -e ".[openai]"`, then set `LLM_BACKEND=llama_server`. The app uses the first loaded model returned by the server, or `LLAMA_SERVER_MODEL` if set. This backend sends passages only to the local server and does not load a second GGUF into the Streamlit process. The model server and app must each be started separately; a working server does not guarantee sufficient memory for retrieval or faithful answers.
+
+  On Windows, with Docker Desktop running and the GGUF at `models/qwen2.5-7b-instruct-q4_k_m.gguf`, start the CUDA container from the repository root using `powershell -File .\scripts\run_local_llama.ps1`. Check readiness with `Invoke-RestMethod http://127.0.0.1:8080/v1/models`. Stop it with `docker stop rve-llama` when finished. The script requests 10 GPU layers, a batch of 32, and an 8192-token context for the 7B baseline; verify the effective context in server logs. The historical 35B benchmark used a different model and build; do not copy its `--n-cpu-moe` or TurboQuant flags into the official CUDA image.
 - **OpenAI:** Install `python -m pip install -e ".[openai]"`, then set `LLM_BACKEND=openai` and `OPENAI_API_KEY`. This sends retrieved filing passages to the API and incurs API charges.
 - **Anthropic:** Install `python -m pip install -e ".[anthropic]"`, then set `LLM_BACKEND=anthropic` and `ANTHROPIC_API_KEY`. This also sends retrieved passages to an external API.
 

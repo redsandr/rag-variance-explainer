@@ -398,21 +398,20 @@ with main_col:
         key="compare_checkbox",
     )
 
-    with st.form("ask_form"):
-        col_q, col_btn = st.columns([5, 1])
-        with col_q:
-            question = st.text_input(
-                "Question",
-                placeholder="e.g. Why did Chipotle's labor costs change?",
-                label_visibility="collapsed",
-                key="question_input",
-            )
-        with col_btn:
-            ask = st.form_submit_button(
-                "Analyze" if not processing else "Analyzing...",
-                use_container_width=True,
-                disabled=processing,
-            ) or auto_ask
+    col_q, col_btn = st.columns([5, 1])
+    with col_q:
+        question = st.text_input(
+            "Question",
+            placeholder="e.g. Why did Chipotle's labor costs change?",
+            label_visibility="collapsed",
+            key="question_input",
+        )
+    with col_btn:
+        ask = st.button(
+            "Analyze" if not processing else "Analyzing...",
+            width="stretch",
+            disabled=processing,
+        ) or auto_ask
 
     if auto_ask:
         compare = st.session_state.pop("_saved_compare", compare)

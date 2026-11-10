@@ -1,8 +1,9 @@
 """
 LLMClient — swappable backend abstraction.
 
-Supports three backends behind one common interface:
+Supports four backends behind one common interface:
 - llama.cpp local (default, no API cost — matches project's no-budget constraint)
+- llama.cpp server (local Docker, no in-process model)
 - Anthropic API (for reviewers who want to plug in their own key)
 - OpenAI API (same, alternate provider)
 
@@ -22,6 +23,7 @@ from logging_config import log_timer
 logger = logging.getLogger(__name__)
 
 _LLM_TIMEOUT = int(os.getenv("LLM_TIMEOUT", "120"))
+_LLAMA_SERVER_TIMEOUT = int(os.getenv("LLAMA_SERVER_TIMEOUT", "300"))
 _MAX_CONCURRENT = int(os.getenv("LLM_MAX_CONCURRENT", "1"))
 _llm_semaphore = threading.Semaphore(_MAX_CONCURRENT)
 _executor = ThreadPoolExecutor(max_workers=_MAX_CONCURRENT)
@@ -37,6 +39,11 @@ def _retry(max_attempts: int = 3, base_delay: float = 2.0):
                     return fn(*args, **kwargs)
                 except Exception as e:
                     last_exc = e
+                    status_code = getattr(e, "status_code", None)
+                    if (isinstance(status_code, int) and 400 <= status_code < 500 and status_code != 429) or (
+                        isinstance(e, ValueError) and "exceed context window" in str(e)
+                    ):
+                        raise
                     if attempt < max_attempts:
                         delay = base_delay * (2 ** (attempt - 1))
                         logger.warning(
@@ -81,7 +88,7 @@ class LLMClient:
 
         preferred = backend or os.getenv("LLM_BACKEND", "llama_cpp")
         backends = [preferred]
-        if preferred != "llama_cpp":
+        if preferred not in ("llama_cpp", "llama_server"):
             backends.append("llama_cpp")
 
         last_error = None
@@ -90,6 +97,8 @@ class LLMClient:
             try:
                 if candidate == "llama_cpp":
                     self._init_llama_cpp()
+                elif candidate == "llama_server":
+                    self._init_llama_server()
                 elif candidate == "anthropic":
                     self._init_anthropic()
                 elif candidate == "openai":
@@ -158,6 +167,20 @@ class LLMClient:
         self._client = OpenAI(api_key=api_key)
         self._model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
+    def _init_llama_server(self):
+        from openai import OpenAI
+
+        self._client = OpenAI(
+            api_key="local",
+            base_url="http://127.0.0.1:8080/v1",
+            timeout=_LLAMA_SERVER_TIMEOUT,
+            max_retries=0,
+        )
+        models = self._client.models.list().data
+        self._model = os.getenv("LLAMA_SERVER_MODEL") or (models[0].id if models else None)
+        if not self._model:
+            raise RuntimeError("Local llama-server has no loaded model")
+
     @_retry(max_attempts=3, base_delay=2.0)
     def generate(
         self,
@@ -178,7 +201,8 @@ class LLMClient:
         """
 
         t_start = time.perf_counter()
-        acquired = _llm_semaphore.acquire(timeout=_LLM_TIMEOUT)
+        timeout = _LLAMA_SERVER_TIMEOUT if self.backend == "llama_server" else _LLM_TIMEOUT
+        acquired = _llm_semaphore.acquire(timeout=timeout)
         if not acquired:
             raise TimeoutError(
                 f"All {_MAX_CONCURRENT} generation slot(s) busy — try again later."
@@ -188,20 +212,20 @@ class LLMClient:
                 future = _executor.submit(self._generate_llama_cpp, prompt, system, max_tokens, temperature, response_format)
             elif self.backend == "anthropic":
                 future = _executor.submit(self._generate_anthropic, prompt, system, max_tokens)
+            elif self.backend == "llama_server":
+                future = _executor.submit(self._generate_openai, prompt, system, max_tokens, temperature, response_format)
             elif self.backend == "openai":
                 future = _executor.submit(self._generate_openai, prompt, system, max_tokens, temperature)
             else:
                 raise ValueError(f"Unknown backend: {self.backend}")
 
             elapsed = time.perf_counter() - t_start
-            remaining = max(_LLM_TIMEOUT - elapsed, 1)
+            remaining = max(timeout - elapsed, 1)
             with log_timer(logger, f"llm.{self.backend}"):
                 try:
                     return future.result(timeout=remaining)
                 except FuturesTimeout:
-                    raise TimeoutError(
-                        f"LLM ({self.backend}) did not respond within {_LLM_TIMEOUT}s timeout."
-                    ) from None
+                    raise TimeoutError(f"LLM ({self.backend}) did not respond within {timeout}s timeout.") from None
         finally:
             _llm_semaphore.release()
 
@@ -233,7 +257,7 @@ class LLMClient:
         response = self._client.messages.create(**kwargs)
         return response.content[0].text.strip()
 
-    def _generate_openai(self, prompt: str, system: str | None, max_tokens: int, temperature: float | None = None) -> str:
+    def _generate_openai(self, prompt: str, system: str | None, max_tokens: int, temperature: float | None = None, response_format: dict | None = None) -> str:
         messages = []
         if system:
             messages.append({"role": "system", "content": system})
@@ -241,5 +265,7 @@ class LLMClient:
         kwargs = {"model": self._model, "max_tokens": max_tokens, "messages": messages}
         if temperature is not None:
             kwargs["temperature"] = temperature
+        if response_format is not None:
+            kwargs["response_format"] = response_format
         response = self._client.chat.completions.create(**kwargs)
         return response.choices[0].message.content.strip()

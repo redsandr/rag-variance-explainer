@@ -24,5 +24,6 @@ def _block_real_llm():
         patch("src.llm.LLMClient._init_llama_cpp", side_effect=RuntimeError("blocked by test fixture - real LLM not allowed")),
         patch("src.llm.LLMClient._init_anthropic", side_effect=RuntimeError("blocked by test fixture - real LLM not allowed")),
         patch("src.llm.LLMClient._init_openai", side_effect=RuntimeError("blocked by test fixture - real LLM not allowed")),
+        patch("src.llm.LLMClient._init_llama_server", side_effect=RuntimeError("blocked by test fixture - real LLM not allowed")),
     ):
         yield

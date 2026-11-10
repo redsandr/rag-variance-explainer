@@ -3,6 +3,8 @@
 MCP (Model Context Protocol) server exposing the RAG pipeline as tools
 consumable by AI agents (Claude Code, Cursor, Cline, Windsurf, etc.).
 
+**Status:** Local code and unit tests exist; first-run client setup and an end-to-end filing-backed answer have not been recorded. This server exposes the current SEC index, not news search or user-uploaded PDFs. See [readiness](14.%20GitHub%20Readiness.md) and the [active roadmap](product-roadmap.md). Do not expose the network transport publicly without authentication, resource limits, and security review.
+
 ## Quick Start
 
 ```bash
