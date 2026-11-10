@@ -808,7 +808,7 @@ def test_embedding_rejects_wrong_dimension() -> None:
 
     emb._embedding_model._model = None
     mock_model = MagicMock()
-    mock_model.get_embedding_dimension.return_value = 384
+    mock_model.get_sentence_embedding_dimension.return_value = 384
 
     with patch("src.embedding.SentenceTransformer", return_value=mock_model):
         with pytest.raises(RuntimeError, match="dimension"):
@@ -823,7 +823,7 @@ def test_embedding_successful_load() -> None:
 
     emb._embedding_model._model = None
     mock_model = MagicMock()
-    mock_model.get_embedding_dimension.return_value = 768
+    mock_model.get_sentence_embedding_dimension.return_value = 768
 
     with patch("src.embedding.SentenceTransformer", return_value=mock_model):
         model = emb._embedding_model.get_model()

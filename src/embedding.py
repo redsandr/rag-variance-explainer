@@ -14,6 +14,7 @@ from logging_config import log_timer
 logger = logging.getLogger(__name__)
 
 _MODEL_NAME = "nomic-ai/nomic-embed-text-v1.5"   # 768-dim
+_MODEL_REVISION = "e9b6763023c676ca8431644204f50c2b100d9aab"
 _TARGET_DIM = 768
 
 
@@ -39,9 +40,14 @@ class EmbeddingModel:
         with self._load_lock:
             model = self._model
             if model is None:
-                model = SentenceTransformer(_MODEL_NAME, device=config.embedding_device)
+                model = SentenceTransformer(
+                    _MODEL_NAME,
+                    device=config.embedding_device,
+                    trust_remote_code=True,
+                    revision=_MODEL_REVISION,
+                )
                 logger.info("Loaded embedding model: %s on %s", _MODEL_NAME, config.embedding_device)
-                dim = model.get_embedding_dimension()
+                dim = model.get_sentence_embedding_dimension()
                 if dim != _TARGET_DIM:
                     raise RuntimeError(f"Embedding model {_MODEL_NAME} has dimension {dim}; expected {_TARGET_DIM}.")
                 self._model = model

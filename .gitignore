@@ -3,6 +3,10 @@ data/raw/
 chroma_db/
 .env
 __pycache__/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+htmlcov/
 .squad/
 locks/
 models/
