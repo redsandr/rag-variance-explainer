@@ -125,9 +125,13 @@ class LLMClient:
                 "downloaded .gguf file, e.g. models/llama-3-8b-instruct.Q4_K_M.gguf"
             )
         model_path = os.path.expandvars(model_path)
-        n_gpu_layers = int(os.getenv("LLAMA_CPP_N_GPU_LAYERS", "-1"))
+        n_gpu_layers = int(os.getenv("LLAMA_CPP_N_GPU_LAYERS", "0"))
+        n_batch = int(os.getenv("LLAMA_CPP_N_BATCH", "32"))
+        n_ctx = int(os.getenv("LLAMA_CPP_N_CTX", "8192"))
+        if n_batch < 1 or n_ctx < 1:
+            raise ValueError("LLAMA_CPP_N_BATCH and LLAMA_CPP_N_CTX must be positive integers")
         try:
-            self._llm = Llama(model_path=model_path, n_ctx=8192, n_gpu_layers=n_gpu_layers, seed=42, verbose=False)
+            self._llm = Llama(model_path=model_path, n_ctx=n_ctx, n_batch=n_batch, n_gpu_layers=n_gpu_layers, seed=42, verbose=False)
         except Exception as e:
             if "CUDA" in str(e) or "cuda" in str(e) or "memory" in str(e).lower():
                 raise RuntimeError(

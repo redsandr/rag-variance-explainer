@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1000" viewBox="0 0 1440 1000" role="img" aria-label="Desktop design concept for the Variance Explainer landing page">
+  <rect width="1440" height="1000" fill="#edf1f2"/>
+  <rect x="32" y="25" width="1376" height="950" fill="#f9fbfa" stroke="#c5d1d6"/>
+  <path d="M96 109H1344 M96 842H1344" stroke="#b8c7ce"/>
+  <rect x="96" y="59" width="31" height="31" fill="#153a56"/>
+  <text x="103" y="80" fill="#fff" font-size="19" font-family="Arial">[ ]</text>
+  <text x="142" y="81" fill="#16344a" font-size="18" font-weight="700" font-family="Arial">Variance Explainer</text>
+  <text x="936" y="80" fill="#425d6b" font-size="14" font-family="Arial">Method</text>
+  <text x="1034" y="80" fill="#425d6b" font-size="14" font-family="Arial">Limits</text>
+  <text x="1123" y="80" fill="#425d6b" font-size="14" font-family="Arial">Source code ↗</text>
+  <text x="96" y="161" fill="#376078" font-size="12" font-family="Arial" letter-spacing="2">RESEARCH PROTOTYPE   /   SEC 10-K + 10-Q</text>
+  <text x="96" y="242" fill="#122e43" font-size="62" font-weight="700" font-family="Arial">Understand the change.</text>
+  <text x="96" y="315" fill="#122e43" font-size="62" font-weight="700" font-family="Arial">Inspect the evidence.</text>
+  <text x="98" y="361" fill="#425d6b" font-size="18" font-family="Arial">Investigate a metric through retrieved MD&amp;A passages.</text>
+  <text x="98" y="388" fill="#425d6b" font-size="18" font-family="Arial">Check the original filing before relying on an explanation.</text>
+  <rect x="96" y="421" width="245" height="57" fill="#205b8a"/>
+  <text x="120" y="457" fill="#ffffff" font-size="16" font-weight="700" font-family="Arial">View demo status  →</text>
+  <text x="360" y="456" fill="#6b7376" font-size="14" font-family="Arial">Reviewed analysis not yet published.</text>
+  <text x="1230" y="168" fill="#78929e" font-size="13" font-family="Arial">VE / 001</text>
+  <rect x="96" y="520" width="1248" height="273" fill="#ffffff" stroke="#b8c7ce"/>
+  <rect x="96" y="520" width="1248" height="40" fill="#e4ecef"/>
+  <text x="117" y="546" fill="#35566b" font-size="12" font-family="Arial" letter-spacing="1">ANALYSIS WORKPAPER</text>
+  <text x="1127" y="546" fill="#6d8490" font-size="12" font-family="Arial">EXAMPLE FLOW  /  01</text>
+  <path d="M706 560V793 M117 697H683 M737 697H1323" stroke="#c8d3d7"/>
+  <text x="118" y="597" fill="#6b8190" font-size="12" font-family="Arial" letter-spacing="1">QUESTION</text>
+  <text x="118" y="642" fill="#17384d" font-size="25" font-weight="700" font-family="Arial">Why did the metric change?</text>
+  <text x="118" y="670" fill="#5d7180" font-size="14" font-family="Arial">Example workflow, not a verified answer.</text>
+  <text x="118" y="733" fill="#456271" font-size="14" font-family="Arial">01  Find a relevant passage</text>
+  <text x="118" y="759" fill="#456271" font-size="14" font-family="Arial">02  Follow it to the original filing</text>
+  <text x="738" y="597" fill="#6b8190" font-size="12" font-family="Arial" letter-spacing="1">SOURCE REVIEW</text>
+  <rect x="1165" y="576" width="157" height="32" fill="#f4e9d7"/>
+  <text x="1181" y="597" fill="#825824" font-size="12" font-weight="700" font-family="Arial">PENDING REVIEW</text>
+  <text x="738" y="643" fill="#17384d" font-size="22" font-weight="700" font-family="Arial">No approved case yet.</text>
+  <text x="738" y="671" fill="#5d7180" font-size="14" font-family="Arial">No invented quote, page number, or confidence score.</text>
+  <text x="738" y="734" fill="#456271" font-size="14" font-family="Arial">A filing-backed example will appear here after review.</text>
+  <text x="97" y="875" fill="#6b8190" font-size="12" font-family="Arial" letter-spacing="1">THE METHOD</text>
+  <text x="96" y="921" fill="#17384d" font-size="20" font-weight="700" font-family="Arial">01  Retrieve</text>
+  <text x="467" y="921" fill="#17384d" font-size="20" font-weight="700" font-family="Arial">02  Check the passage</text>
+  <text x="934" y="921" fill="#17384d" font-size="20" font-weight="700" font-family="Arial">03  Verify the filing</text>
+</svg>

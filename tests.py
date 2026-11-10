@@ -602,7 +602,44 @@ def test_api_answer_returns_answer() -> None:
     assert data["question"] == "Why did marketing costs change?"
     assert data["answer"] == mock_result["answer"]
     assert data["source_count"] == 1
+    assert data["evidence_status"] == "insufficient_evidence"
+    assert data["claims"] == []
     assert "elapsed_seconds" in data
+
+
+def test_api_answer_exposes_quote_and_filing_link() -> None:
+    from unittest.mock import patch
+
+    from fastapi.testclient import TestClient
+
+    from src.api import app
+
+    filing_url = "https://www.sec.gov/Archives/edgar/data/104169/1234567890/report.htm"
+    mock_result = {
+        "question": "Why did labor costs rise?",
+        "answer": "Labor costs rose due to wage inflation.",
+        "structured": True,
+        "claims": [{
+            "statement": "Labor costs rose due to wage inflation.",
+            "source_chunk_index": 0,
+            "source_quote": "Labor costs increased due to wage inflation.",
+        }],
+        "sources": [{
+            "text": "Labor costs increased due to wage inflation.",
+            "metadata": {
+                "ticker": "CMG", "form": "10-Q", "filing_date": "2026-10-29",
+                "filing_url": filing_url,
+            },
+        }],
+    }
+    with patch("src.api.answer_question", return_value=mock_result):
+        response = TestClient(app).post("/answer", json={"question": mock_result["question"]})
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["evidence_status"] == "quote_matched"
+    assert body["claims"] == mock_result["claims"]
+    assert body["sources"][0]["filing_url"] == filing_url
 
 
 def test_api_answer_rejects_empty_question() -> None:

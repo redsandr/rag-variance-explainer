@@ -136,6 +136,7 @@ def search(
             "ticker": meta.get("ticker"),
             "form": meta.get("form"),
             "filing_date": meta.get("filing_date"),
+            "filing_url": meta.get("filing_url"),
             "score": round(r.get("hybrid_score", r.get("relevance", 0)), 4),
         })
 
@@ -172,12 +173,18 @@ def answer(
             "ticker": meta.get("ticker"),
             "form": meta.get("form"),
             "filing_date": meta.get("filing_date"),
+            "filing_url": meta.get("filing_url"),
             "score": round(r.get("hybrid_score", r.get("relevance", 0)), 4),
         })
+
+    claims = result.get("claims", [])
+    quote_matched = result.get("structured") is True and bool(claims)
 
     return {
         "question": result["question"],
         "answer": result["answer"],
+        "claims": claims if quote_matched else [],
+        "evidence_status": "quote_matched" if quote_matched else "insufficient_evidence",
         "sources": sources,
         "source_count": len(sources),
         "elapsed_seconds": elapsed,

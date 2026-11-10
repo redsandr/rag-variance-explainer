@@ -2,6 +2,8 @@
 
 At the start of every task, and again after context compaction, load the installed `poteto-mode` skill and apply the relevant playbook. If it is unavailable, use [the repository hardening skill](.agents/skills/rag-hardening/SKILL.md). Treat these as the first task constraints.
 
+For product-demo work or a new chat continuing this project, read [the product development handoff](docs/15.%20Product%20Development%20Handoff.md) before planning or editing.
+
 Read `git status` and the relevant diff before editing. Keep user changes intact, make coherent changes, and verify the actual behavior affected. Review new comments for purpose and remove narration. Report evidence and open risks.
 
 For financial answers, a matching quote proves that text occurs in a retrieved passage. It does not prove a causal claim or arithmetic. Fail closed when structured parsing or quote validation fails. Keep execution of generated code out of the application process. See [the hardening skill](.agents/skills/rag-hardening/SKILL.md) for the full answer contract and release gates.

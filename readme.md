@@ -30,7 +30,7 @@ cp .env.example .env
 
 Edit `.env` and set `SEC_USER_AGENT` to your name and contact email, for example `SEC_USER_AGENT=Jane Doe jane@example.com`. Choose one LLM backend:
 
-- **Local:** Install `python -m pip install -e ".[local]"`, keep `LLM_BACKEND=llama_cpp`, download a compatible GGUF model, and set `LLAMA_CPP_MODEL_PATH` to its absolute path. For CPU inference set `LLAMA_CPP_N_GPU_LAYERS=0`. The model is not included. On Windows, `llama-cpp-python` may need a compatible prebuilt wheel or a working C++ toolchain.
+- **Local:** Install `python -m pip install -e ".[local]"`, keep `LLM_BACKEND=llama_cpp`, download a compatible GGUF model, and set `LLAMA_CPP_MODEL_PATH` to its absolute path. CPU inference is the default (`LLAMA_CPP_N_GPU_LAYERS=0`, `LLAMA_CPP_N_BATCH=32`, `LLAMA_CPP_N_CTX=8192`). Only enable GPU layers after confirming a compatible GPU build and sufficient VRAM. The model is not included. On Windows, `llama-cpp-python` may need a compatible prebuilt wheel or a working C++ toolchain. If a model exists but fails to load, check available virtual memory and page-file capacity before downloading it again. Reduce `LLAMA_CPP_N_CTX` or `LLAMA_CPP_N_BATCH` when memory is tight.
 - **OpenAI:** Install `python -m pip install -e ".[openai]"`, then set `LLM_BACKEND=openai` and `OPENAI_API_KEY`. This sends retrieved filing passages to the API and incurs API charges.
 - **Anthropic:** Install `python -m pip install -e ".[anthropic]"`, then set `LLM_BACKEND=anthropic` and `ANTHROPIC_API_KEY`. This also sends retrieved passages to an external API.
 

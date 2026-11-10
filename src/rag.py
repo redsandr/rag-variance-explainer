@@ -61,6 +61,7 @@ def answer_question(
     nli_client: Any | None = None,
     retrieval_client: Any | None = None,
     on_progress: Callable[[str, str], None] | None = None,
+    cross_encoder_enabled: bool | None = None,
 ) -> dict:
     """End-to-end RAG pipeline: retrieve, generate.
 
@@ -100,6 +101,7 @@ def answer_question(
             top_k=top_k,
             min_relevance=min_relevance,
             ticker_filter=ticker_filter,
+            cross_encoder_enabled=cross_encoder_enabled,
         )
 
     if not results:

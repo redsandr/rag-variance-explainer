@@ -246,6 +246,7 @@ def query_multi(
     top_k: int | None = None,
     min_relevance: float | None = None,
     ticker_filter: str | None = None,
+    cross_encoder_enabled: bool | None = None,
 ) -> list[dict]:
     """Multi-stage retrieval: dense → optional BM25 hybrid → cross-encoder rerank.
 
@@ -276,7 +277,10 @@ def query_multi(
 
     _add_metric_boost(candidates, query_text)
 
-    if config.cross_encoder_enabled:
+    if cross_encoder_enabled is None:
+        cross_encoder_enabled = config.cross_encoder_enabled
+
+    if cross_encoder_enabled:
         try:
             with log_timer(logger, "rerank.ce"):
                 return rerank(query_text, candidates, top_k=top_k)

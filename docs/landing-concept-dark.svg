@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" role="img" aria-label="Dark gold redesign concept for Variance Explainer">
+  <defs><radialGradient id="light"><stop stop-color="#32302a"/><stop offset="1" stop-color="#141412"/></radialGradient><linearGradient id="gold"><stop stop-color="#f0dba9"/><stop offset="1" stop-color="#ba9e6b"/></linearGradient></defs>
+  <rect width="1440" height="900" fill="#141412"/><ellipse cx="980" cy="190" rx="610" ry="420" fill="url(#light)" opacity=".75"/>
+  <path d="M80 91H1360M80 554H1360" stroke="#49463d"/>
+  <rect x="80" y="38" width="34" height="34" rx="7" fill="url(#gold)"/><text x="90" y="61" fill="#141412" font-size="20" font-family="Arial">◇</text>
+  <text x="130" y="61" fill="#f5f2e9" font-size="19" font-weight="700" font-family="Arial">Variance Explainer</text>
+  <text x="920" y="60" fill="#c7c1b5" font-size="14" font-family="Arial">Method</text><text x="1025" y="60" fill="#c7c1b5" font-size="14" font-family="Arial">Limits</text><text x="1115" y="60" fill="#c7c1b5" font-size="14" font-family="Arial">Source code ↗</text>
+  <rect x="1264" y="28" width="96" height="53" rx="9" fill="#d8c397"/><text x="1275" y="60" fill="#1e1b16" font-size="12" font-weight="700" font-family="Arial">Demo status</text>
+  <text x="80" y="169" fill="#ccb583" font-size="13" font-family="Arial" letter-spacing="3">FINANCIAL RESEARCH  /  SEC FILINGS</text>
+  <text x="80" y="269" fill="#f8f5ed" font-size="72" font-weight="700" font-family="Arial">Understand the change.</text>
+  <text x="80" y="347" fill="url(#gold)" font-size="72" font-weight="700" font-family="Arial">Inspect the evidence.</text>
+  <text x="82" y="399" fill="#c6c1b7" font-size="19" font-family="Arial">Investigate a metric through SEC 10-K and 10-Q passages.</text>
+  <text x="82" y="426" fill="#c6c1b7" font-size="19" font-family="Arial">Always check the original filing before relying on an explanation.</text>
+  <rect x="80" y="466" width="244" height="55" rx="9" fill="url(#gold)"/><text x="104" y="500" fill="#191814" font-size="16" font-weight="700" font-family="Arial">View demo status  →</text>
+  <text x="348" y="499" fill="#b6ae9e" font-size="14" font-family="Arial">Reviewed analysis not yet published.</text>
+  <text x="1195" y="228" fill="#686354" font-size="90" font-family="Arial">01</text>
+  <rect x="80" y="603" width="1280" height="250" rx="15" fill="#22221f" stroke="#4a463b"/>
+  <rect x="80" y="603" width="1280" height="43" rx="15" fill="#2c2b26"/><rect x="80" y="629" width="1280" height="18" fill="#2c2b26"/>
+  <circle cx="107" cy="625" r="5" fill="#d8c397"/><circle cx="124" cy="625" r="5" fill="#756c57"/><circle cx="141" cy="625" r="5" fill="#514e43"/>
+  <text x="170" y="630" fill="#bab4a7" font-size="12" font-family="Arial">variance-explainer / analysis workpaper</text>
+  <path d="M720 647V853" stroke="#49463d"/>
+  <text x="107" y="690" fill="#d0b985" font-size="12" font-family="Arial" letter-spacing="2">QUESTION / EXAMPLE ONLY</text>
+  <text x="107" y="737" fill="#f8f5ed" font-size="28" font-family="Arial">Why did the metric change?</text>
+  <text x="107" y="777" fill="#beb8ae" font-size="15" font-family="Arial">A research workflow, not a verified answer.</text>
+  <text x="107" y="821" fill="#ac9a73" font-size="13" font-family="Arial">RETRIEVE   /   CHECK QUOTE   /   VERIFY FILING</text>
+  <text x="752" y="690" fill="#d0b985" font-size="12" font-family="Arial" letter-spacing="2">SOURCE REVIEW</text>
+  <rect x="1171" y="666" width="158" height="33" rx="17" fill="#49402f"/><text x="1187" y="688" fill="#e6cd95" font-size="12" font-weight="700" font-family="Arial">PENDING REVIEW</text>
+  <text x="752" y="748" fill="#f8f5ed" font-size="27" font-family="Arial">No approved case yet.</text>
+  <text x="752" y="785" fill="#beb8ae" font-size="15" font-family="Arial">No invented quote, page number, or confidence score.</text>
+  <text x="752" y="820" fill="#beb8ae" font-size="14" font-family="Arial">Filing-backed analysis follows manual review.</text>
+</svg>

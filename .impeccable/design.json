@@ -1,0 +1,16 @@
+{
+  "name": "Variance Explainer landing",
+  "colors": {
+    "background": "#151513",
+    "surface": "#22221f",
+    "text": "#f5f2e9",
+    "muted": "#bbb7ac",
+    "rule": "#413f37",
+    "accent": "#d7be8e"
+  },
+  "font": "Segoe UI, Helvetica Neue, Arial, sans-serif",
+  "radius": {
+    "workpaper": "15px",
+    "control": "8px"
+  }
+}

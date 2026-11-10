@@ -1,9 +1,9 @@
 import time
 from pathlib import Path
+from urllib.parse import urlparse
 
 import streamlit as st
 
-from config import config
 from constants import SECTORS
 from constants import TICKER_MAP as _TICKER_MAP
 from llm import LLMClient
@@ -21,6 +21,18 @@ _HTML_ESCAPE_TABLE = str.maketrans({
 
 def _html_escape(text: str) -> str:
     return text.translate(_HTML_ESCAPE_TABLE)
+
+
+def _sec_filing_url(value: str | None) -> str | None:
+    if not value:
+        return None
+    try:
+        parsed = urlparse(value)
+        if parsed.scheme == "https" and parsed.hostname == "www.sec.gov" and parsed.path.startswith("/Archives/edgar/data/"):
+            return _html_escape(value)
+    except ValueError:
+        pass
+    return None
 
 st.set_page_config(
     page_title="RAG Variance Explainer",
@@ -142,14 +154,6 @@ TARGET_SVG = (
     '</svg>'
 )
 
-FLASK_SVG = (
-    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
-    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
-    '<path d="M9 3h6v5l4 11H5l4-11V3"/>'
-    '<line x1="9" y1="3" x2="15" y2="3"/>'
-    '</svg>'
-)
-
 st.markdown(
     f'<div class="app-container">'
     f'<div class="top-header">'
@@ -196,24 +200,18 @@ def run_analysis(question_text, ticker, top_k, compare_mode):
 
     try:
         if compare_mode:
-            with_ce = config.cross_encoder_enabled
-            config.cross_encoder_enabled = False
-            try:
-                before = run_with_progress(
-                    lambda on_progress: answer_question(
-                        question_text, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
-                        on_progress=on_progress),
-                    "Without cross-encoder",
-                )
-            finally:
-                config.cross_encoder_enabled = True
+            before = run_with_progress(
+                lambda on_progress: answer_question(
+                    question_text, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
+                    on_progress=on_progress, cross_encoder_enabled=False),
+                "Without cross-encoder",
+            )
             after = run_with_progress(
                 lambda on_progress: answer_question(
                     question_text, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
-                    on_progress=on_progress),
+                    on_progress=on_progress, cross_encoder_enabled=True),
                 "With cross-encoder",
             )
-            config.cross_encoder_enabled = with_ce
             st.session_state.last_result = {"compare": True, "before": before, "after": after}
         else:
             result = run_with_progress(
@@ -257,7 +255,11 @@ with st.sidebar:
         st.rerun()
 
 if view == "System Analytics":
-    chunk_count, filing_count = _get_db_stats()
+    try:
+        chunk_count, filing_count = _get_db_stats()
+    except Exception:
+        st.error("Index unavailable. Build the index before viewing system analytics.")
+        st.stop()
 
     main_col, right_col = st.columns([3, 1])
     with main_col:
@@ -290,56 +292,15 @@ if view == "System Analytics":
             f'</div></div>',
             unsafe_allow_html=True,
         )
-        st.markdown(
-            '<div class="hero-card">'
-            f'<div class="hero-label">{FLASK_SVG} Answer Quality</div>'
-            '<div class="kpi-stack">'
-            '<div class="kpi-stack-card">'
-            '<div class="kpi-row-label">Restaurant answers, source-backed</div>'
-            '<div class="kpi-row-value"><span class="green">74.2%</span></div>'
-            '<div class="kpi-row-sub">weighted 75.3%</div></div>'
-            '<div class="kpi-stack-card">'
-            '<div class="kpi-row-label">Retail answers, source-backed</div>'
-            '<div class="kpi-row-value"><span class="green">69.7%</span></div>'
-            '<div class="kpi-row-sub">weighted 80.3%</div></div>'
-            '<div class="kpi-stack-card">'
-            '<div class="kpi-row-label">Cross-sector (all 7 cos)</div>'
-            '<div class="kpi-row-value"><span class="green">59.3%</span></div>'
-            '<div class="kpi-row-sub">weighted 73.5%</div></div>'
-            '</div></div>',
-            unsafe_allow_html=True,
-        )
-        with st.expander("Technical details \u2013 retrieval metrics"):
-            st.markdown(
-                '<div class="kpi-stack">'
-                '<div class="kpi-stack-card">'
-                '<div class="kpi-row-label">Overall MRR</div>'
-                '<div class="kpi-row-value"><span class="accent">0.54</span></div>'
-                '<div class="kpi-row-sub">cross-sector, 0 retrieval gaps</div></div>'
-                '<div class="kpi-stack-card">'
-                '<div class="kpi-row-label">Retail recall@10</div>'
-                '<div class="kpi-row-value"><span class="green">1.00</span></div>'
-                '<div class="kpi-row-sub">WMT &middot; TGT — zero degradation</div></div>'
-                '<div class="kpi-stack-card">'
-                '<div class="kpi-row-label">Restaurant recall@10</div>'
-                '<div class="kpi-row-value"><span class="green">0.81</span></div>'
-                '<div class="kpi-row-sub">CMG &middot; DRI &middot; CBRL</div></div>'
-                '</div>',
-                unsafe_allow_html=True,
-            )
-            st.caption(
-                "Hybrid retrieval (BM25 + embeddings) with cross-encoder re-ranking, "
-                "evaluated per sector against a held-out question set."
-            )
+        st.info("Answer quality has not been independently verified on the current index. Review each quote and claim against its original SEC filing.")
 
     with right_col:
         st.markdown(
             '<div class="about-card">'
             '<div class="about-title">About</div>'
             '<div class="about-text">'
-            'Turns SEC filings into plain-language, sourced answers about why a '
-            "company's numbers moved — every answer links back to the exact "
-            'filing text it came from.'
+            'Searches indexed SEC filing passages for potential explanations. '
+            'Quote matches require separate review against the original filing.'
             '</div></div>',
             unsafe_allow_html=True,
         )
@@ -503,34 +464,42 @@ with main_col:
             meta = src["metadata"]
             score = src.get("hybrid_score", src.get("relevance", 0))
             score_cls = _score_class(score)
-            text_preview = src["text"][:400]
-            if len(src["text"]) > 400:
-                text_preview += "..."
+            filing_url = _sec_filing_url(meta.get("filing_url"))
+            filing_link = (f'<a href="{filing_url}" target="_blank" rel="noopener noreferrer">Open SEC filing ↗</a>'
+                           if filing_url else '<span>SEC filing link unavailable for this indexed chunk</span>')
             st.markdown(
                 f'<div class="source-card">'
                 f'<div class="meta-row">'
-                f'<span class="ticker-tag">{meta["ticker"]}</span>'
+                f'<span class="ticker-tag">{_html_escape(meta["ticker"])}</span>'
                 f'{_sector_tag(meta["ticker"])}'
-                f'<span class="form-tag">{meta["form"]}</span>'
-                f'<span class="date-tag">{meta["filing_date"]}</span>'
+                f'<span class="form-tag">{_html_escape(meta["form"])}</span>'
+                f'<span class="date-tag">{_html_escape(meta["filing_date"])}</span>'
                 f'<span class="score-tag {score_cls}">{_score_icon(score)} {score:.2f}</span>'
                 f'</div>'
-                f'<div class="chunk-text">{_html_escape(text_preview)}</div>'
+                f'<div class="chunk-text">{_html_escape(src["text"])}</div>'
+                f'<div class="source-link">{filing_link}</div>'
                 f'</div>',
                 unsafe_allow_html=True,
             )
         st.markdown('</div></div>', unsafe_allow_html=True)
 
-    def _render_answer(answer_text, label="Answer", badge_type=""):
+    def _render_answer(result, label="Answer", badge_type=""):
         badge_cls = f'badge {badge_type}' if badge_type else 'badge'
+        has_quotes = result.get("structured") is True and bool(result.get("claims")) and not result.get("verification_errors")
+        status = "Quote matched in retrieved text" if has_quotes else "No checked quote"
         st.markdown(
             f'<div class="answer-card">'
             f'<div class="answer-head"><h3>{label}</h3>'
-            f'<span class="{badge_cls}">sourced</span></div>'
-            f'<div class="answer-body">{_html_escape(answer_text)}</div>'
+            f'<span class="{badge_cls}">{status}</span></div>'
+            f'<div class="answer-body">{_html_escape(result["answer"])}</div>'
             f'</div>',
             unsafe_allow_html=True,
         )
+        if has_quotes:
+            for claim in result["claims"]:
+                st.caption(f'Matched quote in source {claim["source_chunk_index"] + 1}')
+                st.text(claim["source_quote"])
+        st.caption("A matching quote confirms text presence, not the cause, arithmetic, or accuracy. Check the original filing.")
 
     st.markdown('<div class="answer-section">', unsafe_allow_html=True)
 
@@ -546,16 +515,16 @@ with main_col:
             col_left, col_right = st.columns(2)
             with col_left:
                 st.markdown('<p class="compare-label">Bi-Encoder Only</p>', unsafe_allow_html=True)
-                _render_answer(before["answer"], label="Before", badge_type="")
+                _render_answer(before, label="Before", badge_type="")
                 with st.expander(f"Sources ({len(before['sources'])})"):
                     _render_sources(before["sources"])
             with col_right:
                 st.markdown('<p class="compare-label">With Cross-Encoder Reranking</p>', unsafe_allow_html=True)
-                _render_answer(after["answer"], label="After", badge_type="green")
+                _render_answer(after, label="After", badge_type="green")
                 with st.expander(f"Sources ({len(after['sources'])})"):
                     _render_sources(after["sources"])
         else:
-            _render_answer(_r["answer"], label="AI Analysis", badge_type="green")
+            _render_answer(_r, label="AI Analysis", badge_type="green")
             with st.expander(f"Source Chunks ({len(_r['sources'])})", expanded=True):
                 _render_sources(_r["sources"])
     else:
@@ -613,56 +582,14 @@ with right_col:
         unsafe_allow_html=True,
     )
 
-    st.markdown(
-        '<div class="kpi-panel">'
-        '<div class="panel-title">Answer Quality</div>'
-        '<div class="kpi-stack">'
-        '<div class="kpi-stack-card">'
-        '<div class="kpi-row-label">Restaurant, source-backed</div>'
-        '<div class="kpi-row-value"><span class="green">74.2%</span></div>'
-        '<div class="kpi-row-sub">weighted 75.3%</div></div>'
-        '<div class="kpi-stack-card">'
-        '<div class="kpi-row-label">Retail, source-backed</div>'
-        '<div class="kpi-row-value"><span class="green">69.7%</span></div>'
-        '<div class="kpi-row-sub">weighted 80.3%</div></div>'
-        '<div class="kpi-stack-card">'
-        '<div class="kpi-row-label">Cross-sector (7 cos)</div>'
-        '<div class="kpi-row-value"><span class="green">59.3%</span></div>'
-        '<div class="kpi-row-sub">weighted 73.5%</div></div>'
-        '</div></div>',
-        unsafe_allow_html=True,
-    )
-
-    with st.expander("Technical details \u2013 retrieval metrics"):
-        st.markdown(
-            '<div class="kpi-stack">'
-            '<div class="kpi-stack-card">'
-            '<div class="kpi-row-label">Overall MRR</div>'
-            '<div class="kpi-row-value"><span class="accent">0.54</span></div>'
-            '<div class="kpi-row-sub">cross-sector, 0 gaps</div></div>'
-            '<div class="kpi-stack-card">'
-            '<div class="kpi-row-label">Retail recall@10</div>'
-            '<div class="kpi-row-value"><span class="green">1.00</span></div>'
-            '<div class="kpi-row-sub">WMT &middot; TGT</div></div>'
-            '<div class="kpi-stack-card">'
-            '<div class="kpi-row-label">Restaurant recall@10</div>'
-            '<div class="kpi-row-value"><span class="green">0.81</span></div>'
-            '<div class="kpi-row-sub">CMG &middot; DRI &middot; CBRL</div></div>'
-            '</div>',
-            unsafe_allow_html=True,
-        )
-        st.caption(
-            "Hybrid retrieval (BM25 + embeddings) with cross-encoder re-ranking, "
-            "evaluated per sector against a held-out question set."
-        )
+    st.info("Answer quality has not been independently verified on the current index. Quote matching alone does not validate a financial claim.")
 
     st.markdown(
         '<div class="about-card">'
         '<div class="about-title">About</div>'
         '<div class="about-text">'
-        'Turns SEC filings into plain-language, sourced answers about why a '
-        "company's numbers moved — every answer links back to the exact "
-        'filing text it came from.'
+        'Searches indexed SEC filing passages for potential explanations. '
+        'Quote matches require separate review against the original filing.'
         '</div></div>',
         unsafe_allow_html=True,
     )

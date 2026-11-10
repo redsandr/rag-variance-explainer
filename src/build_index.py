@@ -16,6 +16,7 @@ from config import config
 from constants import TICKERS
 from ingest import (
     fetch_submissions,
+    filing_document_url,
     get_cik,
     get_mda_for_filing,
     list_10k_10q_filings,
@@ -86,6 +87,9 @@ def build_index(rebuild: bool = False) -> None:
                 continue
 
             try:
+                filing_url = filing_document_url(
+                    cik, accession, filing["primaryDocument"]
+                )
                 mda_text = get_mda_for_filing(
                     cik, accession, filing["primaryDocument"]
                 )
@@ -98,6 +102,7 @@ def build_index(rebuild: bool = False) -> None:
                         "accession_number": accession,
                         "form": form,
                         "filing_date": filing_date,
+                        "filing_url": filing_url,
                         "chunk_index": i,
                     }
                     enriched = tag_chunk(chunk, base)
