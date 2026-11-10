@@ -1,20 +1,22 @@
-# Landing design
+# Website design
 
-## Direction
+## Purpose and structure
 
-Dark by default. Warm gold signals the path through a research question, a retrieved passage, a quote check, and original filing review. Light mode is an explicit visitor preference, never the starting state. The landing is a portfolio view of a local prototype, not a hosted financial analysis service.
+The static website explains a local SEC filing research prototype to independent analysts. It is not a hosted analysis service. The homepage shows the use case and its evidence boundary before the implementation. `/example` offers a visitor-controlled, illustrative workpaper. `/method`, `/install`, `/about`, and `/contact` provide focused reading paths. The FAQ remains on `/`.
 
-## Visual system
+## Visual direction
 
-- Dark ground `#121310`, raised research surface `#1b1d18`, pale text `#f6f3e9`, gold `#ead2a0`, quiet rules `#41443c`.
-- Light mode uses paper `#f5f2e9`, ink `#20231d`, and darker gold `#976c33`. The research scene uses pale sage, and the console, installation code, evidence policy, and review badge all use light-theme surfaces and ink.
-- A broad question headline restores the earlier site's typographic presence. A visible illustrative question types beneath it. The floating navigation keeps the local demo, method, installation and FAQ within reach.
-- A full-width research scene changes its central visual at each stage. The illustrative terminal is a narrow console beneath the scene, not a second static panel. Workpaper, method explorer, policy band, install guide, FAQ and closing statement retain the research context. The pending status is visibly separate from an approved answer.
+- Default to charcoal `#121310`, off-white `#f6f3e9`, and pale gold `#ead2a0`. Gold marks actions, selected stages, and evidence labels. A visitor can choose paper mode with background `#f5f2e9`, ink `#20231d`, and darker gold `#785323`.
+- Use a restrained floating navigation, broad editorial headings, quiet rules, and research-paper surfaces. The first viewport pairs the analyst benefit with an illustrative workpaper that visibly withholds unreviewed results.
+- Supporting pages use the same navigation and palette but prioritize reading. A warm contrasting band distinguishes evidence limits and setup requirements from surrounding sections.
 
-## Interaction and responsive behavior
+## Behavior
 
-The theme button switches between dark and light and saves a preference locally. On screens up to 1100 px the navigation becomes a hamburger menu with working section and external links. Escape closes the menu and returns focus to its trigger. The evidence sequence advances once while visible, types an illustrative command at each stage and stops at the unverified filing review. Visitors can pause, replay or select a stage. Motion pauses offscreen or when the tab is hidden. Reduced motion keeps every stage manually selectable without automatic progression or spatial movement. Installation platform tabs and FAQ disclosure rows provide quieter interaction below.
+- The shared theme control stores the preference locally and applies it before paint when browser storage is available. The navigation becomes a menu at widths below 1130 px. Escape closes the menu and restores focus to its trigger.
+- The four example stages move only when the visitor selects a stage or uses the previous or next control. The selected stage highlights the relevant field on the workpaper. Reduced motion removes spatial transitions; no analysis starts automatically.
+- `/install` switches between Windows PowerShell and macOS or Linux commands and reports the result of copying commands. FAQ rows use native disclosure controls.
+- The site is statically exported. `landing/vercel.json` maps clean page URLs to the exported HTML files on Vercel. A case request opens a public GitHub issue, not a contact form. No signup, hosted query, or automatic case publication is promised.
 
 ## Evidence rule
 
-The workpaper is an illustrative workflow, not a demo answer. Do not publish a quote, page reference, number, confidence score, or causal conclusion until reviewed against the original SEC filing.
+The sample workpaper is a process illustration, not an SEC answer. No SEC quote, page reference, financial conclusion, numerical claim, or verification badge is published as evidence before a complete case is checked against its original filing. A quote match establishes that words occur in a retrieved passage. It does not verify causation or arithmetic. The method page explains the release gates.

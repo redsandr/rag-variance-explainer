@@ -1,26 +1,23 @@
+import logging
 import time
 from pathlib import Path
 from urllib.parse import urlparse
 
 import streamlit as st
 
-from constants import SECTORS
+from constants import SECTORS, TICKER_OPTIONS
 from constants import TICKER_MAP as _TICKER_MAP
 from llm import LLMClient
 from rag import answer_question, sanitize_input
 from retrieval import get_client, get_collection
 
-_HTML_ESCAPE_TABLE = str.maketrans({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#x27;",
-})
+logger = logging.getLogger(__name__)
+
+_HTML_ESCAPE_TABLE = str.maketrans({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#x27;"})
 
 
 def _html_escape(text: str) -> str:
-    return text.translate(_HTML_ESCAPE_TABLE)
+    return str(text).translate(_HTML_ESCAPE_TABLE)
 
 
 def _sec_filing_url(value: str | None) -> str | None:
@@ -34,68 +31,21 @@ def _sec_filing_url(value: str | None) -> str | None:
         pass
     return None
 
-st.set_page_config(
-    page_title="RAG Variance Explainer",
-    page_icon="\U0001f4ca",
-    layout="wide",
-)
 
-# Same palette as the marketing site's globals.css (:root / [data-theme='dark']),
-# so the app and the landing page read as one product.
-THEME_VARS = {
-    "light": {
-        "bg": "#FBF9F4", "bg-mist": "#F6EDD3", "surface": "#FFFFFF", "surface-alt": "#FAF6EC",
-        "border": "#EBE2CB", "border-strong": "#DCCE9F",
-        "accent": "#A9860F", "accent-dark": "#8A6D0C", "accent-light": "#C9A227", "accent-soft": "#F6EDD3",
-        "green": "#A9860F", "green-soft": "#F6EDD3",
-        "amber": "#A9860F", "amber-soft": "#F6EDD3",
-        "red": "#C1443D", "red-soft": "#FBEAE8",
-        "blue": "#3B6FA0", "blue-soft": "#EAF1F8",
-        "terracotta": "#B5622E", "terracotta-soft": "#FBEDE3",
-        "text": "#22201A", "text-dim": "#62594A", "text-mute": "#93876E",
-        "btn-text-on-accent": "#FFFFFF",
-        "shadow-lg": "0 4px 20px rgba(27, 24, 48, 0.08)",
-        "shadow-md": "0 4px 16px rgba(27, 24, 48, 0.06)",
-        "icon-glow": "0 0 20px rgba(169, 134, 15, 0.2)",
-        "accent-glow-hover": "0 0 20px rgba(169, 134, 15, 0.12), 0 0 40px rgba(169, 134, 15, 0.06)",
-        "accent-glow-sm": "0 0 20px rgba(169, 134, 15, 0.08)",
-        "btn-glow": "0 2px 12px rgba(169, 134, 15, 0.25)",
-        "btn-glow-hover": "0 6px 20px rgba(169, 134, 15, 0.35)",
-        "focus-ring": "0 0 0 3px rgba(169, 134, 15, 0.15)",
-    },
-    "dark": {
-        "bg": "#0B0B0A", "bg-mist": "#12110D", "surface": "#151412", "surface-alt": "#1B1916",
-        "border": "#2A2620", "border-strong": "#3A3527",
-        "accent": "#C9A227", "accent-dark": "#A9860F", "accent-light": "#E8C766", "accent-soft": "#2B240F",
-        "green": "#E8C766", "green-soft": "#2B240F",
-        "amber": "#E8C766", "amber-soft": "#2B240F",
-        "red": "#FF6B61", "red-soft": "#2B1512",
-        "blue": "#7FB2E0", "blue-soft": "#101A24",
-        "terracotta": "#D97F4A", "terracotta-soft": "#2B1B10",
-        "text": "#F3EFE6", "text-dim": "#B8B0A0", "text-mute": "#7A7364",
-        "btn-text-on-accent": "#101208",
-        "shadow-lg": "0 4px 24px rgba(0, 0, 0, 0.3)",
-        "shadow-md": "0 4px 20px rgba(0, 0, 0, 0.2)",
-        "icon-glow": "0 0 24px rgba(201, 162, 39, 0.2)",
-        "accent-glow-hover": "0 0 24px rgba(201, 162, 39, 0.12), 0 0 48px rgba(201, 162, 39, 0.06)",
-        "accent-glow-sm": "0 0 24px rgba(201, 162, 39, 0.08)",
-        "btn-glow": "0 0 20px rgba(201, 162, 39, 0.2)",
-        "btn-glow-hover": "0 0 30px rgba(201, 162, 39, 0.3)",
-        "focus-ring": "0 0 0 3px rgba(201, 162, 39, 0.15)",
-    },
-}
+st.set_page_config(page_title="RAG Variance Explainer", page_icon=":material/analytics:", layout="wide")
 
 if "theme" not in st.session_state:
     st.session_state.theme = "dark"
 
-
-def _render_css(theme: str) -> str:
-    vars_css = "\n".join(f"        --{k}: {v};" for k, v in THEME_VARS[theme].items())
-    css_path = Path(__file__).parent / "src" / "styles.css"
-    return css_path.read_text(encoding="utf-8").replace("/*__THEME_VARS__*/", vars_css)
-
-
-st.markdown(_render_css(st.session_state.theme), unsafe_allow_html=True)
+palette = {
+    "dark": {"bg": "#11120f", "surface": "#1c1e19", "raised": "#242720", "rule": "#41443b",
+             "text": "#f5f2e9", "secondary": "#c6c8bc", "muted": "#aaaFA1", "gold": "#ead2a0", "gold-soft": "#322e20"},
+    "light": {"bg": "#f5f2e9", "surface": "#ffffff", "raised": "#eeeae0", "rule": "#c7c2b7",
+              "text": "#20231d", "secondary": "#393e36", "muted": "#555c50", "gold": "#704c1e", "gold-soft": "#ede4d2"},
+}[st.session_state.theme]
+tokens = "\n".join(f"    --{name}: {value};" for name, value in palette.items())
+styles = (Path(__file__).parent / "src" / "styles.css").read_text(encoding="utf-8")
+st.markdown(styles.replace("/*__THEME_VARS__*/", tokens), unsafe_allow_html=True)
 
 
 @st.cache_resource
@@ -103,498 +53,161 @@ def get_llm():
     return LLMClient()
 
 
-@st.cache_resource
-def _startup_check():
-    try:
-        client = get_client()
-        collection = get_collection(client)
-        collection.count()
-    except Exception as e:
-        st.warning(f"ChromaDB connection issue: {e}. Some features may be unavailable.")
-    try:
-        get_llm()
-    except Exception as e:
-        st.warning(f"LLM initialization issue: {e}. Answer generation will fail.")
-
-_startup_check()
-
-
-@st.cache_resource
+@st.cache_data(ttl=120)
 def _get_db_stats():
-    client = get_client()
-    collection = get_collection(client)
-    all_meta = collection.get(include=["metadatas"])
-    chunk_count = len(all_meta["metadatas"])
-    filings = set(m["accession_number"] for m in all_meta["metadatas"] if "accession_number" in m)
-    return chunk_count, len(filings)
+    collection = get_collection(get_client())
+    metadata = collection.get(include=["metadatas"])["metadatas"]
+    return len(metadata), len({item["accession_number"] for item in metadata if "accession_number" in item})
 
 
-LOGO_SVG = (
-    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" '
-    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
-    '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>'
-    '<line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/>'
-    '<line x1="15" y1="21" x2="15" y2="9"/>'
-    '</svg>'
-)
-
-ANALYTICS_SVG = (
-    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
-    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
-    '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>'
-    '<line x1="6" y1="20" x2="6" y2="14"/>'
-    '</svg>'
-)
-
-TARGET_SVG = (
-    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
-    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
-    '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/>'
-    '<circle cx="12" cy="12" r="2"/>'
-    '</svg>'
-)
-
-st.markdown(
-    f'<div class="app-container">'
-    f'<div class="top-header">'
-    f'<div class="brand">'
-    f'<div class="brand-icon" role="img" aria-label="RAG Variance Explainer logo">{LOGO_SVG}</div>'
-    f'<div class="brand-text">'
-    f'<h1>RAG Variance Explainer</h1>'
-    f'<p class="breadcrumb">Dashboard <span>/</span> <span class="active">Financial Analysis</span></p>'
-    f'</div></div>'
-    f'</div>',
-    unsafe_allow_html=True,
-)
-
-
-_RATE_LIMIT_SECONDS = 10
-
-
-def _rate_limited() -> str | None:
-    last = st.session_state.get("last_ask_time", 0.0)
-    elapsed = time.time() - last
-    if elapsed < _RATE_LIMIT_SECONDS:
-        remaining = int(_RATE_LIMIT_SECONDS - elapsed)
-        st.warning(f"Please wait {remaining}s before asking another question.")
-        return None
-    return "ok"
-
-
-@st.fragment
-def run_analysis(question_text, ticker, top_k, compare_mode):
+def _analyze(question: str, ticker: str | None, top_k: int, compare: bool) -> None:
     st.session_state.processing = True
     st.session_state.last_ask_time = time.time()
-
-    def run_with_progress(fn, label):
-        status = st.status(label, expanded=True)
-        def on_progress(_phase, msg):
-            status.update(label=msg, state="running")
-        try:
-            result = fn(on_progress=on_progress)
-            status.update(label="Complete", state="complete")
-            return result
-        except Exception as e:
-            status.update(label=f"Error: {e}", state="error")
-            raise
-
+    st.session_state.pop("last_error", None)
     try:
-        if compare_mode:
-            before = run_with_progress(
-                lambda on_progress: answer_question(
-                    question_text, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
-                    on_progress=on_progress, cross_encoder_enabled=False),
-                "Without cross-encoder",
-            )
-            after = run_with_progress(
-                lambda on_progress: answer_question(
-                    question_text, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
-                    on_progress=on_progress, cross_encoder_enabled=True),
-                "With cross-encoder",
-            )
-            st.session_state.last_result = {"compare": True, "before": before, "after": after}
-        else:
-            result = run_with_progress(
-                lambda on_progress: answer_question(
-                    question_text, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
-                    on_progress=on_progress),
-                "Analyzing filings",
-            )
-            st.session_state.last_result = {"compare": False, **result}
-    except Exception as e:
-        st.error(f"Something went wrong: {e}")
+        with st.status("Retrieving filing evidence", expanded=True) as status:
+            def on_progress(_phase: str, message: str) -> None:
+                status.update(label=message, state="running")
+
+            if compare:
+                before = answer_question(question, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
+                                         on_progress=on_progress, cross_encoder_enabled=False)
+                after = answer_question(question, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
+                                        on_progress=on_progress, cross_encoder_enabled=True)
+                st.session_state.last_result = {"compare": True, "before": before, "after": after}
+            else:
+                result = answer_question(question, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
+                                         on_progress=on_progress)
+                st.session_state.last_result = {"compare": False, **result}
+            status.update(label="Analysis complete", state="complete", expanded=False)
+    except Exception:
+        logger.exception("Analysis failed")
         st.session_state.pop("last_result", None)
+        st.session_state.last_error = "Analysis could not finish. Check the local model server and index, then try again."
+        status.update(label="Analysis unavailable", state="error", expanded=False)
     finally:
         st.session_state.processing = False
-        st.rerun()
+
+
+def _render_sources(sources: list[dict]) -> None:
+    if not sources:
+        st.caption("No filing passages were retrieved for this question.")
+        return
+    for index, source in enumerate(sources, 1):
+        meta = source["metadata"]
+        ticker = _html_escape(meta.get("ticker", "Unknown"))
+        form = _html_escape(meta.get("form", "Filing"))
+        date = _html_escape(meta.get("filing_date", "Date unavailable"))
+        sector = _html_escape(SECTORS.get(meta.get("ticker", ""), ""))
+        filing_url = _sec_filing_url(meta.get("filing_url"))
+        link = (f'<a href="{filing_url}" target="_blank" rel="noopener noreferrer">Open SEC filing ↗</a>'
+                if filing_url else "SEC filing link unavailable for this indexed chunk")
+        with st.expander(f"{index:02d} · {ticker} · {form} · {date}"):
+            st.markdown(
+                f'<div class="source-meta">{sector} · {form} · Filed {date}</div>'
+                f'<div class="source-body">{_html_escape(source.get("text", ""))}</div>'
+                f'<div class="source-link">{link}</div>',
+                unsafe_allow_html=True,
+            )
+
+
+def _render_result(result: dict, heading: str = "Research finding") -> None:
+    claims = result.get("claims", [])
+    checked = result.get("structured") is True and bool(claims) and not result.get("verification_errors")
+    st.subheader("No verified finding" if not checked and heading == "Research finding" else heading)
+    if result.get("question"):
+        st.caption(f'Question analyzed: {result["question"]}')
+    if checked:
+        st.markdown('<span class="evidence-status">Quote matched in retrieved text</span>', unsafe_allow_html=True)
+    else:
+        st.markdown('<span class="evidence-status unverified">No checked quote</span>', unsafe_allow_html=True)
+        if result.get("verification_errors"):
+            st.warning("The generated claims did not match their cited passages. No sourced finding is shown.")
+
+    answer = ("I cannot verify the generated claims against the retrieved SEC filing excerpts."
+              if result.get("verification_errors") else result["answer"])
+    st.markdown(f'<div class="finding-text">{_html_escape(answer)}</div>', unsafe_allow_html=True)
+    if checked:
+        st.markdown("#### Matched quotations")
+        for claim in claims:
+            st.caption(f'Source {claim["source_chunk_index"] + 1}')
+            st.text(claim["source_quote"])
+    st.caption("A quote match confirms text presence in a retrieved passage, not the cause or arithmetic. Check the original filing.")
+    st.markdown("#### Filing passages")
+    _render_sources(result.get("sources", []))
 
 
 with st.sidebar:
-    view = st.radio(
-        "Navigation",
-        ["Ask a Question", "System Analytics"],
-        index=0,
-        label_visibility="collapsed",
-    )
-
-with st.sidebar:
+    st.markdown("**RAG Variance Explainer**")
+    view = st.radio("Navigation", ["Ask a Question", "System Analytics"], label_visibility="collapsed")
     st.divider()
-    st.link_button(
-        "Documentation \u2197",
-        "https://github.com/redsandr/rag-variance-explainer",
-        use_container_width=True,
-    )
-    is_dark = st.toggle(
-        "Dark mode",
-        value=(st.session_state.theme == "dark"),
-        key="theme_toggle",
-    )
-    new_theme = "dark" if is_dark else "light"
-    if new_theme != st.session_state.theme:
-        st.session_state.theme = new_theme
+    dark = st.toggle("Dark mode", value=st.session_state.theme == "dark", key="theme_toggle")
+    if dark != (st.session_state.theme == "dark"):
+        st.session_state.theme = "dark" if dark else "light"
         st.rerun()
+    st.link_button("Documentation", "https://github.com/redsandr/rag-variance-explainer", width="stretch")
+    st.caption("Local research prototype · SEC 10-K / 10-Q")
 
 if view == "System Analytics":
+    st.title("Index overview")
+    st.caption("Local index coverage. These counts are not measures of answer accuracy.")
     try:
-        chunk_count, filing_count = _get_db_stats()
+        chunks, filings = _get_db_stats()
     except Exception:
-        st.error("Index unavailable. Build the index before viewing system analytics.")
-        st.stop()
-
-    main_col, right_col = st.columns([3, 1])
-    with main_col:
-        st.markdown(
-            f'<div class="hero-card">'
-            f'<div class="hero-label">{ANALYTICS_SVG} System Analytics</div>'
-            f'<div class="kpi-stack">'
-            '<div class="kpi-stack-card">'
-            '<div class="kpi-row-label">Companies</div>'
-            '<div class="kpi-row-value">7</div>'
-            '<div class="kpi-row-sub">CMG &middot; DRI &middot; CBRL &middot; WMT &middot; TGT &middot; JNJ &middot; XOM</div>'
-            '</div>'
-            '<div class="kpi-stack-card">'
-            '<div class="kpi-row-label">Sectors</div>'
-            '<div class="kpi-row-value">4</div>'
-            '<div class="kpi-row-sub">'
-            '<span class="sector-badge restaurant">Restaurant</span> '
-            '<span class="sector-badge retail">Retail</span> '
-            '<span class="sector-badge healthcare">Healthcare</span> '
-            '<span class="sector-badge energy">Energy</span>'
-            '</div></div>'
-            '<div class="kpi-stack-card">'
-            '<div class="kpi-row-label">Filings Indexed</div>'
-            f'<div class="kpi-row-value">{filing_count}</div>'
-            '<div class="kpi-row-sub">10-K &amp; 10-Q combined</div></div>'
-            '<div class="kpi-stack-card">'
-            '<div class="kpi-row-label">Knowledge Base</div>'
-            f'<div class="kpi-row-value">{chunk_count}</div>'
-            '<div class="kpi-row-sub">MD&A text chunks</div></div>'
-            f'</div></div>',
-            unsafe_allow_html=True,
-        )
-        st.info("Answer quality has not been independently verified on the current index. Review each quote and claim against its original SEC filing.")
-
-    with right_col:
-        st.markdown(
-            '<div class="about-card">'
-            '<div class="about-title">About</div>'
-            '<div class="about-text">'
-            'Searches indexed SEC filing passages for potential explanations. '
-            'Quote matches require separate review against the original filing.'
-            '</div></div>',
-            unsafe_allow_html=True,
-        )
-        with st.expander("Technical details"):
-            st.caption(
-                "Hybrid retrieval (BM25 + embeddings) over indexed MD&A sections "
-                "from SEC EDGAR 10-K/10-Q filings, with cross-encoder re-ranking "
-                "and configurable top-k."
-            )
-
-    st.stop()
-
-main_col, right_col = st.columns([3, 1])
-
-with main_col:
-    SEARCH_SVG = (
-        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
-        'stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">'
-        '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>'
-        '</svg>'
-    )
-
-    st.markdown(
-        f'<div class="hero-label">{SEARCH_SVG} Ask a Question</div>',
-        unsafe_allow_html=True,
-    )
-
-    pending_question = st.session_state.pop("pending_question", None)
-    auto_ask = st.session_state.pop("auto_ask", False)
-
-    if pending_question:
-        st.session_state.question_input = pending_question
-
-    processing = st.session_state.get("processing", False)
-
-    EXAMPLE_QUESTIONS = {
-        "Revenue": [
-            "What drove Darden's revenue changes?",
-            "How did Walmart's e-commerce sales change?",
-            "What drove Target's comparable sales?",
-            "How did Johnson & Johnson's pharmaceutical revenue perform?",
-        ],
-        "Labor": [
-            "Why did Chipotle's labor costs change?",
-            "How did wage inflation affect Chipotle?",
-        ],
-        "Margin": [
-            "Why did CBRL's operating costs change?",
-            "What drove Exxon's upstream earnings changes?",
-        ],
-    }
-
-    st.markdown('<span class="hint">Try a question:</span>', unsafe_allow_html=True)
-    for category, questions in EXAMPLE_QUESTIONS.items():
-        st.markdown(f'<span class="category-label">{category}</span>', unsafe_allow_html=True)
-        cols = st.columns(len(questions))
-        for i, q in enumerate(questions):
-            with cols[i]:
-                if st.button(q, key=f"ex_{q[:20]}", use_container_width=True, type="secondary",
-                             disabled=processing):
-                    st.session_state.pending_question = q
-                    st.session_state.auto_ask = True
-                    st.session_state._saved_compare = st.session_state.get("compare_checkbox", False)
-                    st.session_state._saved_topk = st.session_state.get("top_k_slider", 5)
-                    st.session_state._saved_ticker = st.session_state.get("ticker_filter", "All")
-                    st.rerun()
-
-    filter_col, topk_col = st.columns(2)
-    with filter_col:
-        ticker_filter = st.selectbox(
-            "Company",
-            options=[
-                "All", "CMG (Chipotle)", "DRI (Darden)", "CBRL (Cracker Barrel)",
-                "WMT (Walmart)", "TGT (Target)", "JNJ (Johnson & Johnson)", "XOM (Exxon Mobil)",
-            ],
-            index=0,
-            help="Filter sources by company ticker",
-            disabled=processing,
-            key="ticker_filter",
-        )
-    with topk_col:
-        top_k = st.slider(
-            "Source chunks",
-            min_value=1, max_value=15, value=5,
-            help="Number of retrieved chunks to include",
-            disabled=processing,
-            key="top_k_slider",
-        )
-
-    compare = st.checkbox(
-        "Side-by-side: with vs without cross-encoder",
-        value=False,
-        help="Compare retrieval with and without cross-encoder re-ranking",
-        disabled=processing,
-        key="compare_checkbox",
-    )
-
-    col_q, col_btn = st.columns([5, 1])
-    with col_q:
-        question = st.text_input(
-            "Question",
-            placeholder="e.g. Why did Chipotle's labor costs change?",
-            label_visibility="collapsed",
-            key="question_input",
-        )
-    with col_btn:
-        ask = st.button(
-            "Analyze" if not processing else "Analyzing...",
-            width="stretch",
-            disabled=processing,
-        ) or auto_ask
-
-    if auto_ask:
-        compare = st.session_state.pop("_saved_compare", compare)
-        top_k = st.session_state.pop("_saved_topk", top_k)
-        ticker_filter = st.session_state.pop("_saved_ticker", ticker_filter)
-
-    if ask and question.strip() and not processing:
-        question = sanitize_input(question)
-        if not question:
-            st.warning("Question is empty after sanitization.")
-        elif _rate_limited() is None:
-            pass
-        else:
-            run_analysis(question, _TICKER_MAP[ticker_filter], top_k, compare)
-
-    elif ask and not question.strip():
-        st.warning("Please enter a question.")
-
-    def _score_class(score: float) -> str:
-        if score >= 0.7:
-            return "sc-high"
-        elif score >= 0.4:
-            return "sc-mid"
-        return "sc-low"
-
-    def _score_icon(score: float) -> str:
-        if score >= 0.7:
-            return "\u25B2"
-        elif score >= 0.4:
-            return "\u25C6"
-        return "\u25BC"
-
-    def _sector_tag(ticker: str) -> str:
-        sector = SECTORS.get(ticker, "")
-        css_class = sector.lower() if sector else ""
-        return f'<span class="sector-tag {css_class}">{sector}</span>'
-
-    def _render_sources(sources):
-        if not sources:
-            return
-        st.markdown(
-            f'<div class="sources-panel">'
-            f'<div class="sources-head"><h4>Source Chunks</h4>'
-            f'<span class="count-badge">{len(sources)}</span></div>'
-            f'<div class="source-grid">',
-            unsafe_allow_html=True,
-        )
-        for src in sources:
-            meta = src["metadata"]
-            score = src.get("hybrid_score", src.get("relevance", 0))
-            score_cls = _score_class(score)
-            filing_url = _sec_filing_url(meta.get("filing_url"))
-            filing_link = (f'<a href="{filing_url}" target="_blank" rel="noopener noreferrer">Open SEC filing ↗</a>'
-                           if filing_url else '<span>SEC filing link unavailable for this indexed chunk</span>')
-            st.markdown(
-                f'<div class="source-card">'
-                f'<div class="meta-row">'
-                f'<span class="ticker-tag">{_html_escape(meta["ticker"])}</span>'
-                f'{_sector_tag(meta["ticker"])}'
-                f'<span class="form-tag">{_html_escape(meta["form"])}</span>'
-                f'<span class="date-tag">{_html_escape(meta["filing_date"])}</span>'
-                f'<span class="score-tag {score_cls}">{_score_icon(score)} {score:.2f}</span>'
-                f'</div>'
-                f'<div class="chunk-text">{_html_escape(src["text"])}</div>'
-                f'<div class="source-link">{filing_link}</div>'
-                f'</div>',
-                unsafe_allow_html=True,
-            )
-        st.markdown('</div></div>', unsafe_allow_html=True)
-
-    def _render_answer(result, label="Answer", badge_type=""):
-        badge_cls = f'badge {badge_type}' if badge_type else 'badge'
-        has_quotes = result.get("structured") is True and bool(result.get("claims")) and not result.get("verification_errors")
-        status = "Quote matched in retrieved text" if has_quotes else "No checked quote"
-        st.markdown(
-            f'<div class="answer-card">'
-            f'<div class="answer-head"><h3>{label}</h3>'
-            f'<span class="{badge_cls}">{status}</span></div>'
-            f'<div class="answer-body">{_html_escape(result["answer"])}</div>'
-            f'</div>',
-            unsafe_allow_html=True,
-        )
-        if has_quotes:
-            for claim in result["claims"]:
-                st.caption(f'Matched quote in source {claim["source_chunk_index"] + 1}')
-                st.text(claim["source_quote"])
-        st.caption("A matching quote confirms text presence, not the cause, arithmetic, or accuracy. Check the original filing.")
-
-    st.markdown('<div class="answer-section">', unsafe_allow_html=True)
-
-    if "last_result" in st.session_state:
-        _r = st.session_state.last_result
-        if _r.get("compare"):
-            before, after = _r["before"], _r["after"]
-            st.markdown(
-                '<div class="compare-vs"><h3>Comparison</h3>'
-                '<span class="vs-badge">VS</span></div>',
-                unsafe_allow_html=True,
-            )
-            col_left, col_right = st.columns(2)
-            with col_left:
-                st.markdown('<p class="compare-label">Bi-Encoder Only</p>', unsafe_allow_html=True)
-                _render_answer(before, label="Before", badge_type="")
-                with st.expander(f"Sources ({len(before['sources'])})"):
-                    _render_sources(before["sources"])
-            with col_right:
-                st.markdown('<p class="compare-label">With Cross-Encoder Reranking</p>', unsafe_allow_html=True)
-                _render_answer(after, label="After", badge_type="green")
-                with st.expander(f"Sources ({len(after['sources'])})"):
-                    _render_sources(after["sources"])
-        else:
-            _render_answer(_r, label="AI Analysis", badge_type="green")
-            with st.expander(f"Source Chunks ({len(_r['sources'])})", expanded=True):
-                _render_sources(_r["sources"])
+        st.error("Index unavailable. Build or reconnect the SEC index to see its coverage.")
     else:
-        if not question.strip():
-            EMPTY_SVG = (
-                '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6B7280" '
-                'stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'
-                '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>'
-                '</svg>'
-            )
-            st.markdown(
-                f'<div class="empty-state" role="status">'
-                f'<div class="empty-icon" aria-hidden="true">{EMPTY_SVG}</div>'
-                f'<div class="empty-title">Ask a question to get started</div>'
-                f'<div class="empty-desc">'
-                 'Ask about revenue, labor, or margin drivers — sourced from SEC '
-                 'EDGAR filings for Chipotle, Darden, Cracker Barrel, Walmart, '
-                 'Target, Johnson & Johnson, and Exxon Mobil.'
-                f'</div></div>',
-                unsafe_allow_html=True,
-            )
+        one, two, three = st.columns(3)
+        one.metric("Indexed companies", len(SECTORS))
+        two.metric("SEC filings", filings)
+        three.metric("Passages", chunks)
+        st.info("Answer quality has not been independently verified on the current index. Review each quote and claim against its original SEC filing.")
+        if st.button("Refresh index counts", icon=":material/refresh:"):
+            _get_db_stats.clear()
+            st.rerun()
+else:
+    st.title("Ask the filings")
+    st.markdown("Ask freely about the indexed SEC filings. Inspect the source passages before relying on an answer.")
+
+    if "question_input" not in st.session_state:
+        st.session_state.question_input = ""
+    if "processing" not in st.session_state:
+        st.session_state.processing = False
+
+    question = st.text_area("Research question", placeholder="Ask anything about the indexed filings…",
+                            key="question_input", height=118, max_chars=256, disabled=st.session_state.processing)
+    with st.expander("Scope and comparison options"):
+        first, second = st.columns(2)
+        with first:
+            ticker_filter = st.selectbox("Company", TICKER_OPTIONS, key="ticker_filter", disabled=st.session_state.processing)
+        with second:
+            top_k = st.slider("Source passages", 1, 15, 5, key="top_k_slider", disabled=st.session_state.processing)
+        compare = st.checkbox("Compare retrieval with and without reranking", key="compare_checkbox",
+                              disabled=st.session_state.processing)
+
+    ask = st.button("Analyze filings", type="primary", icon=":material/search:",
+                    disabled=st.session_state.processing)
+    if ask:
+        cleaned = sanitize_input(question.strip())
+        if not cleaned:
+            st.warning("Enter a question before analyzing filings.")
+        elif time.time() - st.session_state.get("last_ask_time", 0) < 10:
+            st.warning("Please wait a few seconds before asking another question.")
         else:
-            pass
+            _analyze(cleaned, _TICKER_MAP[ticker_filter], top_k, compare)
 
-    st.markdown('</div>', unsafe_allow_html=True)
-
-with right_col:
-    try:
-        chunk_count, filing_count = _get_db_stats()
-    except Exception:
-        chunk_count, filing_count = 0, 0
-
-    refresh = st.button("Refresh Stats", key="refresh_kpi", use_container_width=True)
-    if refresh:
-        st.cache_resource.clear()
-        st.rerun()
-
-    st.markdown(
-        f'<div class="kpi-panel">'
-        f'<div class="panel-title">System Overview</div>'
-        f'<div class="kpi-stack">'
-        f'<div class="kpi-stack-card">'
-        f'<div class="kpi-row-label">Companies</div>'
-         f'<div class="kpi-row-value">7</div>'
-         f'<div class="kpi-row-sub">CMG &middot; DRI &middot; CBRL &middot; WMT &middot; TGT &middot; JNJ &middot; XOM</div></div>'
-        f'<div class="kpi-stack-card">'
-        f'<div class="kpi-row-label">Filings Indexed</div>'
-        f'<div class="kpi-row-value">{filing_count}</div>'
-        f'<div class="kpi-row-sub">10-K &amp; 10-Q combined</div></div>'
-        f'<div class="kpi-stack-card">'
-        f'<div class="kpi-row-label">Knowledge Base</div>'
-        f'<div class="kpi-row-value">{chunk_count}</div>'
-        f'<div class="kpi-row-sub">MD&A text chunks</div></div>'
-        f'</div></div>',
-        unsafe_allow_html=True,
-    )
-
-    st.info("Answer quality has not been independently verified on the current index. Quote matching alone does not validate a financial claim.")
-
-    st.markdown(
-        '<div class="about-card">'
-        '<div class="about-title">About</div>'
-        '<div class="about-text">'
-        'Searches indexed SEC filing passages for potential explanations. '
-        'Quote matches require separate review against the original filing.'
-        '</div></div>',
-        unsafe_allow_html=True,
-    )
-    with st.expander("Technical details"):
-        st.caption(
-            "Hybrid retrieval (BM25 + embeddings) over indexed MD&A sections "
-            "from SEC EDGAR 10-K/10-Q filings, with cross-encoder re-ranking "
-            "and configurable top-k."
-        )
+    result = st.session_state.get("last_result")
+    if result:
+        st.divider()
+        if result.get("compare"):
+            left, right = st.columns(2)
+            with left:
+                _render_result(result["before"], "Without reranking")
+            with right:
+                _render_result(result["after"], "With reranking")
+        else:
+            _render_result(result)
+    elif st.session_state.get("last_error"):
+        st.error(st.session_state.last_error)
+    else:
+        st.markdown('<div class="empty-note">Your question and evidence will appear here. Sources must be checked before a finding is trusted.</div>',
+                    unsafe_allow_html=True)
