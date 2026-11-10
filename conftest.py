@@ -20,7 +20,6 @@ def _block_real_llm():
     make every backend fail instantly, which is exactly the condition it tests.
     """
     with (
-        patch("llama_cpp.Llama", side_effect=RuntimeError("blocked by test fixture - real LLM not allowed")),
         patch("src.llm.LLMClient._init_llama_cpp", side_effect=RuntimeError("blocked by test fixture - real LLM not allowed")),
         patch("src.llm.LLMClient._init_anthropic", side_effect=RuntimeError("blocked by test fixture - real LLM not allowed")),
         patch("src.llm.LLMClient._init_openai", side_effect=RuntimeError("blocked by test fixture - real LLM not allowed")),
