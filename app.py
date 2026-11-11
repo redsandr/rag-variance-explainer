@@ -8,7 +8,7 @@ import streamlit as st
 from constants import SECTORS, TICKER_OPTIONS
 from constants import TICKER_MAP as _TICKER_MAP
 from llm import LLMClient
-from rag import answer_question, sanitize_input
+from rag import MAX_QUESTION_LENGTH, answer_question, sanitize_input
 from retrieval import get_client, get_collection
 
 logger = logging.getLogger(__name__)
@@ -66,19 +66,22 @@ def _analyze(question: str, ticker: str | None, top_k: int, compare: bool) -> No
     st.session_state.pop("last_error", None)
     try:
         with st.status("Retrieving filing evidence", expanded=True) as status:
+            st.caption("This can take several minutes. Keep this page open while the model responds.")
+
             def on_progress(_phase: str, message: str) -> None:
                 status.update(label=message, state="running")
 
-            if compare:
-                before = answer_question(question, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
-                                         on_progress=on_progress, cross_encoder_enabled=False)
-                after = answer_question(question, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
-                                        on_progress=on_progress, cross_encoder_enabled=True)
-                st.session_state.last_result = {"compare": True, "before": before, "after": after}
-            else:
-                result = answer_question(question, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
-                                         on_progress=on_progress)
-                st.session_state.last_result = {"compare": False, **result}
+            with st.spinner("Analysis in progress", show_time=True):
+                if compare:
+                    before = answer_question(question, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
+                                             on_progress=on_progress, cross_encoder_enabled=False)
+                    after = answer_question(question, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
+                                            on_progress=on_progress, cross_encoder_enabled=True)
+                    st.session_state.last_result = {"compare": True, "before": before, "after": after}
+                else:
+                    result = answer_question(question, ticker_filter=ticker, top_k=top_k, llm=get_llm(),
+                                             on_progress=on_progress)
+                    st.session_state.last_result = {"compare": False, **result}
             status.update(label="Analysis complete", state="complete", expanded=False)
     except Exception:
         logger.exception("Analysis failed")
@@ -174,7 +177,8 @@ else:
         st.session_state.processing = False
 
     question = st.text_area("Research question", placeholder="Ask anything about the indexed filings…",
-                            key="question_input", height=118, max_chars=256, disabled=st.session_state.processing)
+                            key="question_input", height=118, max_chars=MAX_QUESTION_LENGTH,
+                            disabled=st.session_state.processing)
     with st.expander("Scope and comparison options"):
         first, second = st.columns(2)
         with first:

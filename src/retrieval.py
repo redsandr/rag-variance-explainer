@@ -266,7 +266,7 @@ def _filter_to_report_filing(candidates: list[dict], question: str) -> list[dict
         logger.warning("No indexed filing near the requested report date %s", report_date)
         return []
 
-    selected = []
+    selected: list[dict] = []
     for eligible in by_ticker.values():
         with_period = [(filed, candidate) for filed, candidate in eligible
                        if candidate["metadata"].get("report_period_end")]

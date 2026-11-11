@@ -25,6 +25,22 @@ def test_research_question_is_free_form_without_presets() -> None:
     assert not any(button.label in {"Revenue", "Costs", "Margins"} for button in app.button)
 
 
+def test_research_question_accepts_cross_company_prompt_without_truncation() -> None:
+    from src.rag import sanitize_input
+
+    question = ("Compare how Chipotle's labor costs changed for the three months ended June 30, 2024 "
+                "and how Johnson & Johnson's Europe sales grew for the quarter ended March 29, 2026, "
+                "respectively. Report each company's metric separately; do not treat them as the same metric or period.")
+    app = AppTest.from_file(str(APP), default_timeout=35).run()
+
+    assert len(question) > 256
+    assert app.text_area[0].proto.max_chars >= len(question)
+    assert sanitize_input(question) == question
+    app.text_area[0].set_value(question).run()
+    assert not app.exception
+    assert app.text_area[0].value == question
+
+
 def test_answer_shows_matched_quote_and_restricts_filing_links() -> None:
     app = AppTest.from_file(str(APP), default_timeout=35)
     app.session_state["last_result"] = {

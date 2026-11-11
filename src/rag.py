@@ -27,7 +27,7 @@ from verifier import (
 logger = logging.getLogger(__name__)
 
 
-MAX_QUESTION_LENGTH = 256
+MAX_QUESTION_LENGTH = 1024
 
 
 def sanitize_input(raw: str) -> str:
