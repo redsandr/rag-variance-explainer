@@ -42,11 +42,11 @@ def build_context(results: list[dict]) -> str:
         return "No relevant filing excerpts were found."
 
     blocks = []
-    for r in results:
+    for index, r in enumerate(results):
         meta = r["metadata"]
         score = r.get("hybrid_score", r.get("relevance", 0))
         label = (
-            f"[{meta['ticker']} {meta['form']} filed {meta['filing_date']}"
+            f"[Source {index} | {meta['ticker']} {meta['form']} filed {meta['filing_date']}"
             f" | relevance: {score:.2f}]"
         )
         blocks.append(f"{label}\n{r['text']}")
@@ -133,10 +133,15 @@ def answer_question(
         }
 
     context = build_context(results)
+    answer_instruction = (
+        "Answer as structured claims; source_chunk_index is the zero-based Source number above:"
+        if config.structured_output_enabled
+        else "Answer (bullet points, cite each claim, chronological by period):"
+    )
     prompt = (
         f"Context from SEC filings:\n{context}\n\n"
         f"=== USER QUESTION ===\n{question}\n=== END ===\n\n"
-        f"Answer (bullet points, cite each claim, chronological by period):"
+        f"{answer_instruction}"
     )
 
     if on_progress:

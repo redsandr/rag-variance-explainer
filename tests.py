@@ -57,8 +57,49 @@ def test_build_context_includes_relevance() -> None:
         }
     ]
     context = build_context(results)
-    assert "[DRI 10-Q filed 2026-03-27 | relevance: 0.87]" in context
+    assert "[Source 0 | DRI 10-Q filed 2026-03-27 | relevance: 0.87]" in context
     assert "Marketing expense decreased" in context
+
+
+def test_context_uses_the_same_zero_based_source_indexes_as_claims() -> None:
+    sources = [
+        {"text": "CMG labor costs.", "metadata": {"ticker": "CMG", "form": "10-Q",
+                                              "filing_date": "2024-07-25"}},
+        {"text": "JNJ Europe sales grew 14.5%.", "metadata": {"ticker": "JNJ", "form": "10-Q",
+                                                         "filing_date": "2026-04-22"}},
+    ]
+
+    context = build_context(sources)
+
+    assert "[Source 0 | CMG" in context
+    assert "[Source 1 | JNJ" in context
+    assert context.index("[Source 0") < context.index("[Source 1")
+
+
+def test_generation_prompt_exposes_claim_source_indexes_to_model() -> None:
+    from unittest.mock import MagicMock, patch
+
+    from src.rag import answer_question
+
+    sources = [
+        {"text": "CMG labor costs.", "metadata": {"ticker": "CMG", "form": "10-Q",
+                                              "filing_date": "2024-07-25"}},
+        {"text": "JNJ Europe sales.", "metadata": {"ticker": "JNJ", "form": "10-Q",
+                                               "filing_date": "2026-04-22"}},
+    ]
+    llm = MagicMock()
+    llm.generate.return_value = '{"answer":"No finding.","claims":[],"can_answer":false,"confidence":0}'
+    with (
+        patch("src.rag.get_client"),
+        patch("src.rag.get_collection"),
+        patch("src.rag.query_multi", return_value=sources),
+    ):
+        answer_question("How did sales change?", llm=llm)
+
+    prompt = llm.generate.call_args_list[0].args[0]
+    assert "[Source 0 | CMG" in prompt
+    assert "[Source 1 | JNJ" in prompt
+    assert "source_chunk_index is the zero-based Source number" in prompt
 
 
 def test_build_context_empty_returns_fallback() -> None:
@@ -788,7 +829,7 @@ def test_build_context_missing_score_keys() -> None:
     results = [{"text": "Revenue increased.", "metadata": {"ticker": "CMG", "form": "10-Q", "filing_date": "2026-03-27"}}]
     context = build_context(results)
     assert "Revenue increased" in context
-    assert "[CMG" in context
+    assert "[Source 0 | CMG" in context
     assert "relevance: 0.00" in context
 
 

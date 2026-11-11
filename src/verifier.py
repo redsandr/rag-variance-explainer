@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 class VerifiedClaim(BaseModel):
     statement: str = Field(description="One atomic claim from the answer")
-    source_chunk_index: int = Field(ge=0, description="Index into the retrieved chunks list")
+    source_chunk_index: int = Field(ge=0, description="Zero-based Source number in the provided context")
     source_quote: str = Field(description="Verbatim quote from the source chunk supporting this claim")
 
 
