@@ -1,6 +1,6 @@
 # RAG Variance Explainer
 
-A SEC research workbench for investigating why a public company's financial metric changed, with inspectable quotations from 10-K and 10-Q filings. **Portfolio reviewers** can preview a [reviewed J&J Europe sales walkthrough](DEMO.md) locally while public hosting is being prepared; **analysts and developers** can run the question-answering application locally. The static website does **not** run a model or accept live questions. [Demo and release status](DEMO.md) · [Evidence and limitations](docs/jnj-europe-sales-review-2026-11-11.md).
+A SEC research workbench for investigating why a public company's financial metric changed, with inspectable quotations from 10-K and 10-Q filings. **Portfolio reviewers:** [explore the reviewed J&J case](https://rag-variance-explainer.vercel.app/example) in a browser. **Analysts and developers:** run the question-answering application locally. The public website is a **static walkthrough**, not a live model or question box. [Demo guide](DEMO.md) · [Evidence and limitations](docs/jnj-europe-sales-review-2026-11-11.md).
 
 ![Static J&J Europe sales case walkthrough, with stage controls and a link to the SEC filing](docs/assets/jnj-example-desktop.png)
 

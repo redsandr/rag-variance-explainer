@@ -1,8 +1,8 @@
 # Portfolio demo
 
-**Public URL:** not deployed or verified yet. A GitHub push does not by itself publish the site. Do not describe this as a live question-answering demo.
+**Public URL:** [rag-variance-explainer.vercel.app](https://rag-variance-explainer.vercel.app/) · [Explore the J&J case](https://rag-variance-explainer.vercel.app/example). The production case page was opened in a browser after commit `b07d77e`; it showed the approved 14.5% growth finding. This is a static walkthrough, not a live question-answering demo.
 
-**Recommended free host:** Vercel Hobby for a personal, non-commercial portfolio. Import `redsandr/rag-variance-explainer` in the Vercel dashboard, set **Root Directory** to `landing`, confirm framework **Next.js**, and deploy the existing static export. No API key, Streamlit deployment, index upload, or model server is needed. Vercel Hobby is free for personal non-commercial use; if the site later becomes commercial, revisit the hosting terms before using this plan. The owner must authorize the GitHub integration and choose the account; these steps have not been performed. After deployment, open both `/` and `/example`, check the SEC link, and only then put the verified URL here and at the top of the README.
+**Host:** The repository is already connected to Vercel; pushing `b07d77e` triggered its deployment. The Next.js `landing` exports static pages. No API key, Streamlit deployment, index upload, or model server is needed. Vercel Hobby is free for personal non-commercial use; if the site later becomes commercial, revisit the hosting terms before using this plan.
 
 ## What visitors can do
 
@@ -28,4 +28,4 @@ Open `http://127.0.0.1:3100/example`. From a fresh clone, configure and run the 
 
 - Capture current desktop and mobile screenshots after the final site build; do not reuse older pending-review captures as proof of the approved case.
 - Verify the exported routes, original SEC link, and lack of any live-question promise on desktop and mobile.
-- Select and configure a free static host, then replace the URL placeholder **only after** opening the deployed address in a browser. No hosted backend or paid API is required.
+- Recheck the production home page, mobile case layout and SEC link after future deployments. No hosted backend or paid API is required.
