@@ -4,9 +4,9 @@ import ExampleWalkthrough from '../components/ExampleWalkthrough';
 import SiteLayout, { ArrowIcon, repositoryUrl } from '../components/SiteLayout';
 
 const questions = [
-  { question: 'Can I ask my own question on this website?', answer: 'Not yet. This website walks through an illustrative research process. The open-source project runs locally; there is no public hosted analysis service here.' },
+  { question: 'Can I ask my own question on this website?', answer: 'No. This is an interactive static walkthrough of a reviewed case. Run the open-source application locally to ask new questions; this site has no hosted model.' },
   { question: 'Does a matching quote prove the explanation?', answer: 'No. A quote check only tests whether words occur in a retrieved passage. The metric, period, arithmetic and causal language still need review in the original filing.' },
-  { question: 'Why is there no example quotation?', answer: 'No filing-backed case has completed manual review for publication. Showing an invented SEC quotation would make the demonstration look more certain than the evidence allows.' },
+  { question: 'Is the J&J example a live answer?', answer: 'No. A prior local run produced a quote-matched answer. Its narrow financial wording was then checked against the original SEC 10-Q and approved for this static walkthrough.' },
   { question: 'What can I do now?', answer: 'Explore the interactive workpaper, read the method, or follow the local installation guide. You can also suggest a filing case through the public project repository.' },
 ];
 
@@ -22,18 +22,18 @@ export default function Home() {
       <div className="home-hero-copy">
         <h1 id="hero-title">Understand what moved.<br /><span>See where it came from.</span></h1>
         <p>Investigate why a financial metric changed using passages from a company’s own SEC filings. Follow the source, check the quoted words, and decide what the disclosure actually supports.</p>
-        <div className="home-hero-actions"><a className="primary-action" href="/example">Explore the example <ArrowIcon /></a><a className="secondary-action" href="/method">See how it works <ArrowIcon /></a></div>
+        <div className="home-hero-actions"><a className="primary-action" href="/example">Explore the J&J case <ArrowIcon /></a><a className="secondary-action" href="/method">See how it works <ArrowIcon /></a></div>
         <p className="home-hero-context">SEC 10-K / 10-Q research <span aria-hidden="true">·</span> Local prototype <span aria-hidden="true">·</span> Not investment advice</p>
       </div>
-      <motion.div className="home-preview" aria-label="Illustrative evidence workpaper with no published financial answer"
+      <motion.div className="home-preview" aria-label="Preview of reviewed JNJ Europe sales case, not a live query"
         initial={reducedMotion ? false : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}>
-        <div className="home-preview-top"><span>Variance / research note</span><span>Illustrative layout</span></div>
-        <div className="home-preview-question"><span>Ask the filing</span><strong>Why did this metric change?</strong></div>
-        <div className="home-preview-record"><span>01 / Proposed explanation</span><strong>Awaiting reviewed case</strong><p>No financial conclusion is published here without filing review.</p></div>
-        <div className="home-preview-row"><span>02 / Exact passage</span><strong>Not published</strong></div>
-        <div className="home-preview-row"><span>03 / Original filing</span><strong>Review pending</strong></div>
-        <div className="home-preview-bottom"><span className="home-preview-pulse" aria-hidden="true" /> Evidence status is visible before any answer</div>
+        <div className="home-preview-top"><span>JNJ / Europe sales</span><span>Static case · not live</span></div>
+        <div className="home-preview-question"><span>Research question</span><strong>Why did Europe sales change in Q1 2026?</strong></div>
+        <div className="home-preview-record"><span>01 / Reviewed finding</span><strong>14.5% reported growth</strong><p>11.8 percentage points currency; 2.7 percentage points operational.</p></div>
+        <div className="home-preview-row"><span>02 / Exact passage</span><strong>Read the filing quotation</strong></div>
+        <div className="home-preview-row"><span>03 / Original filing</span><strong>J&J Form 10-Q · Item 2</strong></div>
+        <div className="home-preview-bottom"><span className="home-preview-pulse" aria-hidden="true" /> Reviewed case · not a general model accuracy claim</div>
       </motion.div>
     </section>
 
@@ -44,7 +44,7 @@ export default function Home() {
 
     <section className="home-example" id="example" aria-labelledby="home-example-title">
       <div className="wrap">
-        <div className="section-heading"><div><h2 id="home-example-title">See how an answer earns its place.</h2><p>Choose a stage. Watch the workpaper change without pretending an unreviewed filing answer is real.</p></div><a className="text-link" href="/example">Open the full example <ArrowIcon /></a></div>
+        <div className="section-heading"><div><h2 id="home-example-title">See how an answer earns its place.</h2><p>Follow one reviewed J&J case from question to filing; no model runs in this browser.</p></div><a className="text-link" href="/example">Open the full example <ArrowIcon /></a></div>
         <ExampleWalkthrough compact />
       </div>
     </section>

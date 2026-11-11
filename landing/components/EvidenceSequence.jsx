@@ -5,7 +5,7 @@ const stages = [
   { name: 'The question', title: 'Every explanation starts with a question.', detail: 'Name the metric and period before searching for a reason.', command: 'ask "Why did the metric change?"', output: 'A question opens an investigation. It is not an answer.', scene: 'question' },
   { name: 'The passage', title: 'Go where the filing speaks.', detail: 'Look for relevant language in indexed MD&A passages.', command: 'retrieve --section "MD&A"', output: 'Relevant passages are leads, not verified causes.', scene: 'passage' },
   { name: 'The check', title: 'Words must survive a closer look.', detail: 'Compare proposed quotations with the retrieved passage.', command: 'verify --quoted-text', output: 'A text match does not establish arithmetic or causation.', scene: 'check' },
-  { name: 'The review', title: 'The final word belongs to the filing.', detail: 'An analyst must inspect the original SEC filing before using any explanation.', command: 'review --original-filing', output: 'PENDING REVIEW · No approved example published.', scene: 'review' },
+  { name: 'The review', title: 'The final word belongs to the filing.', detail: 'An analyst must inspect the original SEC filing before using any explanation.', command: 'review --original-filing', output: 'JNJ EUROPE CASE REVIEWED · Explore the static example.', scene: 'review' },
 ];
 
 function ResearchScene({ scene }) {

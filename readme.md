@@ -1,16 +1,18 @@
 # RAG Variance Explainer
 
-A local research application for asking why financial metrics changed in SEC 10-K and 10-Q filings. It downloads MD&A text, builds a ChromaDB index, retrieves relevant passages, and asks an LLM to answer with source quotes. The current dataset covers seven US companies across restaurant, retail, healthcare, and energy. You can use the Streamlit UI, REST API, or MCP server on your own machine.
+A SEC research workbench for investigating why a public company's financial metric changed, with inspectable quotations from 10-K and 10-Q filings. **Portfolio reviewers** can preview a [reviewed J&J Europe sales walkthrough](DEMO.md) locally while public hosting is being prepared; **analysts and developers** can run the question-answering application locally. The static website does **not** run a model or accept live questions. [Demo and release status](DEMO.md) · [Evidence and limitations](docs/jnj-europe-sales-review-2026-11-11.md).
+
+![Static J&J Europe sales case walkthrough, with stage controls and a link to the SEC filing](docs/assets/jnj-example-desktop.png)
 
 For the intended analyst decision workflow, planned news and private financial-PDF sources, and the evidence gates before publishing, see the [active product roadmap](docs/product-roadmap.md). Those extensions are **not** implemented by this local SEC prototype.
 
-This is a research prototype. A source quote match confirms that the quoted text exists in a retrieved passage. It does not independently prove a causal explanation, a computed number, or investment suitability. Review the cited filing before relying on an answer.
+The local application is a research prototype, not investment advice. A source quote match confirms that the quoted text exists in a retrieved passage. It does not independently prove a causal explanation, a computed number, or investment suitability. Review the cited filing before relying on an answer.
 
-**Portfolio demo work:** follow the [operator runbook](docs/demo-review-runbook.md) for six varied candidate questions, complete Docker/Streamlit startup commands, what to capture, and the original-filing review gate. These are research questions, not hard-coded answers; no candidate is approved for public display merely because a quote matches. The public landing remains illustrative until a case passes review.
+**Portfolio demo work:** the J&J example received a separate claim-by-claim filing-body review and owner copy approval. The other [six candidate runs](docs/demo-review-results-2026-11-11.md) remain research observations, not approved public answers or a reliability metric. The case is a curated static walkthrough, not a hard-coded rule in the answer pipeline.
 
 ## Run locally
 
-Use Python 3.11, enough disk space for model downloads and an index, and an internet connection to fetch SEC filings and embedding models. Set a descriptive `SEC_USER_AGENT` with your name and contact email. SEC requests fail with a clear error when it is missing. No hosted demo or prebuilt index is required.
+Use Python 3.11, enough disk space for model downloads and an index, and an internet connection to fetch SEC filings and embedding models. Set a descriptive `SEC_USER_AGENT` with your name and contact email. SEC requests fail with a clear error when it is missing. No prebuilt index is included, and no public inference service is provided.
 
 Check `py -0p` on Windows before creating the environment. If the launcher does not list Python 3.11, install it or invoke its executable directly: `& "C:\path\to\Python311\python.exe" -m venv .venv`.
 
@@ -93,7 +95,7 @@ Install development tools with `python -m pip install -e ".[dev]"`, then run `py
 
 The next release gate is a clean-clone setup on Windows and Linux, followed by a versioned evaluation with per-question results and human review of unsupported claims. Keep the package local until those gates pass. The agent skill in `.opencode/skills/rag-finance` currently assumes this repository's MCP server is already installed; it is not a standalone marketplace product.
 
-The current app **does not accept uploaded PDFs**. See the [product roadmap](docs/product-roadmap.md) for the separate, unimplemented private-document workflow and security requirements. The website's workpaper is illustrative; it is not a hosted SEC question-answering service.
+The current app **does not accept uploaded PDFs**. See the [product roadmap](docs/product-roadmap.md) for the separate, unimplemented private-document workflow and security requirements. The website's J&J workpaper is a static reviewed example; it is not a hosted SEC question-answering service.
 
 ## License
 

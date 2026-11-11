@@ -2,6 +2,22 @@
 
 Updated: 2026-11-11. This document describes the **target**, not shipped capabilities. The repository root is the code and documentation source of truth; the separate `Documents/portofolio 2/Project 2` vault points here. Older numbered notes are history, not release evidence.
 
+## Agreed public portfolio release
+
+**Goal:** Ship a free, English-language public website where a portfolio reviewer can understand RAG Variance Explainer in five minutes and explore a static SEC research walkthrough from question to proposed finding, quotation, original filing, and limits. Financial analysts should still be able to inspect the evidence. The question-answering application remains local; visitors cannot submit live questions on the public site.
+
+**First release acceptance criteria:**
+
+- A public URL opens without installation, account, API key, paid service, or the owner's laptop being online. The site says plainly that its interactive walkthrough is static, not live model inference; it has no simulated Ask box.
+- A reviewer can identify what the tool does, who it is for, how a passage relates to the original SEC filing, and what a matching quotation does **not** establish. The owner and assistant will perform the initial five-minute comprehension check; an unfamiliar-person test is not a release prerequisite.
+- Before an approved financial case exists, the public site may explain the process but must display **Pending review** instead of an unreviewed finding. The first candidate is JNJ Europe sales for the quarter ended March 29, 2026. Its numbers, period, attribution, qualifiers, and website wording must be checked against the body of the original filing and approved by the owner before publication.
+- Publish one approved filing-backed case first, with an inspectable quotation, original SEC link, and explicit limitations. The README and a root-level `DEMO.md` should distinguish the public walkthrough from locally runnable Streamlit, API, and MCP interfaces.
+- Choose a genuinely free static host after auditing the landing configuration; build and inspect the public URL on desktop and mobile. If account authorization blocks deployment, record the exact owner action and do not claim a live URL.
+
+**Out of scope for this release:** hosted model inference, public free-form questions, paid API keys, a hosted backend, new MCP or Skill packaging, a controlled token-budget comparison, and any assertion that quote matching alone proves numerical accuracy, causality, or completeness. Do not commit `.env`, the local index, or its backup.
+
+This public portfolio release is a separate, narrower delivery track from the longer-term analyst product roadmap below; it does not satisfy the analyst workflow or production-readiness gates.
+
 ## Product and user
 
 An evidence-first research assistant for independent financial analysts investigating public companies. It should help answer what changed, why management says it changed, what alternative explanations exist, and what to check before a decision. It must distinguish a company's filings, the analyst's uploaded documents, and dated third-party news. It must not turn a news headline or a matching quote into a proven cause, calculated value, or buy/sell recommendation.
