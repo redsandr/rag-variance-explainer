@@ -992,6 +992,78 @@ def test_structured_nli_checks_each_claim_against_its_cited_passage() -> None:
     assert result["nli_summary"]["supported"] == 1
 
 
+def test_comparison_refuses_verified_finding_when_only_one_company_is_cited() -> None:
+    from unittest.mock import MagicMock, patch
+
+    from src.rag import answer_question
+
+    sources = [
+        {"text": "Labor costs decreased 0.2% as a percentage of total revenue.",
+         "metadata": {"ticker": "CMG", "form": "10-Q", "filing_date": "2024-07-25",
+                      "report_period_end": "2024-06-30"}},
+        {"text": "Europe sales achieved growth of 14.5%.",
+         "metadata": {"ticker": "JNJ", "form": "10-Q", "filing_date": "2026-04-22",
+                      "report_period_end": "2026-03-29"}},
+    ]
+    llm = MagicMock()
+    llm.generate.return_value = (
+        '{"answer":"CMG labor share fell. JNJ Europe growth unavailable in context.",'
+        '"claims":[{"statement":"CMG labor share fell.","source_chunk_index":0,'
+        '"source_quote":"Labor costs decreased 0.2% as a percentage of total revenue."}],'
+        '"can_answer":true,"confidence":0.8}'
+    )
+    question = ("Compare Chipotle labor costs for the period ended June 30, 2024 "
+                "and Johnson & Johnson Europe sales for the period ended March 29, 2026, respectively")
+    with (
+        patch("src.rag.get_client"),
+        patch("src.rag.get_collection"),
+        patch("src.rag.query_multi", return_value=sources),
+        patch("src.rag.config.nli_enabled", False),
+    ):
+        result = answer_question(question, llm=llm)
+
+    assert "JNJ Europe growth unavailable" not in result["answer"]
+    assert "each requested company" in result["answer"]
+    assert result["claims"] == []
+    assert result["verification_errors"]
+
+
+def test_comparison_accepts_quotes_for_both_company_periods() -> None:
+    from unittest.mock import MagicMock, patch
+
+    from src.rag import answer_question
+
+    sources = [
+        {"text": "Labor costs decreased as a percentage of revenue.",
+         "metadata": {"ticker": "CMG", "form": "10-Q", "filing_date": "2024-07-25",
+                      "report_period_end": "2024-06-30"}},
+        {"text": "Europe sales growth was 14.5%.",
+         "metadata": {"ticker": "JNJ", "form": "10-Q", "filing_date": "2026-04-22",
+                      "report_period_end": "2026-03-29"}},
+    ]
+    llm = MagicMock()
+    llm.generate.return_value = (
+        '{"answer":"Labor share fell; Europe sales grew 14.5%.",'
+        '"claims":[{"statement":"Labor share fell.","source_chunk_index":0,'
+        '"source_quote":"Labor costs decreased as a percentage of revenue."},'
+        '{"statement":"Europe sales grew 14.5%.","source_chunk_index":1,'
+        '"source_quote":"Europe sales growth was 14.5%."}],'
+        '"can_answer":true,"confidence":0.8}'
+    )
+    with (
+        patch("src.rag.get_client"),
+        patch("src.rag.get_collection"),
+        patch("src.rag.query_multi", return_value=sources),
+        patch("src.rag.config.nli_enabled", False),
+    ):
+        result = answer_question(
+            "Compare CMG and JNJ for June 30, 2024 and March 29, 2026, respectively", llm=llm
+        )
+
+    assert len(result["claims"]) == 2
+    assert result["verification_errors"] == []
+
+
 def test_rag_diagnostics_identify_retrieved_sources_without_logging_passages(monkeypatch, caplog) -> None:
     from unittest.mock import MagicMock, patch
 
@@ -1412,6 +1484,47 @@ def test_query_multi_allocates_evidence_to_each_explicit_company_and_period() ->
 
     assert {(row["metadata"]["ticker"], row["metadata"]["report_period_end"])
             for row in results} == {("CMG", "2024-06-30"), ("JNJ", "2026-03-29")}
+
+
+def test_multi_company_retrieval_uses_each_company_metric_in_its_lookup() -> None:
+    from unittest.mock import MagicMock, patch
+
+    from src.retrieval import query_multi
+
+    question = ("Compare how Chipotle's labor costs changed for the three months ended June 30, 2024 "
+                "and how Johnson & Johnson's Europe sales grew for the quarter ended March 29, 2026, "
+                "respectively. Report each company's metric separately; do not treat them as the same metric or period.")
+    lookups = {}
+
+    def retrieve(_collection, _question, lookup, _min_relevance, ticker_filter=None,
+                 report_period_end=None):
+        lookups[ticker_filter] = lookup
+        if ticker_filter == "JNJ" and "labor costs" in lookup.lower():
+            return [{"text": "Unrelated JNJ tax passage", "metadata": {"ticker": "JNJ",
+                    "filing_date": "2026-04-22", "report_period_end": report_period_end}, "relevance": 0.8}]
+        return [{"text": "Europe sales growth 14.5%" if ticker_filter == "JNJ" else "Labor costs",
+                 "metadata": {"ticker": ticker_filter, "filing_date": "2024-07-25" if ticker_filter == "CMG"
+                              else "2026-04-22", "report_period_end": report_period_end}, "relevance": 0.8}]
+
+    with (
+        patch("src.retrieval._retrieve_dense", side_effect=retrieve),
+        patch("src.retrieval.config.hybrid_search_enabled", False),
+        patch("src.retrieval.config.cross_encoder_enabled", False),
+        patch("src.retrieval.config.expansion_enabled", False),
+    ):
+        results = query_multi(MagicMock(), question, top_k=5)
+
+    assert "labor costs" in lookups["CMG"].lower()
+    assert "Europe sales" in lookups["JNJ"]
+    assert "labor costs" not in lookups["JNJ"].lower()
+    assert any("14.5%" in row["text"] for row in results)
+
+
+def test_multi_company_retrieval_keeps_full_question_if_clauses_cannot_be_mapped() -> None:
+    from src.retrieval import _scoped_company_question
+
+    question = "Compare Chipotle and Johnson & Johnson for June 30, 2024 and March 29, 2026, respectively"
+    assert _scoped_company_question(question, "JNJ", "2026-03-29") == question
 
 
 def test_company_period_plan_requires_unambiguous_date_mapping() -> None:

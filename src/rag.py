@@ -14,7 +14,7 @@ from llm import LLMClient
 from logging_config import log_timer
 from post_process import verify_answer_llm
 from prompts import build_rag_system_prompt
-from retrieval import get_client, get_collection, query_multi
+from retrieval import _company_period_plan, get_client, get_collection, query_multi
 from verifier import (
     aggregate_verdicts,
     fallback_answer,
@@ -168,11 +168,29 @@ def answer_question(
         parsed = parse_answer(answer)
         if parsed is not None and parsed.can_answer:
             quote_errors = validate_answer(parsed, results)
+            plan = _company_period_plan(question) if ticker_filter is None else None
+            if plan and not quote_errors:
+                cited_scopes = {
+                    (results[claim.source_chunk_index]["metadata"].get("ticker"),
+                     results[claim.source_chunk_index]["metadata"].get("report_period_end"))
+                    for claim in parsed.claims
+                    if 0 <= claim.source_chunk_index < len(results)
+                }
+                if any(not any(cited_ticker == ticker and (period is None or cited_period == period)
+                               for cited_ticker, cited_period in cited_scopes)
+                       for ticker, period in plan):
+                    quote_errors.append("No source-backed claim for each requested company and period")
             if quote_errors:
                 logger.warning("[StructuredOutput] quote validation (%d errors): %s", len(quote_errors), quote_errors)
+                failure_answer = (
+                    "I cannot verify a sourced finding for each requested company and period."
+                    if any("each requested company" in error for error in quote_errors)
+                    else "I cannot verify the generated claims against the retrieved SEC filing excerpts, "
+                         "so I will not present them as sourced findings."
+                )
                 return {
                     "question": question,
-                    "answer": "I cannot verify the generated claims against the retrieved SEC filing excerpts, so I will not present them as sourced findings.",
+                    "answer": failure_answer,
                     "sources": results,
                     "verification_errors": quote_errors,
                     "structured": True,

@@ -247,6 +247,41 @@ def _company_period_plan(question: str) -> list[tuple[str, str | None]] | None:
     return []
 
 
+def _scoped_company_question(question: str, ticker: str, period: str | None) -> str:
+    if period is None:
+        return question
+    positions = {}
+    for symbol, name in TICKERS.items():
+        aliases = {name, COMPANY_SHORT[symbol], symbol}
+        matches = [match.start() for alias in aliases
+                   for match in re.finditer(r"(?<!\w)" + re.escape(alias) + r"(?!\w)", question,
+                                            0 if alias == symbol or symbol == "TGT" else re.I)]
+        if matches:
+            positions[symbol] = min(matches)
+    if ticker not in positions:
+        return question
+    start = positions[ticker]
+    end = min((pos for symbol, pos in positions.items() if symbol != ticker and pos > start),
+              default=len(question))
+    segment = question[start:end]
+    dates = []
+    for match in _REPORT_DATE_PATTERN.finditer(segment):
+        try:
+            value = datetime.strptime(match.group(), "%B %d, %Y" if "," in match.group()
+                                      else "%B %d %Y").date().isoformat()
+        except ValueError:
+            return question
+        dates.append((value, match.end()))
+    for match in _ISO_DATE_PATTERN.finditer(segment):
+        try:
+            dates.append((date.fromisoformat(match.group()).isoformat(), match.end()))
+        except ValueError:
+            return question
+    if len(dates) != 1 or dates[0][0] != period:
+        return question
+    return segment[:dates[0][1]].strip()
+
+
 def _filter_to_report_filing(candidates: list[dict], question: str) -> list[dict]:
     report_date = _requested_report_date(question)
     if report_date is None:
@@ -376,7 +411,7 @@ def query_multi(
             for index, (ticker, period) in enumerate(plan):
                 allocation = top_k // len(plan) + (index < top_k % len(plan))
                 group = query_multi(
-                    collection, query_text, top_k=allocation,
+                    collection, _scoped_company_question(query_text, ticker, period), top_k=allocation,
                     min_relevance=min_relevance, ticker_filter=ticker,
                     cross_encoder_enabled=cross_encoder_enabled, report_period_end=period,
                 )
