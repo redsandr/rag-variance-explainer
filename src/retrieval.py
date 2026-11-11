@@ -8,7 +8,9 @@ requires.
 """
 
 import logging
+import re
 import threading
+from datetime import date, datetime
 from typing import Any
 
 import chromadb
@@ -23,6 +25,12 @@ from query_expansion import expand_query
 
 logger = logging.getLogger(__name__)
 _COLLECTION_NAME = "mda_filings"
+_REPORT_DATE_PATTERN = re.compile(
+    r"\b(January|February|March|April|May|June|July|August|September|October|November|December)"
+    r"\s+(\d{1,2}),?\s+(\d{4})\b",
+    re.IGNORECASE,
+)
+_ISO_DATE_PATTERN = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
 
 
 def get_client() -> Any:
@@ -151,10 +159,12 @@ def _retrieve_dense(
     query_text: str,
     lookup: str,
     min_relevance: float,
+    ticker_filter: str | None = None,
 ) -> list[dict]:
     results = collection.query(
         query_embeddings=[embed_query(lookup)],
         n_results=config.retrieval_n_candidates,
+        **({"where": {"ticker": ticker_filter}} if ticker_filter else {}),
     )
 
     candidates = []
@@ -174,6 +184,53 @@ def _retrieve_dense(
             candidates.append(c)
 
     return candidates
+
+
+def _requested_report_date(question: str) -> date | None:
+    dates: set[date] = set()
+    for match in _REPORT_DATE_PATTERN.finditer(question):
+        try:
+            dates.add(datetime.strptime(match.group(), "%B %d, %Y" if "," in match.group() else "%B %d %Y").date())
+        except ValueError:
+            return None
+    for match in _ISO_DATE_PATTERN.finditer(question):
+        try:
+            dates.add(date.fromisoformat(match.group()))
+        except ValueError:
+            return None
+    return next(iter(dates)) if len(dates) == 1 else None
+
+
+def _filter_to_report_filing(candidates: list[dict], question: str) -> list[dict]:
+    report_date = _requested_report_date(question)
+    if report_date is None:
+        return candidates
+
+    by_ticker: dict[str, list[tuple[date, dict]]] = {}
+    for candidate in candidates:
+        try:
+            filed = date.fromisoformat(candidate["metadata"]["filing_date"])
+        except (KeyError, TypeError, ValueError):
+            continue
+        if 0 <= (filed - report_date).days <= 120:
+            ticker = candidate["metadata"].get("ticker", "")
+            by_ticker.setdefault(ticker, []).append((filed, candidate))
+
+    if not by_ticker:
+        logger.warning("No indexed filing near the requested report date %s", report_date)
+        return []
+
+    selected = []
+    for eligible in by_ticker.values():
+        with_period = [(filed, candidate) for filed, candidate in eligible
+                       if candidate["metadata"].get("report_period_end")]
+        if with_period:
+            eligible = [(filed, candidate) for filed, candidate in with_period
+                        if candidate["metadata"]["report_period_end"] == report_date.isoformat()]
+        if eligible:
+            first_date = min(filed for filed, _ in eligible)
+            selected.extend(candidate for filed, candidate in eligible if filed == first_date)
+    return selected
 
 
 def _bm25_cache_key(ticker_filter: str | None) -> str:
@@ -263,7 +320,7 @@ def query_multi(
     lookup = expand_query(query_text) if config.expansion_enabled else query_text
 
     with log_timer(logger, "retrieve.dense"):
-        dense = _retrieve_dense(collection, query_text, lookup, min_relevance)
+        dense = _retrieve_dense(collection, query_text, lookup, min_relevance, ticker_filter)
     if not dense:
         return []
 
@@ -274,6 +331,10 @@ def query_multi(
         _fill_missing_fields(candidates, query_text)
     else:
         candidates = dense
+
+    candidates = _filter_to_report_filing(candidates, query_text)
+    if not candidates:
+        return []
 
     _add_metric_boost(candidates, query_text)
 

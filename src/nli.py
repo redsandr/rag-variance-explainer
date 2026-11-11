@@ -96,6 +96,8 @@ class NLIClient:
         max_entailment = 0.0
         best_label = "neutral"
         best_score = 0.0
+        strongest_entailing_score = 0.0
+        strongest_contradiction_score = 0.0
 
         for chunk_text in chunk_texts:
             try:
@@ -106,12 +108,23 @@ class NLIClient:
 
                 if entail > max_entailment:
                     max_entailment = entail
+                if label == "entailment":
+                    strongest_entailing_score = max(strongest_entailing_score, score)
+                if label == "contradiction":
+                    strongest_contradiction_score = max(strongest_contradiction_score, score)
                 if score > best_score:
                     best_score = score
                     best_label = label
             except (RuntimeError, ValueError, IndexError, AttributeError) as e:
                 logger.warning("NLI inference error for claim: %s — %s", claim[:80], e)
                 continue
+
+        if strongest_entailing_score >= threshold and strongest_entailing_score > strongest_contradiction_score:
+            best_label = "entailment"
+            best_score = strongest_entailing_score
+        elif strongest_contradiction_score > 0 and strongest_contradiction_score >= strongest_entailing_score:
+            best_label = "contradiction"
+            best_score = strongest_contradiction_score
 
         return {
             "claim": claim,

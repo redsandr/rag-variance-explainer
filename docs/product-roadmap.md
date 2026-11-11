@@ -12,7 +12,7 @@ Initial scope: US public companies with reviewed SEC 10-K/10-Q coverage; English
 
 - Local SEC ingestion and Chroma index, Streamlit UI, REST API, and a local MCP server (`src/server.py`). These surfaces do not yet share a reviewed production-grade answer contract.
 - Quote-to-retrieved-chunk checking can refuse unsourced generated text. It does not prove causation, arithmetic, or fidelity to the original filing.
-- Local Docker llama.cpp backend can serve the existing 7B model. A Qwen3-8B/TurboQuant Docker build and comparative benchmark are **not yet verified**. Keep baseline and candidate configurations separate.
+- Local Docker llama.cpp backend can serve the existing 7B model. A separate Qwen3-8B TurboQuant candidate answered a few synthetic checks correctly, and its `q8_0/turbo3` KV-cache allocation appeared in startup logs. General answer quality and comparative performance remain unverified. See [the local iteration record](qwen3-8b-turboquant-iteration.md). Keep baseline and candidate configurations separate.
 - No general user-PDF ingestion, live news retrieval, hosted multi-user isolation, or Agensi publication has been verified. See [readiness](14.%20GitHub%20Readiness.md) for recorded checks.
 
 ## Delivery order and gates
@@ -49,6 +49,6 @@ Refactor only after the answer/evidence contract is stable. Make Streamlit a cle
 
 ## Immediate next actions
 
-1. Finish and validate the Qwen3-8B download. Build the candidate TurboQuant image separately; verify supported flags and compare against a recorded 7B baseline on identical workloads. Do not infer answer quality from token speed.
+1. Continue the [Qwen3-8B TurboQuant iteration](qwen3-8b-turboquant-iteration.md): expand the reviewed quality set and run matched repeated benchmarks. Compare the 8B candidate with an 8B control before drawing cache-specific conclusions. Record the separate 7B baseline on identical product workloads. Do not infer answer quality from token speed.
 2. Capture a reproducible failing Chipotle retrieval/generation case and fix the first unsupported step, keeping fail-closed behavior.
 3. Define the smallest reviewed filing-backed analyst case and run it through all three current surfaces before adding news or PDF upload.

@@ -105,6 +105,8 @@ def build_index(rebuild: bool = False) -> None:
                         "filing_url": filing_url,
                         "chunk_index": i,
                     }
+                    if filing.get("reportDate"):
+                        base["report_period_end"] = filing["reportDate"]
                     enriched = tag_chunk(chunk, base)
                     enriched_metadatas.append(enriched)
 

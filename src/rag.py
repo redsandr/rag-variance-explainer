@@ -4,6 +4,7 @@ a grounded answer via the swappable LLMClient.
 """
 
 import logging
+import os
 import re
 from collections.abc import Callable
 from typing import Any
@@ -104,6 +105,18 @@ def answer_question(
             cross_encoder_enabled=cross_encoder_enabled,
         )
 
+    if os.getenv("RAG_DIAGNOSTICS", "").lower() == "true":
+        logger.warning("[RAG-DIAG] retrieved=%d ticker_filter=%s", len(results), ticker_filter)
+        for index, result in enumerate(results):
+            meta = result.get("metadata", {})
+            logger.warning(
+                "[RAG-DIAG] source=%d ticker=%s form=%s filed=%s accession=%s chunk=%s "
+                "relevance=%s hybrid_score=%s chars=%d",
+                index, meta.get("ticker"), meta.get("form"), meta.get("filing_date"),
+                meta.get("accession_number"), meta.get("chunk_index"),
+                result.get("relevance"), result.get("hybrid_score"), len(result.get("text", "")),
+            )
+
     if not results:
         if on_progress:
             on_progress("done", "No relevant filing excerpts found.")
@@ -180,8 +193,24 @@ def answer_question(
                                 device=config.nli_device,
                                 threshold=config.nli_threshold,
                             )
-                        nli_verdicts = verify_claims_nli(sub_claims, results, nli_client, config.nli_threshold)
+                        nli_verdicts = [
+                            verdict
+                            for claim in parsed.claims
+                            for verdict in verify_claims_nli(
+                                [claim.statement], [results[claim.source_chunk_index]],
+                                nli_client, config.nli_threshold,
+                            )
+                        ]
                         nli_summary = aggregate_verdicts(nli_verdicts)
+                        if os.getenv("RAG_DIAGNOSTICS", "").lower() == "true":
+                            for index, verdict in enumerate(nli_verdicts):
+                                logger.warning(
+                                    "[RAG-DIAG] nli_claim=%d verdict=%s confidence=%.4f "
+                                    "max_entailment=%.4f supported=%s claim=%r",
+                                    index, verdict.get("verdict"), verdict.get("confidence", 0.0),
+                                    verdict.get("max_entailment", 0.0), verdict.get("supported"),
+                                    verdict.get("claim"),
+                                )
                         if nli_summary["overall"] == "fail":
                             logger.warning(
                                 "[NLI] %d/%d claims unsupported — answer may contain unsupported facts",

@@ -1,6 +1,7 @@
 venv/
 data/raw/
 chroma_db/
+chroma_db_backup_*/
 .env
 __pycache__/
 .mypy_cache/
@@ -16,6 +17,7 @@ data/gemini_eval.txt
 data/claude_evaluation.txt
 data/claude_all_questions.txt
 data/*.json
+!data/nli_claim_eval.json
 .coverage*
 
 .streamlit/secrets.toml

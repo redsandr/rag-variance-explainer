@@ -191,6 +191,50 @@ def test_filing_document_url_format() -> None:
     assert url.startswith("https://www.sec.gov/")
 
 
+def test_sec_submissions_preserve_report_period_end() -> None:
+    from src.ingest import list_10k_10q_filings
+
+    submissions = {"filings": {"recent": {
+        "form": ["10-Q", "8-K"],
+        "accessionNumber": ["quarter", "event"],
+        "filingDate": ["2024-07-25", "2024-08-01"],
+        "reportDate": ["2024-06-30", "2024-08-01"],
+        "primaryDocument": ["quarter.htm", "event.htm"],
+    }}}
+
+    assert list_10k_10q_filings(submissions) == [{
+        "accessionNumber": "quarter", "form": "10-Q", "filingDate": "2024-07-25",
+        "reportDate": "2024-06-30", "primaryDocument": "quarter.htm",
+    }]
+
+
+def test_metadata_migration_preserves_existing_fields_and_skips_conflicts() -> None:
+    from unittest.mock import patch
+
+    from src.migrate_filing_metadata import plan
+
+    rows = {"ids": ["a", "b"], "metadatas": [
+        {"ticker": "CMG", "accession_number": "acc", "filing_date": "2024-07-25", "form": "10-Q", "extra": 3},
+        {"ticker": "CMG", "accession_number": "acc", "filing_date": "2024-07-25", "form": "10-Q", "extra": 4},
+    ]}
+    submissions = {"filings": {"recent": {
+        "accessionNumber": ["acc"], "form": ["10-Q"], "filingDate": ["2024-07-25"],
+        "reportDate": ["2024-06-30"], "primaryDocument": ["cmg.htm"],
+    }}}
+    with patch("src.migrate_filing_metadata.get_cik", return_value="0001058090"), patch(
+        "src.migrate_filing_metadata.fetch_submissions", return_value=submissions
+    ):
+        changes, unresolved, count = plan(rows)
+        assert count == 1 and not unresolved
+        assert set(changes) == {"a", "b"}
+        assert changes["a"]["extra"] == 3 and changes["b"]["extra"] == 4
+        assert changes["a"]["report_period_end"] == "2024-06-30"
+        assert changes["a"]["filing_url"].endswith("/cmg.htm")
+        rows["metadatas"][1]["report_period_end"] = "2024-03-31"
+        changes, unresolved, _ = plan(rows)
+        assert not changes and len(unresolved) == 1
+
+
 def test_parse_judge_response_trailing_comma_returns_none() -> None:
     from src.eval_faithfulness import parse_judge_response
     raw = '{"claims": [{"claim": "test", "verdict": "FAITHFUL"}], "faithful_count": 1,}'
@@ -884,6 +928,114 @@ def test_answer_question_full_pipeline() -> None:
     assert result["sources"][0]["metadata"]["ticker"] == "DRI"
 
 
+def test_nli_diagnostics_show_claim_and_verdict_when_enabled(monkeypatch, caplog) -> None:
+    from unittest.mock import MagicMock, patch
+
+    from src.rag import answer_question
+
+    monkeypatch.setenv("RAG_DIAGNOSTICS", "true")
+    passage = "Labor costs fell as a percentage of revenue."
+    llm = MagicMock()
+    llm.generate.return_value = (
+        '{"answer":"Labor costs fell.","claims":[{"statement":"Labor costs fell.",'
+        '"source_chunk_index":0,"source_quote":"Labor costs fell as a percentage of revenue."}],'
+        '"can_answer":true,"confidence":0.8}'
+    )
+    nli = MagicMock()
+    nli.verify_batch.return_value = [{"claim": "Labor costs fell.", "verdict": "neutral",
+                                      "confidence": 0.9, "max_entailment": 0.1, "supported": False}]
+    with (
+        patch("src.rag.get_client"),
+        patch("src.rag.get_collection"),
+        patch("src.rag.query_multi", return_value=[{"text": passage, "metadata": {
+            "ticker": "CMG", "form": "10-Q", "filing_date": "2024-07-25"}}]),
+        patch("src.rag.config.nli_enabled", True),
+    ):
+        result = answer_question("Costs?", llm=llm, nli_client=nli)
+
+    assert result["nli_summary"]["unsupported"] == 1
+    assert "nli_claim=0 verdict=neutral confidence=0.9000 max_entailment=0.1000" in caplog.text
+    assert "claim='Labor costs fell.'" in caplog.text
+
+
+def test_structured_nli_checks_each_claim_against_its_cited_passage() -> None:
+    from unittest.mock import MagicMock, patch
+
+    from src.rag import answer_question
+
+    llm = MagicMock()
+    llm.generate.return_value = (
+        '{"answer":"Labor costs fell.","claims":[{"statement":"Labor costs fell.",'
+        '"source_chunk_index":1,"source_quote":"Labor costs fell as a percentage of revenue."}],'
+        '"can_answer":true,"confidence":0.8}'
+    )
+    nli = MagicMock()
+    nli.verify_batch.return_value = [{"claim": "Labor costs fell.", "verdict": "entailment",
+                                      "confidence": 0.5, "max_entailment": 0.5, "supported": True}]
+    sources = [
+        {"text": "Unrelated filing passage.", "metadata": {"ticker": "CMG", "form": "10-Q",
+                                                     "filing_date": "2024-07-25"}},
+        {"text": "Labor costs fell as a percentage of revenue.",
+         "metadata": {"ticker": "CMG", "form": "10-Q", "filing_date": "2024-07-25"}},
+    ]
+    with (
+        patch("src.rag.get_client"),
+        patch("src.rag.get_collection"),
+        patch("src.rag.query_multi", return_value=sources),
+        patch("src.rag.config.nli_enabled", True),
+    ):
+        result = answer_question("Costs?", llm=llm, nli_client=nli)
+
+    nli.verify_batch.assert_called_once_with(
+        ["Labor costs fell."], ["Labor costs fell as a percentage of revenue."], 0.4,
+    )
+    assert result["nli_summary"]["supported"] == 1
+
+
+def test_rag_diagnostics_identify_retrieved_sources_without_logging_passages(monkeypatch, caplog) -> None:
+    from unittest.mock import MagicMock, patch
+
+    from src.rag import answer_question
+
+    monkeypatch.setenv("RAG_DIAGNOSTICS", "true")
+    source = {
+        "text": "Private passage text that must not appear in diagnostics.",
+        "metadata": {"ticker": "CMG", "form": "10-Q", "filing_date": "2024-07-25",
+                     "accession_number": "0001058090-24-000032", "chunk_index": 6},
+        "hybrid_score": 0.87,
+    }
+    with (
+        patch("src.rag.get_client"),
+        patch("src.rag.get_collection"),
+        patch("src.rag.query_multi", return_value=[source]),
+        patch("src.rag.config.structured_output_enabled", True),
+    ):
+        answer_question("Costs?", llm=MagicMock(generate=MagicMock(return_value=(
+            '{"answer":"No finding.","claims":[],"can_answer":false,"confidence":0.0}'
+        ))))
+
+    assert "source=0 ticker=CMG" in caplog.text
+    assert "chunk=6" in caplog.text
+    assert source["text"] not in caplog.text
+
+
+def test_quote_diagnostics_find_wrong_source_without_logging_quote(monkeypatch, caplog) -> None:
+    from src.verifier import StructuredAnswer, validate_answer
+
+    monkeypatch.setenv("RAG_DIAGNOSTICS", "true")
+    quote = "Sensitive excerpt found in source one."
+    answer = StructuredAnswer.model_validate({
+        "answer": "Claim", "claims": [{"statement": "Claim", "source_chunk_index": 0,
+                                       "source_quote": quote}], "can_answer": True, "confidence": 0.5,
+    })
+
+    errors = validate_answer(answer, [{"text": "Other text."}, {"text": quote}])
+
+    assert errors == ["Claim 0: quote not found (fuzzy) in chunk 0"]
+    assert "matches_other_sources=[1]" in caplog.text
+    assert quote not in caplog.text
+
+
 def test_answer_question_refuses_without_retrieved_sources() -> None:
     from unittest.mock import MagicMock, patch
 
@@ -1192,6 +1344,128 @@ def test_query_multi_with_mocked_chromadb() -> None:
     assert results[0]["metadata"]["ticker"] == "CMG"
 
 
+@pytest.mark.parametrize("ticker", ["CMG", "DRI"])
+def test_query_multi_limits_explicit_report_date_before_reranking(ticker: str) -> None:
+    from unittest.mock import MagicMock, patch
+
+    from src.retrieval import query_multi
+
+    sources = [
+        {"text": "Earlier filing", "metadata": {"ticker": ticker, "form": "10-Q",
+                                             "filing_date": "2024-07-25", "accession_number": "2024"},
+         "relevance": 0.8},
+        {"text": "Later filing", "metadata": {"ticker": ticker, "form": "10-Q",
+                                           "filing_date": "2025-07-24", "accession_number": "2025"},
+         "relevance": 0.9},
+    ]
+    with (
+        patch("src.retrieval._retrieve_dense", return_value=sources),
+        patch("src.retrieval.config.hybrid_search_enabled", False),
+        patch("src.retrieval.config.cross_encoder_enabled", False),
+    ):
+        results = query_multi(MagicMock(), "Three months ended June 30, 2024 vs 2023", ticker_filter=ticker)
+
+    assert [source["text"] for source in results] == ["Earlier filing"]
+
+
+def test_query_multi_keeps_multiple_periods_when_comparing_dates() -> None:
+    from unittest.mock import MagicMock, patch
+
+    from src.retrieval import query_multi
+
+    sources = [
+        {"text": str(year), "metadata": {"ticker": "DRI", "form": "10-Q",
+                                               "filing_date": f"{year}-07-25"}, "relevance": 0.8}
+        for year in (2024, 2025)
+    ]
+    with (
+        patch("src.retrieval._retrieve_dense", return_value=sources),
+        patch("src.retrieval.config.hybrid_search_enabled", False),
+        patch("src.retrieval.config.cross_encoder_enabled", False),
+    ):
+        results = query_multi(MagicMock(), "June 30, 2024 versus June 30, 2025", ticker_filter="DRI")
+
+    assert {source["text"] for source in results} == {"2024", "2025"}
+
+
+def test_report_date_keeps_one_filing_per_company() -> None:
+    from src.retrieval import _filter_to_report_filing
+
+    candidates = [
+        {"metadata": {"ticker": "CMG", "filing_date": "2024-07-25", "accession_number": "cmg"}},
+        {"metadata": {"ticker": "DRI", "filing_date": "2024-07-26", "accession_number": "dri"}},
+    ]
+
+    results = _filter_to_report_filing(candidates, "Compare CMG and DRI for June 30, 2024")
+
+    assert {item["metadata"]["ticker"] for item in results} == {"CMG", "DRI"}
+
+
+def test_report_date_prefers_matching_period_over_earlier_filing() -> None:
+    from src.retrieval import _filter_to_report_filing
+
+    candidates = [
+        {"metadata": {"ticker": "WMT", "filing_date": "2024-07-10",
+                      "report_period_end": "2024-03-31", "accession_number": "other"}},
+        {"metadata": {"ticker": "WMT", "filing_date": "2024-07-30",
+                      "report_period_end": "2024-06-30", "accession_number": "right"}},
+    ]
+
+    results = _filter_to_report_filing(candidates, "Three months ended June 30, 2024")
+
+    assert [item["metadata"]["accession_number"] for item in results] == ["right"]
+
+
+def test_query_multi_returns_no_sources_when_requested_filing_is_not_indexed() -> None:
+    from unittest.mock import MagicMock, patch
+
+    from src.retrieval import query_multi
+
+    source = {"text": "Later filing", "metadata": {"ticker": "DRI", "form": "10-Q",
+                                                  "filing_date": "2025-07-24"}, "relevance": 0.9}
+    with (
+        patch("src.retrieval._retrieve_dense", return_value=[source]),
+        patch("src.retrieval.config.hybrid_search_enabled", False),
+        patch("src.retrieval.config.cross_encoder_enabled", False),
+    ):
+        results = query_multi(MagicMock(), "Three months ended June 30, 2024", ticker_filter="DRI")
+
+    assert results == []
+
+
+def test_query_multi_does_not_filter_year_only_questions() -> None:
+    from unittest.mock import MagicMock, patch
+
+    from src.retrieval import query_multi
+
+    sources = [
+        {"text": str(year), "metadata": {"ticker": "DRI", "form": "10-Q",
+                                               "filing_date": f"{year}-07-25"}, "relevance": 0.8}
+        for year in (2024, 2025)
+    ]
+    with (
+        patch("src.retrieval._retrieve_dense", return_value=sources),
+        patch("src.retrieval.config.hybrid_search_enabled", False),
+        patch("src.retrieval.config.cross_encoder_enabled", False),
+    ):
+        results = query_multi(MagicMock(), "How did costs change in 2024?", ticker_filter="DRI")
+
+    assert {source["text"] for source in results} == {"2024", "2025"}
+
+
+def test_dense_retrieval_applies_ticker_filter_to_chroma() -> None:
+    from unittest.mock import MagicMock, patch
+
+    from src.retrieval import _retrieve_dense
+
+    collection = MagicMock()
+    collection.query.return_value = {"documents": [[]], "metadatas": [[]], "distances": [[]]}
+    with patch("src.retrieval.embed_query", return_value=[0.1]):
+        _retrieve_dense(collection, "labor", "labor", 0.3, ticker_filter="DRI")
+
+    assert collection.query.call_args.kwargs["where"] == {"ticker": "DRI"}
+
+
 def test_mcp_server_tool_rag_search_invalid_ticker() -> None:
     from mcp.server.fastmcp.exceptions import ToolError
 
@@ -1338,6 +1612,84 @@ def test_verify_claims_nli_empty_returns_empty() -> None:
     from src.verifier import verify_claims_nli
     assert verify_claims_nli([], [{"text": "chunk"}], None) == []
     assert verify_claims_nli(["claim"], [], None) == []
+
+
+def test_nli_neutral_other_passage_does_not_override_entailing_passage() -> None:
+    from unittest.mock import patch
+
+    from src.nli import NLIClient
+
+    client = NLIClient(threshold=0.4)
+    predictions = [
+        {"label": "entailment", "score": 0.45, "entailment_score": 0.45},
+        {"label": "neutral", "score": 0.55, "entailment_score": 0.18},
+    ]
+    with patch.object(client, "_load"), patch.object(client, "_predict", side_effect=predictions):
+        client._model = object()
+        result = client.verify("Labor costs fell as a percentage of revenue", ["labor passage", "other passage"])
+
+    assert result["supported"] is True
+    assert result["verdict"] == "entailment"
+    assert result["confidence"] == 0.45
+
+
+def test_nli_stronger_contradiction_still_blocks_support() -> None:
+    from unittest.mock import patch
+
+    from src.nli import NLIClient
+
+    client = NLIClient(threshold=0.4)
+    predictions = [
+        {"label": "entailment", "score": 0.45, "entailment_score": 0.45},
+        {"label": "contradiction", "score": 0.9, "entailment_score": 0.05},
+    ]
+    with patch.object(client, "_load"), patch.object(client, "_predict", side_effect=predictions):
+        client._model = object()
+        result = client.verify("Labor costs fell", ["labor passage", "conflicting passage"])
+
+    assert result["supported"] is False
+    assert result["verdict"] == "contradiction"
+
+
+def test_nli_eval_reports_false_accept_and_false_reject_separately() -> None:
+    from src.eval_nli_claims import summarize
+
+    rows = [
+        {"gold": "entailment", "predicted": "neutral"},
+        {"gold": "contradiction", "predicted": "entailment"},
+        {"gold": "neutral", "predicted": "neutral"},
+    ]
+    summary = summarize(rows)
+
+    assert summary["false_accept"] == 1
+    assert summary["false_reject"] == 1
+    assert summary["correct"] == 1
+
+
+def test_nli_eval_dataset_has_multiple_sectors_and_labels() -> None:
+    import json
+
+    from src.constants import SECTORS
+    from src.eval_nli_claims import DATASET
+
+    dataset = json.loads(DATASET.read_text(encoding="utf-8"))
+    cases = dataset["cases"]
+    assert len({SECTORS[case["ticker"]] for case in cases}) >= 4
+    assert {case["label"] for case in cases} == {"supported", "refuted", "not-enough-info"}
+    assert len({case["id"] for case in cases}) == len(cases)
+    assert {case["source"] for case in cases} == set(dataset["filings"])
+    assert all(url.startswith("https://www.sec.gov/Archives/edgar/data/")
+               for url in dataset["filings"].values())
+
+
+def test_sec_source_review_compares_indexed_text_with_original_html() -> None:
+    from src.review_nli_sources import passage_overlap
+
+    passage = "Labor costs decreased as a percentage of revenue due to restaurant wage inflation."
+    html = "<p>Labor costs decreased as a percentage of revenue due to restaurant wage inflation.</p>"
+
+    assert passage_overlap(passage, html) == (1, 1)
+    assert passage_overlap(passage, "<p>Unrelated text only.</p>") == (0, 1)
 
 
 def test_verify_claims_nli_calls_client() -> None:

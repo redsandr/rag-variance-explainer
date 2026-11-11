@@ -6,6 +6,7 @@ Phase 2: claim decomposition + NLI verification.
 import copy
 import json
 import logging
+import os
 from collections.abc import Sequence
 
 from pydantic import BaseModel, Field
@@ -111,6 +112,17 @@ def validate_answer(answer: StructuredAnswer, chunks: Sequence[dict]) -> list[st
         chunk_text = chunks[idx].get("text", "")
         if _normalize(claim.source_quote) not in _normalize(chunk_text):
             errors.append(f"Claim {i}: quote not found (fuzzy) in chunk {idx}")
+            if os.getenv("RAG_DIAGNOSTICS", "").lower() == "true":
+                quote = _normalize(claim.source_quote)
+                other_matches = [
+                    j for j, chunk in enumerate(chunks)
+                    if j != idx and quote and quote in _normalize(chunk.get("text", ""))
+                ]
+                logger.warning(
+                    "[RAG-DIAG] claim=%d cited_source=%d quote_chars=%d "
+                    "ellipsis=%s matches_other_sources=%s",
+                    i, idx, len(claim.source_quote), "..." in claim.source_quote, other_matches,
+                )
     return errors
 
 

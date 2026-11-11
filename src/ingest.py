@@ -252,18 +252,21 @@ def fetch_submissions(cik: str) -> dict:
 def list_10k_10q_filings(submissions: dict) -> list[dict]:
     """
     Extract just the 10-K/10-Q filings from a submissions payload,
-    as a list of {accessionNumber, form, filingDate, primaryDocument}.
+    Preserve the reporting period date when the SEC submissions data includes it.
     """
     recent = submissions["filings"]["recent"]
     results = []
     for i, form in enumerate(recent["form"]):
         if form in ("10-K", "10-Q"):
-            results.append({
+            filing = {
                 "accessionNumber": recent["accessionNumber"][i],
                 "form": form,
                 "filingDate": recent["filingDate"][i],
                 "primaryDocument": recent["primaryDocument"][i],
-            })
+            }
+            if recent.get("reportDate") and recent["reportDate"][i]:
+                filing["reportDate"] = recent["reportDate"][i]
+            results.append(filing)
     return results
 
 
