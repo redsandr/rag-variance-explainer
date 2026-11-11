@@ -1388,6 +1388,80 @@ def test_query_multi_keeps_multiple_periods_when_comparing_dates() -> None:
     assert {source["text"] for source in results} == {"2024", "2025"}
 
 
+def test_query_multi_allocates_evidence_to_each_explicit_company_and_period() -> None:
+    from unittest.mock import MagicMock, patch
+
+    from src.retrieval import query_multi
+
+    question = ("Compare Chipotle and Johnson & Johnson for the periods ended "
+                "June 30, 2024 and March 29, 2026, respectively")
+
+    def retrieve(_collection, _question, _lookup, _min_relevance, ticker_filter=None, report_period_end=None):
+        ticker = ticker_filter or "CMG"
+        period = report_period_end or "2025-06-30"
+        return [{"text": ticker, "metadata": {"ticker": ticker, "form": "10-Q",
+                "filing_date": "2024-07-25" if ticker == "CMG" else "2026-04-22",
+                "report_period_end": period, "accession_number": ticker}, "relevance": 0.8}]
+
+    with (
+        patch("src.retrieval._retrieve_dense", side_effect=retrieve),
+        patch("src.retrieval.config.hybrid_search_enabled", False),
+        patch("src.retrieval.config.cross_encoder_enabled", False),
+    ):
+        results = query_multi(MagicMock(), question, top_k=5)
+
+    assert {(row["metadata"]["ticker"], row["metadata"]["report_period_end"])
+            for row in results} == {("CMG", "2024-06-30"), ("JNJ", "2026-03-29")}
+
+
+def test_company_period_plan_requires_unambiguous_date_mapping() -> None:
+    from src.retrieval import _company_period_plan
+
+    assert _company_period_plan("Compare CMG and JNJ for June 30, 2024") == [
+        ("CMG", "2024-06-30"), ("JNJ", "2024-06-30")
+    ]
+    assert _company_period_plan("Compare CMG and JNJ for June 30, 2024 and March 29, 2026") == []
+    assert _company_period_plan("Compare costs of CMG in 2024") is None
+
+
+def test_query_multi_abstains_if_one_explicit_company_has_no_evidence() -> None:
+    from unittest.mock import MagicMock, patch
+
+    from src.retrieval import query_multi
+
+    def retrieve(_collection, _question, _lookup, _min_relevance, ticker_filter=None,
+                 report_period_end=None):
+        if ticker_filter == "JNJ":
+            return []
+        return [{"text": "CMG", "metadata": {"ticker": "CMG", "form": "10-Q",
+                "filing_date": "2024-07-25", "report_period_end": report_period_end},
+                "relevance": 0.8}]
+
+    with (
+        patch("src.retrieval._retrieve_dense", side_effect=retrieve),
+        patch("src.retrieval.config.hybrid_search_enabled", False),
+        patch("src.retrieval.config.cross_encoder_enabled", False),
+    ):
+        results = query_multi(MagicMock(), "Compare CMG and JNJ for June 30, 2024", top_k=5)
+
+    assert results == []
+
+
+def test_dense_retrieval_filters_company_and_period_before_ranking() -> None:
+    from unittest.mock import MagicMock, patch
+
+    from src.retrieval import _retrieve_dense
+
+    collection = MagicMock()
+    collection.query.return_value = {"documents": [[]], "metadatas": [[]], "distances": [[]]}
+    with patch("src.retrieval.embed_query", return_value=[0.1]):
+        _retrieve_dense(collection, "compare", "compare", 0.3, "JNJ", "2026-03-29")
+
+    assert collection.query.call_args.kwargs["where"] == {
+        "$and": [{"ticker": "JNJ"}, {"report_period_end": "2026-03-29"}]
+    }
+
+
 def test_report_date_keeps_one_filing_per_company() -> None:
     from src.retrieval import _filter_to_report_filing
 

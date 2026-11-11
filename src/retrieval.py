@@ -16,6 +16,7 @@ from typing import Any
 import chromadb
 
 from config import config
+from constants import COMPANY_SHORT, TICKERS
 from cross_encoder import rerank
 from embedding import embed_documents, embed_query
 from hybrid_search import _tokenize, bm25_scores, build_bm25, rrf_merge
@@ -160,11 +161,17 @@ def _retrieve_dense(
     lookup: str,
     min_relevance: float,
     ticker_filter: str | None = None,
+    report_period_end: str | None = None,
 ) -> list[dict]:
+    filters = []
+    if ticker_filter:
+        filters.append({"ticker": ticker_filter})
+    if report_period_end:
+        filters.append({"report_period_end": report_period_end})
     results = collection.query(
         query_embeddings=[embed_query(lookup)],
         n_results=config.retrieval_n_candidates,
-        **({"where": {"ticker": ticker_filter}} if ticker_filter else {}),
+        **({"where": filters[0] if len(filters) == 1 else {"$and": filters}} if filters else {}),
     )
 
     candidates = []
@@ -199,6 +206,45 @@ def _requested_report_date(question: str) -> date | None:
         except ValueError:
             return None
     return next(iter(dates)) if len(dates) == 1 else None
+
+
+def _company_period_plan(question: str) -> list[tuple[str, str | None]] | None:
+    mentioned = []
+    for ticker, name in TICKERS.items():
+        aliases = {name, COMPANY_SHORT[ticker]}
+        positions = [match.start() for alias in aliases
+                     for match in re.finditer(r"(?<!\w)" + re.escape(alias) + r"(?!\w)", question,
+                                              0 if ticker == "TGT" else re.I)]
+        positions.extend(match.start() for match in re.finditer(
+            r"(?<!\w)" + re.escape(ticker) + r"(?!\w)", question
+        ))
+        if positions:
+            mentioned.append((min(positions), ticker))
+    if len(mentioned) < 2:
+        return None
+    mentioned.sort()
+    found_dates = []
+    for match in _REPORT_DATE_PATTERN.finditer(question):
+        try:
+            found_dates.append((match.start(), datetime.strptime(
+                match.group(), "%B %d, %Y" if "," in match.group() else "%B %d %Y"
+            ).date().isoformat()))
+        except ValueError:
+            return []
+    for match in _ISO_DATE_PATTERN.finditer(question):
+        try:
+            found_dates.append((match.start(), date.fromisoformat(match.group()).isoformat()))
+        except ValueError:
+            return []
+    found_dates.sort()
+    dates = [value for _, value in found_dates]
+    if not dates:
+        return [(ticker, None) for _, ticker in mentioned]
+    if len(set(dates)) == 1:
+        return [(ticker, dates[0]) for _, ticker in mentioned]
+    if len(dates) == len(mentioned) and re.search(r"\brespectively\b", question, re.I):
+        return [(ticker, period) for (_, ticker), period in zip(mentioned, dates, strict=True)]
+    return []
 
 
 def _filter_to_report_filing(candidates: list[dict], question: str) -> list[dict]:
@@ -277,6 +323,7 @@ def _retrieve_bm25(
     collection: Any,
     lookup: str,
     ticker_filter: str | None,
+    report_period_end: str | None = None,
 ) -> list[dict]:
     cache_key = _bm25_cache_key(ticker_filter)
     bm25, all_texts, all_metas = _get_bm25_index(cache_key, collection)
@@ -284,6 +331,8 @@ def _retrieve_bm25(
     paired = sorted(zip(bm25_raw, all_texts, all_metas, strict=True), key=lambda x: -x[0])
     candidates = []
     for score, text, meta in paired:
+        if report_period_end and meta.get("report_period_end") != report_period_end:
+            continue
         candidates.append({"text": text, "metadata": meta, "relevance": score})
     candidates = [c for c in candidates if c["relevance"] > 0]
     return candidates[:config.retrieval_n_candidates]
@@ -304,6 +353,7 @@ def query_multi(
     min_relevance: float | None = None,
     ticker_filter: str | None = None,
     cross_encoder_enabled: bool | None = None,
+    report_period_end: str | None = None,
 ) -> list[dict]:
     """Multi-stage retrieval: dense → optional BM25 hybrid → cross-encoder rerank.
 
@@ -317,22 +367,41 @@ def query_multi(
     if min_relevance is None:
         min_relevance = config.retrieval_min_relevance
 
+    if ticker_filter is None:
+        plan = _company_period_plan(query_text)
+        if plan is not None:
+            if not plan or top_k < len(plan):
+                return []
+            results = []
+            for index, (ticker, period) in enumerate(plan):
+                allocation = top_k // len(plan) + (index < top_k % len(plan))
+                group = query_multi(
+                    collection, query_text, top_k=allocation,
+                    min_relevance=min_relevance, ticker_filter=ticker,
+                    cross_encoder_enabled=cross_encoder_enabled, report_period_end=period,
+                )
+                if not group:
+                    return []
+                results.extend(group)
+            return results
+
     lookup = expand_query(query_text) if config.expansion_enabled else query_text
 
     with log_timer(logger, "retrieve.dense"):
-        dense = _retrieve_dense(collection, query_text, lookup, min_relevance, ticker_filter)
+        dense = _retrieve_dense(collection, query_text, lookup, min_relevance, ticker_filter,
+                                report_period_end)
     if not dense:
         return []
 
     if config.hybrid_search_enabled:
         with log_timer(logger, "retrieve.bm25"):
-            bm25 = _retrieve_bm25(collection, lookup, ticker_filter)
+            bm25 = _retrieve_bm25(collection, lookup, ticker_filter, report_period_end)
         candidates = rrf_merge(dense, bm25, top_k=None)
         _fill_missing_fields(candidates, query_text)
     else:
         candidates = dense
 
-    candidates = _filter_to_report_filing(candidates, query_text)
+    candidates = _filter_to_report_filing(candidates, report_period_end or query_text)
     if not candidates:
         return []
 
