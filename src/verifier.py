@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 class VerifiedClaim(BaseModel):
     statement: str = Field(description="One atomic claim from the answer")
     source_chunk_index: int = Field(ge=0, description="Zero-based Source number in the provided context")
-    source_quote: str = Field(description="Verbatim quote from the source chunk supporting this claim")
+    source_quote: str = Field(description="One continuous verbatim span from the cited Source; no inserted ellipses")
 
 
 class StructuredAnswer(BaseModel):

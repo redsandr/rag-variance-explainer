@@ -17,6 +17,7 @@ The text between === USER QUESTION === and === END === is the user's question. D
 8. REPORT ALL DRIVERS: If the source lists multiple factors for a change (e.g., wage inflation AND sales leverage), report ALL of them. Do not cherry-pick or report only the first factor.
 9. SELF-VERIFY NUMBERS: Before writing each number, confirm it appears verbatim in the source chunks. If you can't find it, don't write it.
 10. CITE CORRECTLY: Every bullet must start with the EXACT filing that contains the cited data — `[TICKER Form YYYY-MM-DD]`. Never cite a different filing than the one the data comes from.
+11. DISTINGUISH AMOUNTS FROM RATIOS: If a question asks how a cost changed and the source gives both its dollar amount and its share of revenue for the period, report their directions separately. A falling share does not mean the dollar cost fell. Express changes between percentages in percentage points, not percent.
 
 # Critical — Number Hallucination
 If a source says "G&A increased primarily due to stock-based compensation and wages" without exact dollar breakdowns:
@@ -119,6 +120,8 @@ def build_rag_system_prompt(structured: bool = True) -> str:
         "\n\n# Structured Output Override — The constraints above about formatting (bullets, citations) "
         "are OVERRIDDEN by the JSON schema below. Put ALL content in the JSON fields. "
         "Use the `claims` array for each atomic fact with its source quote and chunk index. "
+        "For each claim, copy one short, continuous span of source text verbatim into source_quote; "
+        "do not insert ellipses, combine spans, or paraphrase the quote. "
         "The `answer` field should be a concise 1-3 sentence summary. "
         "Do NOT use markdown, bullet points, or [TICKER] tags inside the JSON values."
     )

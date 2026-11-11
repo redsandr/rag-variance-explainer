@@ -76,6 +76,24 @@ def test_context_uses_the_same_zero_based_source_indexes_as_claims() -> None:
     assert context.index("[Source 0") < context.index("[Source 1")
 
 
+def test_rag_prompt_distinguishes_cost_amount_from_revenue_share() -> None:
+    from src.prompts import build_rag_system_prompt
+
+    for structured in (True, False):
+        prompt = build_rag_system_prompt(structured=structured)
+        assert "report their directions separately" in prompt
+        assert "A falling share does not mean the dollar cost fell" in prompt
+        assert "percentage points, not percent" in prompt
+
+
+def test_structured_rag_prompt_requires_contiguous_verbatim_quotes() -> None:
+    from src.prompts import build_rag_system_prompt
+
+    prompt = build_rag_system_prompt(structured=True)
+    assert "one short, continuous span of source text verbatim" in prompt
+    assert "do not insert ellipses, combine spans" in prompt
+
+
 def test_generation_prompt_exposes_claim_source_indexes_to_model() -> None:
     from unittest.mock import MagicMock, patch
 

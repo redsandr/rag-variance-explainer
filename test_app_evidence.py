@@ -113,3 +113,4 @@ def test_failed_quote_validation_hides_generated_financial_claim() -> None:
     assert "Revenue grew 25%" not in text
     assert "I cannot verify the generated claims" in text
     assert "Quote matched in retrieved text" not in text
+    assert "Validation: Quote not found" in "\n".join(item.value for item in app.text)

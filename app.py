@@ -126,6 +126,8 @@ def _render_result(result: dict, heading: str = "Research finding") -> None:
         st.markdown('<span class="evidence-status unverified">No checked quote</span>', unsafe_allow_html=True)
         if result.get("verification_errors"):
             st.warning("The generated claims did not match their cited passages. No sourced finding is shown.")
+            for error in result["verification_errors"]:
+                st.text(f"Validation: {error}")
 
     answer = ("I cannot verify the generated claims against the retrieved SEC filing excerpts."
               if result.get("verification_errors") else result["answer"])
