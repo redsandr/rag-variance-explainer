@@ -124,6 +124,8 @@ def _render_result(result: dict, heading: str = "Research finding") -> None:
         st.markdown('<span class="evidence-status">Quote matched in retrieved text</span>', unsafe_allow_html=True)
     else:
         st.markdown('<span class="evidence-status unverified">No checked quote</span>', unsafe_allow_html=True)
+        if result.get("structured_failure_reason") == "output_limit":
+            st.warning("The model reached its answer-token limit. The partial response was not shown as a finding.")
         if result.get("verification_errors"):
             st.warning("The generated claims did not match their cited passages. No sourced finding is shown.")
             for error in result["verification_errors"]:

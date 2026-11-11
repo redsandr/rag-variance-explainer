@@ -114,3 +114,22 @@ def test_failed_quote_validation_hides_generated_financial_claim() -> None:
     assert "I cannot verify the generated claims" in text
     assert "Quote matched in retrieved text" not in text
     assert "Validation: Quote not found" in "\n".join(item.value for item in app.text)
+
+
+def test_output_limit_displays_actionable_notice() -> None:
+    app = AppTest.from_file(str(APP), default_timeout=35)
+    app.session_state["last_result"] = {
+        "compare": False,
+        "answer": "The model reached its 2048-token output limit before completing a verified answer.",
+        "structured_fallback": True,
+        "structured_failure_reason": "output_limit",
+        "claims": [],
+        "sources": [],
+    }
+    app.run()
+
+    assert not app.exception
+    text = "\n".join(item.value for item in app.markdown)
+    assert "2048-token output limit" in text
+    assert "Quote matched in retrieved text" not in text
+    assert "answer-token limit" in "\n".join(item.value for item in app.warning)

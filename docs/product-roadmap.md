@@ -1,6 +1,6 @@
 # Active product roadmap
 
-Updated: 2026-11-10. This document describes the **target**, not shipped capabilities. The repository root is the code and documentation source of truth; the separate `Documents/portofolio 2/Project 2` vault points here. Older numbered notes are history, not release evidence.
+Updated: 2026-11-11. This document describes the **target**, not shipped capabilities. The repository root is the code and documentation source of truth; the separate `Documents/portofolio 2/Project 2` vault points here. Older numbered notes are history, not release evidence.
 
 ## Product and user
 
@@ -12,14 +12,14 @@ Initial scope: US public companies with reviewed SEC 10-K/10-Q coverage; English
 
 - Local SEC ingestion and Chroma index, Streamlit UI, REST API, and a local MCP server (`src/server.py`). These surfaces do not yet share a reviewed production-grade answer contract.
 - Quote-to-retrieved-chunk checking can refuse unsourced generated text. It does not prove causation, arithmetic, or fidelity to the original filing.
-- Local Docker llama.cpp backend can serve the existing 7B model. A separate Qwen3-8B TurboQuant candidate answered a few synthetic checks correctly, and its `q8_0/turbo3` KV-cache allocation appeared in startup logs. General answer quality and comparative performance remain unverified. See [the local iteration record](qwen3-8b-turboquant-iteration.md). Keep baseline and candidate configurations separate.
+- The operator has run an official CUDA Qwen3-8B container for local SEC question tests. Some CMG/JNJ runs produced correctly matched quotes, but the CMG answer omitted a relevant nominal-cost change. Single runs and throughput numbers do not establish general answer quality; keep the historical 7B and TurboQuant experiments separate. See [the case record](cmg-jnj-amount-vs-ratio-case.md) and [local iteration record](qwen3-8b-turboquant-iteration.md).
 - No general user-PDF ingestion, live news retrieval, hosted multi-user isolation, or Agensi publication has been verified. See [readiness](14.%20GitHub%20Readiness.md) for recorded checks.
 
 ## Delivery order and gates
 
 ### 1. Reliable SEC research core
 
-Reproduce the failed Chipotle question: record the retrieved passages, generated claims and rejected quotes without treating model output as verified. Establish a versioned, human-reviewed set of questions covering revenue versus income versus margin, period comparisons, numerical checks, unsupported causes, and abstention. Rebuild a small index with source URLs; manually compare one complete result with the original SEC filing. Record model, index version, prompt, configuration, latency and per-question outcomes. Fail closed on parse and quote errors; independently review causal and numerical claims.
+Record retrieved passages, generated claims and rejected quotes without treating model output as verified. Establish a versioned, human-reviewed set covering revenue versus income versus margin, period comparisons, numerical checks, unsupported causes, and abstention. The local legacy index was metadata-migrated to include filing links; preserve it and its backup, and check at least one complete answer against its original SEC filing. Record model, index version, prompt, configuration, latency and per-question outcomes. Fail closed on parse and quote errors; independently review causal and numerical claims.
 
 **Gate:** at least one recorded end-to-end filing-backed case through UI, API and MCP, plus documented failures and regression tests. This is a development milestone, not a production-readiness claim.
 
@@ -49,6 +49,6 @@ Refactor only after the answer/evidence contract is stable. Make Streamlit a cle
 
 ## Immediate next actions
 
-1. Continue the [Qwen3-8B TurboQuant iteration](qwen3-8b-turboquant-iteration.md): expand the reviewed quality set and run matched repeated benchmarks. Compare the 8B candidate with an 8B control before drawing cache-specific conclusions. Record the separate 7B baseline on identical product workloads. Do not infer answer quality from token speed.
-2. Capture a reproducible failing Chipotle retrieval/generation case and fix the first unsupported step, keeping fail-closed behavior.
-3. Define the smallest reviewed filing-backed analyst case and run it through all three current surfaces before adding news or PDF upload.
+1. Follow the [six-case operator runbook](demo-review-runbook.md) on the current local SEC index. Record full outputs and human-review source relevance, quotes, numeric units, period, causality and completeness against linked original filings. Do not tune the app to pass these questions individually.
+2. Publish only approved filing-backed examples on the landing. Keep the other candidate results, including refusals and misleading answers, in a dated evaluation record rather than presenting them as success rates.
+3. Confirm at least one approved case through UI, API and MCP, then test a clean setup. Evaluate independent holdout questions before making general answer-quality claims. Consider private-PDF support only after its separate provenance, isolation and retention requirements are designed.

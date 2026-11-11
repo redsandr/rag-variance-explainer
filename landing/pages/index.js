@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import { motion, useReducedMotion } from 'framer-motion';
 import ExampleWalkthrough from '../components/ExampleWalkthrough';
 import SiteLayout, { ArrowIcon, repositoryUrl } from '../components/SiteLayout';
 
@@ -10,6 +11,7 @@ const questions = [
 ];
 
 export default function Home() {
+  const reducedMotion = useReducedMotion();
   return <SiteLayout active="home">
     <Head>
       <title>Variance Explainer | Understand what changed in SEC filings</title>
@@ -23,14 +25,16 @@ export default function Home() {
         <div className="home-hero-actions"><a className="primary-action" href="/example">Explore the example <ArrowIcon /></a><a className="secondary-action" href="/method">See how it works <ArrowIcon /></a></div>
         <p className="home-hero-context">SEC 10-K / 10-Q research <span aria-hidden="true">·</span> Local prototype <span aria-hidden="true">·</span> Not investment advice</p>
       </div>
-      <div className="home-preview" aria-label="Illustrative evidence workpaper with no published financial answer">
+      <motion.div className="home-preview" aria-label="Illustrative evidence workpaper with no published financial answer"
+        initial={reducedMotion ? false : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}>
         <div className="home-preview-top"><span>Variance / research note</span><span>Illustrative layout</span></div>
         <div className="home-preview-question"><span>Ask the filing</span><strong>Why did this metric change?</strong></div>
         <div className="home-preview-record"><span>01 / Proposed explanation</span><strong>Awaiting reviewed case</strong><p>No financial conclusion is published here without filing review.</p></div>
         <div className="home-preview-row"><span>02 / Exact passage</span><strong>Not published</strong></div>
         <div className="home-preview-row"><span>03 / Original filing</span><strong>Review pending</strong></div>
         <div className="home-preview-bottom"><span className="home-preview-pulse" aria-hidden="true" /> Evidence status is visible before any answer</div>
-      </div>
+      </motion.div>
     </section>
 
     <section className="home-intro wrap" aria-labelledby="home-intro-title">

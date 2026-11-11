@@ -6,6 +6,8 @@ For the intended analyst decision workflow, planned news and private financial-P
 
 This is a research prototype. A source quote match confirms that the quoted text exists in a retrieved passage. It does not independently prove a causal explanation, a computed number, or investment suitability. Review the cited filing before relying on an answer.
 
+**Portfolio demo work:** follow the [operator runbook](docs/demo-review-runbook.md) for six varied candidate questions, complete Docker/Streamlit startup commands, what to capture, and the original-filing review gate. These are research questions, not hard-coded answers; no candidate is approved for public display merely because a quote matches. The public landing remains illustrative until a case passes review.
+
 ## Run locally
 
 Use Python 3.11, enough disk space for model downloads and an index, and an internet connection to fetch SEC filings and embedding models. Set a descriptive `SEC_USER_AGENT` with your name and contact email. SEC requests fail with a clear error when it is missing. No hosted demo or prebuilt index is required.
@@ -41,6 +43,8 @@ Edit `.env` and set `SEC_USER_AGENT` to your name and contact email, for example
 
 The embedding and cross-encoder devices default to CPU. Set `EMBEDDING_DEVICE=cuda` and `RAG_CROSS_ENCODER_DEVICE=cuda` only when your PyTorch installation supports your NVIDIA GPU.
 
+If you already have the working local Qwen3-8B CUDA container named `rve-official-8b-rag-34l`, use the [operator runbook](docs/demo-review-runbook.md) instead of the separate 7B launcher above. The container name and model ID in that runbook describe this operator's environment, not a downloadable part of this repository.
+
 Build the index and start the UI from the repository root:
 
 ```bash
@@ -75,6 +79,8 @@ See [architecture and failure behavior](docs/architecture.md) for the index upda
 
 If structured output cannot be parsed or its quotes do not match the retrieved passages, the app refuses to present the model text as a sourced answer. Optional NLI verification is disabled by default (`RAG_NLI_ENABLED=false`) pending independent evaluation. The experimental execution of LLM-generated arithmetic code was removed from the application path.
 
+When a Chat Completions response reports that its **output-token limit** was reached, Streamlit shows a warning instead of presenting incomplete JSON as a finding. The configured output ceiling is 4,096 tokens (`RAG_LLM_MAX_TOKENS`); this is an output cap, not a guarantee that it fits the server's context alongside the prompt. If the server reports a context-window error, reduce the limit or passages before retrying. See [the budget and SEC archive note](docs/output-budget-and-sec-archives.md). The app keeps only the latest answer in the current Streamlit session; it does not save a query history.
+
 ## Published research results
 
 The earlier evaluation used 40 questions across seven companies. The reported full-pipeline retrieval recall@10 was **0.81** and mean reciprocal rank was **0.54**. The reported cross-sector answer faithfulness was **68.85% strict** and **79.51% weighted** after tuning. These are historical results from a particular index, model, configuration, and LLM-judge method. They have not been reproduced on the current working tree and do not measure production reliability. No fully human-labeled faithfulness set is available. See [dataset notes](docs/dataset.md) and [evaluation notes](docs/README.md) for methodology.
@@ -86,6 +92,8 @@ Install development tools with `python -m pip install -e ".[dev]"`, then run `py
 ## Development status
 
 The next release gate is a clean-clone setup on Windows and Linux, followed by a versioned evaluation with per-question results and human review of unsupported claims. Keep the package local until those gates pass. The agent skill in `.opencode/skills/rag-finance` currently assumes this repository's MCP server is already installed; it is not a standalone marketplace product.
+
+The current app **does not accept uploaded PDFs**. See the [product roadmap](docs/product-roadmap.md) for the separate, unimplemented private-document workflow and security requirements. The website's workpaper is illustrative; it is not a hosted SEC question-answering service.
 
 ## License
 

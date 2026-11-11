@@ -10,7 +10,7 @@ from collections.abc import Callable
 from typing import Any
 
 from config import config
-from llm import LLMClient
+from llm import LLMClient, OutputLimitError
 from logging_config import log_timer
 from post_process import verify_answer_llm
 from prompts import build_rag_system_prompt
@@ -162,13 +162,26 @@ def answer_question(
         schema = get_structured_schema()
         response_format = {"type": "json_object", "schema": schema}
         with log_timer(logger, "rag.generate"):
-            answer = llm.generate(
-                prompt,
-                system=system_prompt,
-                max_tokens=config.llm_max_tokens,
-                temperature=config.llm_temperature,
-                response_format=response_format,
-            )
+            try:
+                answer = llm.generate(
+                    prompt,
+                    system=system_prompt,
+                    max_tokens=config.llm_max_tokens,
+                    temperature=config.llm_temperature,
+                    response_format=response_format,
+                )
+            except OutputLimitError:
+                return {
+                    "question": question,
+                    "answer": (f"The model reached its {config.llm_max_tokens}-token output limit before completing "
+                               "a verified answer. No sourced finding is shown. Review the source passages or "
+                               "narrow the question to one reporting period."),
+                    "sources": results,
+                    "structured_fallback": True,
+                    "structured_failure_reason": "output_limit",
+                    "claims": [],
+                    "verification_errors": [],
+                }
 
         parsed = parse_answer(answer)
         if parsed is not None and parsed.can_answer:

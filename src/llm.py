@@ -22,6 +22,11 @@ from logging_config import log_timer
 
 logger = logging.getLogger(__name__)
 
+
+class OutputLimitError(ValueError):
+    """The model stopped before completing its answer due to the output budget."""
+
+
 _LLM_TIMEOUT = int(os.getenv("LLM_TIMEOUT", "120"))
 _LLAMA_SERVER_TIMEOUT = int(os.getenv("LLAMA_SERVER_TIMEOUT", "300"))
 _MAX_CONCURRENT = int(os.getenv("LLM_MAX_CONCURRENT", "1"))
@@ -40,7 +45,9 @@ def _retry(max_attempts: int = 3, base_delay: float = 2.0):
                 except Exception as e:
                     last_exc = e
                     status_code = getattr(e, "status_code", None)
-                    if (isinstance(status_code, int) and 400 <= status_code < 500 and status_code != 429) or (
+                    if isinstance(e, OutputLimitError) or (
+                        isinstance(status_code, int) and 400 <= status_code < 500 and status_code != 429
+                    ) or (
                         isinstance(e, ValueError) and "exceed context window" in str(e)
                     ):
                         raise
@@ -247,6 +254,8 @@ class LLMClient:
         if response_format is not None:
             kwargs["response_format"] = response_format
         output = self._llm.create_chat_completion(**kwargs)
+        if output["choices"][0].get("finish_reason") == "length":
+            raise OutputLimitError(f"Generated answer reached the {max_tokens}-token output limit")
         return output["choices"][0]["message"]["content"].strip()
 
     def _generate_anthropic(self, prompt: str, system: str | None, max_tokens: int) -> str:
@@ -268,4 +277,6 @@ class LLMClient:
         if response_format is not None:
             kwargs["response_format"] = response_format
         response = self._client.chat.completions.create(**kwargs)
+        if response.choices[0].finish_reason == "length":
+            raise OutputLimitError(f"Generated answer reached the {max_tokens}-token output limit")
         return response.choices[0].message.content.strip()

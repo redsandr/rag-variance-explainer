@@ -1999,6 +1999,32 @@ def test_fallback_answer_refuses_unparsed_model_text() -> None:
     assert result["verification_errors"] == []
 
 
+def test_output_limit_refuses_partial_answer_without_second_llm_call() -> None:
+    from unittest.mock import MagicMock, patch
+
+    from llm import OutputLimitError
+    from src.rag import answer_question
+
+    llm = MagicMock()
+    llm.generate.side_effect = OutputLimitError("Generated answer reached the 2048-token output limit")
+    sources = [{"text": "Labor costs increased.", "metadata": {"ticker": "CMG", "form": "10-Q",
+                                                               "filing_date": "2024-07-25"}}]
+    with (
+        patch("src.rag.get_client"),
+        patch("src.rag.get_collection"),
+        patch("src.rag.query_multi", return_value=sources),
+        patch("src.rag.verify_answer_llm") as verifier,
+    ):
+        result = answer_question("How did costs change?", llm=llm)
+
+    assert result["structured_failure_reason"] == "output_limit"
+    assert "output limit" in result["answer"]
+    assert result["sources"] == sources
+    assert result["claims"] == []
+    llm.generate.assert_called_once()
+    verifier.assert_not_called()
+
+
 def test_fallback_answer_marks_empty_response() -> None:
     from src.verifier import fallback_answer
 
